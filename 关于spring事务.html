@@ -7,12 +7,12 @@
   
   <title>Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="test2 title 测试…">
+  <meta name="description" content="https:&#x2F;&#x2F;my.oschina.net&#x2F;u&#x2F;4579410&#x2F;blog&#x2F;4525713 看完这个明白的 想想aop， 犯的错：  在一个serviceA的非事务方法中调用 this.func2()   func2是个事务方法， func2中调用了 serviceB的func1()  serviceB.func1() 是事务方法   结果：    在serviceB.func1()最后抛异常，">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Hexo">
-<meta property="og:url" content="https://melopoz.github.io/test2.html">
+<meta property="og:url" content="https://melopoz.github.io/%E5%85%B3%E4%BA%8Espring%E4%BA%8B%E5%8A%A1.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="test2 title 测试…">
+<meta property="og:description" content="https:&#x2F;&#x2F;my.oschina.net&#x2F;u&#x2F;4579410&#x2F;blog&#x2F;4525713 看完这个明白的 想想aop， 犯的错：  在一个serviceA的非事务方法中调用 this.func2()   func2是个事务方法， func2中调用了 serviceB的func1()  serviceB.func1() 是事务方法   结果：    在serviceB.func1()最后抛异常，">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-11-11T16:07:46.137Z">
 <meta property="article:modified_time" content="2020-11-11T16:07:46.137Z">
@@ -68,7 +68,7 @@
       <div class="outer">
         <section id="main"><article id="page-" class="article article-type-page" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/blog/test2.html" class="article-date">
+    <a href="/blog/%E5%85%B3%E4%BA%8Espring%E4%BA%8B%E5%8A%A1.html" class="article-date">
   <time datetime="2020-11-11T16:07:46.137Z" itemprop="datePublished">2020-11-11</time>
 </a>
     
@@ -78,12 +78,24 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="test2-title"><a href="#test2-title" class="headerlink" title="test2 title"></a>test2 title</h1><p> 测试… </p>
+        <p><a target="_blank" rel="noopener" href="https://my.oschina.net/u/4579410/blog/4525713">https://my.oschina.net/u/4579410/blog/4525713</a></p>
+<p>看完这个明白的</p>
+<p>想想aop，</p>
+<p>犯的错：</p>
+<blockquote>
+<p>在一个serviceA的非事务方法中调用 this.func2()   func2是个事务方法，</p>
+<p>func2中调用了 serviceB的func1()  serviceB.func1() 是事务方法</p>
+</blockquote>
+<blockquote>
+<p>结果：    在serviceB.func1()最后抛异常， serviceB回滚了  serviceA.func2()的数据落库了。。</p>
+</blockquote>
+<p>原理 ：</p>
+<p>在serviceA的代理对象的调用过程中，serviceA的方法内部调用了本service的方法，aop只在 最外层的方法（serviceA.func1）进行了增强，也就是 事务开启和回滚都应该加在这里，但是serviceA.func1 没有@Transaction。。。所以 serviceA.func2() 的声明式事务并没有生效。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://melopoz.github.io/test2.html" data-id="ckhdlkn7j0000zwqw3ma18mpv" class="article-share-link">Share</a>
+      <a data-url="https://melopoz.github.io/%E5%85%B3%E4%BA%8Espring%E4%BA%8B%E5%8A%A1.html" data-id="ckhdlkn7o0002zwqwcfl6bo9d" class="article-share-link">Share</a>
       
       
     </footer>

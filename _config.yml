@@ -3,11 +3,18 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
-subtitle: ''
+# title: Hexo
+# subtitle: ''
+# description: ''
+# keywords:
+# author: John Doe
+# language: zh-CN
+# timezone: ''
+title: 你不喜欢孤独 那就别停下来
+subtitle: '你不喜欢孤独 那就别停下来'
 description: ''
 keywords:
-author: John Doe
+author: melopoz
 language: zh-CN
 timezone: ''
 

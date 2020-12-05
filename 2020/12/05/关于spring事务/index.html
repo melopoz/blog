@@ -17,7 +17,7 @@
   <meta name="description" content="">
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
-  <title>Hello World - Hexo</title>
+  <title>Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
 
@@ -162,7 +162,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="Hello World">
+            <span class="h2" id="subtitle" title="">
               
             </span>
 
@@ -172,8 +172,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2020-11-18 14:01" pubdate>
-        2020年11月18日 下午
+      <time datetime="2020-12-05 04:24" pubdate>
+        2020年12月5日 凌晨
       </time>
     </span>
   
@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      75 字
+      166 字
     </span>
   
 
@@ -224,22 +224,22 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">Hello World</h1>
+            <h1 style="display: none"></h1>
             
             <div class="markdown-body">
-              <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><pre><code class="hljs bash">$ hexo new <span class="hljs-string">&quot;My New Post&quot;</span></code></pre>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><pre><code class="hljs bash">$ hexo server</code></pre>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><pre><code class="hljs bash">$ hexo generate</code></pre>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><pre><code class="hljs bash">$ hexo deploy</code></pre>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+              <h1 id="关于Spring事务"><a href="#关于Spring事务" class="headerlink" title="关于Spring事务"></a>关于Spring事务</h1><p><a target="_blank" rel="noopener" href="https://my.oschina.net/u/4579410/blog/4525713">https://my.oschina.net/u/4579410/blog/4525713</a></p>
+<p>看完这个明白的</p>
+<p>想想aop，</p>
+<p>犯的错：</p>
+<blockquote>
+<p>在一个serviceA的非事务方法中调用 this.func2()   func2是个事务方法，</p>
+<p>func2中调用了 serviceB的func1()  serviceB.func1() 是事务方法</p>
+</blockquote>
+<blockquote>
+<p>结果：    在serviceB.func1()最后抛异常， serviceB回滚了  serviceA.func2()的数据落库了。。</p>
+</blockquote>
+<p>原理 ：</p>
+<p>在serviceA的代理对象的调用过程中，serviceA的方法内部调用了本service的方法，aop只在 最外层的方法（serviceA.func1）进行了增强，也就是 事务开启和回滚都应该加在这里，但是serviceA.func1 没有@Transaction。。。所以 serviceA.func2() 的声明式事务并没有生效。</p>
 
             </div>
             <hr>
@@ -256,12 +256,18 @@
                   <article class="post-prev col-6">
                     
                     
+                      <a href="/blog/2020/12/05/hello-world/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Hello World</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/blog/2020/11/18/%E5%85%B3%E4%BA%8Espring%E4%BA%8B%E5%8A%A1/">
-                        <span class="hidden-mobile"></span>
+                      <a href="/blog/2020/10/25/test1/">
+                        <span class="hidden-mobile">test1</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

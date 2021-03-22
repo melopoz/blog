@@ -17,9 +17,25 @@
   <meta name="description" content="">
   <meta name="author" content="melopoz">
   <meta name="keywords" content="">
-  <title>分类 - 你不喜欢孤独 那就别停下来</title>
+  <title>你不喜欢孤独 那就别停下来</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/blog/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.1.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+  
 
 
 
@@ -47,7 +63,7 @@
 
 
 <body>
-  <header style="height: 60vh;">
+  <header style="height: 70vh;">
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand"
@@ -146,9 +162,46 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="分类">
+            <span class="h2" id="subtitle" title="">
               
             </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-03-22 13:35" pubdate>
+        2021年3月22日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      459 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      6
+       分钟
+    </span>
+  
+
+  
+  
+</div>
 
             
           </div>
@@ -161,33 +214,118 @@
 
   <main>
     
-      <div class="container nopadding-md">
-        <div class="py-5" id="board"
-          >
-          
-          <div class="container">
-            <div class="row">
-              <div class="col-12 col-md-10 m-auto">
-                
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none"></h1>
+            
+            <div class="markdown-body">
+              <h5 id="初始化成git仓库"><a href="#初始化成git仓库" class="headerlink" title="初始化成git仓库"></a>初始化成git仓库</h5><p><code>git init</code></p>
+<h5 id="绑定到远程仓库"><a href="#绑定到远程仓库" class="headerlink" title="绑定到远程仓库"></a>绑定到远程仓库</h5><p><code>git remote add origin https://xxx.git</code></p>
+<h5 id="第一次push-的时候携带的参数"><a href="#第一次push-的时候携带的参数" class="headerlink" title="第一次push 的时候携带的参数"></a>第一次push 的时候携带的参数</h5><p><code>git push -u origin master</code></p>
+<h2 id="revert"><a href="#revert" class="headerlink" title="revert"></a>revert</h2><p><code>git revert HEAD^</code>  <code>git revert HEAD^^</code>  <code>git revert HEAD~3</code>   一个^就是前1次commit </p>
+<p><code>git revert &lt;commitId&gt;</code>  revert 到指定的commit版本</p>
+<p>会再生成一次commit，并且当前代码和指定的那次commit的代码一致。</p>
+<h2 id="reset"><a href="#reset" class="headerlink" title="reset"></a>reset</h2><p>用<code>reset</code>回滚，参数：</p>
+<blockquote>
+<ul>
+<li>git reset –soft                          保留工作目录，并把新的全部差异放进暂存区</li>
+</ul>
+<blockquote>
+<p>原节点和Reset节点之间的所有差异都会放到暂存区中</p>
+</blockquote>
+<ul>
+<li><p>git reset (git reset –mixed)    保留工作目录，清空暂存区</p>
+</li>
+<li><p>git reset –hard                         清空工作目录，清空暂存区，全部和git log 中的上n次commit内容相同</p>
+<blockquote>
+<p>然后push的话会报错，‘必须先pull’ 才能push， 但是pull，会把刚才回退的commit又带出来，所以得 push -f   （强制）</p>
+</blockquote>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p> soft 和 mixed 区别应该就是 mixed 不需要再手动 add 而 soft 需要自己再手动 add 然后 commit。</p>
+</blockquote>
+<h2 id="修改commit的msg"><a href="#修改commit的msg" class="headerlink" title="修改commit的msg"></a>修改commit的msg</h2><p><code>git commit --amend</code><br>会进入vim，修改保存就行了</p>
+<h3 id="如果commit已经被覆盖"><a href="#如果commit已经被覆盖" class="headerlink" title="如果commit已经被覆盖"></a>如果commit已经被覆盖</h3><p><code>git rebase -i HEAD^</code> </p>
+<p><code>git rebase -i HEAD~n</code> n是逆推几次</p>
+<pre><code class="hljs awk">pick <span class="hljs-number">07</span>bca843 添加 广告线索来源构成分析、概览 接口 <span class="hljs-regexp">/source-ad/</span>constitute、<span class="hljs-regexp">/source-ad/</span>list
+pick <span class="hljs-number">67</span>d1e638 移除<span class="hljs-regexp">/income/</span>top</code></pre>
+<p>将开头的pick修改为edit就可以编辑了<br>然后git会提示</p>
+<pre><code class="hljs sql">You can amend the <span class="hljs-keyword">commit</span> now, <span class="hljs-keyword">with</span>
+  git <span class="hljs-keyword">commit</span> <span class="hljs-comment">--amend</span>
+Once you <span class="hljs-keyword">are</span> satisfied <span class="hljs-keyword">with</span> your changes, run
+  git rebase <span class="hljs-comment">--continue</span></code></pre>
+<p><code>git commit --amend</code> 进入修改<br>完事continue rebase 即可<br><code>git rebase --continue</code></p>
+<p>​             </p>
+<h2 id="git-diff"><a href="#git-diff" class="headerlink" title="git diff"></a>git diff</h2><p><code>git diff --cached</code> 查看本地分支和当前代码的区别</p>
+<h2 id="统计git-log"><a href="#统计git-log" class="headerlink" title="统计git log"></a>统计git log</h2><pre><code class="hljs apache"><span class="hljs-attribute">git</span> log --author=<span class="hljs-string">&quot;$(git config --get user.name)&quot;</span> --since=<span class="hljs-number">2021</span>-<span class="hljs-number">01</span>-<span class="hljs-number">01</span> --until=<span class="hljs-number">2021</span>-<span class="hljs-number">03</span>-<span class="hljs-number">30</span> --pretty=tformat: --numstat | gawk &#x27;&#123; add += $<span class="hljs-number">1</span> ; subs += $<span class="hljs-number">2</span> ; loc += $<span class="hljs-number">1</span> - $<span class="hljs-number">2</span> &#125; END &#123; printf <span class="hljs-string">&quot;增加的行数:%s 删除的行数:%s 总行数: %s\n&quot;</span>,add,subs,loc &#125;&#x27;</code></pre>
 
 
-
-
-
-
-
-<div class="category-list">
-  
-  
-  
-  
-</div>
-
-              </div>
             </div>
-          </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2021/03/22/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2021/03/22/hadoop/">
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
         </div>
       </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
     
 
     
@@ -270,9 +408,15 @@
 
 
 
+  <script  src="https://cdn.staticfile.org/tocbot/4.12.0/tocbot.min.js" ></script>
 
 
 
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.3.0/anchor.min.js" ></script>
 
 
 

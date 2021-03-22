@@ -17,9 +17,25 @@
   <meta name="description" content="">
   <meta name="author" content="melopoz">
   <meta name="keywords" content="">
-  <title>分类 - 你不喜欢孤独 那就别停下来</title>
+  <title>你不喜欢孤独 那就别停下来</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/blog/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.1.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+  
 
 
 
@@ -47,7 +63,7 @@
 
 
 <body>
-  <header style="height: 60vh;">
+  <header style="height: 70vh;">
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand"
@@ -146,9 +162,46 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="分类">
+            <span class="h2" id="subtitle" title="">
               
             </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-03-22 13:35" pubdate>
+        2021年3月22日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      538 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      5
+       分钟
+    </span>
+  
+
+  
+  
+</div>
 
             
           </div>
@@ -161,33 +214,102 @@
 
   <main>
     
-      <div class="container nopadding-md">
-        <div class="py-5" id="board"
-          >
-          
-          <div class="container">
-            <div class="row">
-              <div class="col-12 col-md-10 m-auto">
-                
+      
 
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none"></h1>
+            
+            <div class="markdown-body">
+              <p>如何保证幂等性</p>
+<ol>
+<li><p>在数据库利用唯一索引。</p>
+<blockquote>
+<p>比如生成订单的时候，不能因为网络延迟而创建两次这个订单，所以可以根据这个订单的唯一id。</p>
+<p>第一个 insert 执行之后已经有了这个订单，下次 insert 的时候会报错，可以直接 try-catch 这个异常，在catch中 select by id 查询这个订单，查询到的结果也就是 insert 的期望结果了。</p>
+</blockquote>
+<blockquote>
+<p>不过要利用这个唯一索引的话，订单的 id 肯定是要相同的生成策略，比如使用相同算法生成，重复生成这个订单的时候，算法入参也是相同的，才能得到相同的订单id。比如根据用户id等等。</p>
+</blockquote>
+<blockquote>
+<p>或者使用 唯一组合索引来创建。</p>
+</blockquote>
+</li>
+<li><p>session-token 来防止表单重复提交</p>
+<blockquote>
+<p>前段生成表单之前先从后端得到一个 form-token ，请求到后端之后，后端先对这个token进行验证，然后修改session中的token。这样重复提交的表单所携带的token就会是无效的token。</p>
+</blockquote>
+</li>
+<li><p>对外提供幂等接口</p>
+<blockquote>
+<p>10、对外提供接口的api如何保证幂等<br>如银联提供的付款接口：需要接入商户提交付款请求时附带：source来源，seq序列号；source+seq在数据库里面做唯一索引，防止多次付款(并发时，只能处理一个请求) 。<br>重点：对外提供接口为了支持幂等调用，接口有两个字段必须传，一个是来源source，一个是来源方序列号seq，这个两个字段在提供方系统里面做联合唯一索引，这样当第三方调用时，先在本方系统里面查询一下，是否已经处理过，返回相应处理结果；没有处理过，进行相应处理，返回结果。注意，为了幂等友好，一定要先查询一下，是否处理过该笔业务，不查询直接插入业务系统，会报错，但实际已经处理了。</p>
+</blockquote>
+</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/linjiqin/p/9678022.html">https://www.cnblogs.com/linjiqin/p/9678022.html</a></p>
 
-
-
-
-
-
-<div class="category-list">
-  
-  
-  
-  
-</div>
-
-              </div>
             </div>
-          </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2021/03/22/%E5%85%B3%E4%BA%8Espring%E4%BA%8B%E5%8A%A1/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">about Spring transaction</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2021/03/22/%E6%AD%BB%E9%94%81/">
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
         </div>
       </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
     
 
     
@@ -270,9 +392,15 @@
 
 
 
+  <script  src="https://cdn.staticfile.org/tocbot/4.12.0/tocbot.min.js" ></script>
 
 
 
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.3.0/anchor.min.js" ></script>
 
 
 

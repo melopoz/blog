@@ -17,9 +17,25 @@
   <meta name="description" content="">
   <meta name="author" content="melopoz">
   <meta name="keywords" content="">
-  <title>分类 - 你不喜欢孤独 那就别停下来</title>
+  <title>你不喜欢孤独 那就别停下来</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/blog/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.1.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+  
 
 
 
@@ -47,7 +63,7 @@
 
 
 <body>
-  <header style="height: 60vh;">
+  <header style="height: 70vh;">
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand"
@@ -146,9 +162,46 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="分类">
+            <span class="h2" id="subtitle" title="">
               
             </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-03-22 13:35" pubdate>
+        2021年3月22日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      156 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      2
+       分钟
+    </span>
+  
+
+  
+  
+</div>
 
             
           </div>
@@ -161,33 +214,100 @@
 
   <main>
     
-      <div class="container nopadding-md">
-        <div class="py-5" id="board"
-          >
-          
-          <div class="container">
-            <div class="row">
-              <div class="col-12 col-md-10 m-auto">
-                
+      
 
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none"></h1>
+            
+            <div class="markdown-body">
+              <pre><code class="hljs apache"><span class="hljs-attribute">tail</span> -f system.log |grep <span class="hljs-string">&quot;/write-down&quot;</span> |grep <span class="hljs-string">&quot;payload=&quot;</span> | perl -pe &#x27;s/(visitType)|(visitTerminal)|(operateType)/\e[<span class="hljs-number">1</span>;<span class="hljs-number">33</span>m$<span class="hljs-number">1</span>\e[<span class="hljs-number">0</span>m\e[<span class="hljs-number">1</span>;<span class="hljs-number">33</span>m$<span class="hljs-number">2</span>\e[<span class="hljs-number">0</span>m\e[<span class="hljs-number">1</span>;<span class="hljs-number">33</span>m$<span class="hljs-number">3</span>\e[<span class="hljs-number">0</span>m/g&#x27;</code></pre>
+<p><code>perl</code>命令 进行动态替换，格式：</p>
+<pre><code class="hljs apache"><span class="hljs-attribute">perl</span> -pe &#x27;s/([关键词<span class="hljs-number">1</span>])|([关键词<span class="hljs-number">2</span>])/\e</code></pre>
+<p>关键词部分：<code>s/([关键词1])|([关键词2])/</code><br>颜色部分：<code>\e[1;颜色1$1\e[背景颜色</code> <code>\e[1;颜色2$2\e[背景颜色</code></p>
+<pre><code class="hljs subunit">字体颜色：
+30m：黑
+31m：红
+32m：绿
+33m：黄
+34m：蓝
+35m：紫
+36m：青
+37m：白
 
-
-
-
-
-
-<div class="category-list">
-  
-  
-  
-  
-</div>
-
-              </div>
+背景颜色设置
+40<span class="hljs-string">-47</span> 黑、红、绿、黄、蓝、紫、青、白
+40：黑
+41：红
+42：绿
+43：黄
+44：蓝
+45：紫
+46：青
+47：白
+</code></pre>
             </div>
-          </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2021/03/22/hadoop/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2021/03/22/zookeeper/">
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
         </div>
       </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
     
 
     
@@ -270,9 +390,15 @@
 
 
 
+  <script  src="https://cdn.staticfile.org/tocbot/4.12.0/tocbot.min.js" ></script>
 
 
 
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.3.0/anchor.min.js" ></script>
 
 
 

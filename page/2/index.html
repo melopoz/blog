@@ -17,7 +17,7 @@
   <meta name="description" content="">
   <meta name="author" content="melopoz">
   <meta name="keywords" content="">
-  <title>分类 - 你不喜欢孤独 那就别停下来</title>
+  <title>你不喜欢孤独 那就别停下来</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
 
@@ -47,7 +47,7 @@
 
 
 <body>
-  <header style="height: 60vh;">
+  <header style="height: 100vh;">
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand"
@@ -146,13 +146,17 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="分类">
+            <span class="h2" id="subtitle" title="An elegant Material-Design theme for Hexo">
               
             </span>
 
             
           </div>
 
+          
+            <div class="scroll-down-bar">
+              <i class="iconfont icon-arrowdown"></i>
+            </div>
           
         </div>
       </div>
@@ -163,7 +167,7 @@
     
       <div class="container nopadding-md">
         <div class="py-5" id="board"
-          >
+          style=margin-top:0>
           
           <div class="container">
             <div class="row">
@@ -171,17 +175,111 @@
                 
 
 
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/22/%E6%AD%BB%E9%94%81/"></a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/22/%E6%AD%BB%E9%94%81/">
+          
+          
+            
+          
+          https://blog.csdn.net/hd12370/article/details/82814348
+四个必要条件
+互斥
+请求和保持（占有并等待）
+不可剥夺（不能抢）
+环路等待（循环等待）
+
+预防死锁
+资源一次性分配（破坏请求条件）
+一次性获取所有资源，不能全部获取就释放所有（破坏保持条件）
+资源有序分配（按照一定算法对资源进行排序，按顺序拿资源）
+资源可抢夺（需要设置优先级）
+
+死锁检测
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-22 13:35" pubdate>
+              2021-03-22
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/22/redis/"></a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/22/redis/">
+          
+          
+            
+          
+          Redis配置文件示例
+http://download.redis.io/redis-stable/redis.conf
+参考
+https://www.cnblogs.com/kismetv/p/9137897.html
+
+本地缓存和分布式缓存
+本地缓存，比如java中的map，guava实现，轻量、快速，但是如果有多个实例，就需要每个实例都保存一份缓存，不具有一致性。
+
+
+ 分布式缓存，比如re
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-22 13:35" pubdate>
+              2021-03-22
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
 
 
 
-
-
-<div class="category-list">
+  <nav aria-label="navigation">
+    <span class="pagination" id="pagination">
+      <a class="extend prev" rel="prev" href="/blog/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/blog/">1</a><span class="page-number current">2</span>
+    </span>
+  </nav>
   
-  
-  
-  
-</div>
+  <script>
+    for (ele of document.getElementById("pagination").getElementsByTagName("a")) {
+      ele.href += '#board';
+    }
+  </script>
+
+
 
               </div>
             </div>

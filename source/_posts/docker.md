@@ -1,3 +1,11 @@
+---
+title: Docker
+tags: docker
+categories: docker
+---
+
+
+
 # Docker
 
 Docker本身是一个容器运行载体（或称为 管理引擎）。我们把应用程序和配置依赖打包成一个可交付的运行环境，这个环境就是image镜像文件。只有通过这个image才能生成Docker容器。

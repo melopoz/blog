@@ -11,12 +11,13 @@
 # language: zh-CN
 # timezone: ''
 title: 你不喜欢孤独 那就别停下来
-subtitle: '你不喜欢孤独 那就别停下来'
-description: ''
+subtitle: ''
+description: 'Although things are always not as you wish, but effort will be lucy!'
 keywords:
 author: melopoz
 language: zh-CN
-timezone: ''
+#timezone: 'Asia/Beijing'
+timezone: 'Asia/Shanghai'
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://example.com/child' and root as '/child/'

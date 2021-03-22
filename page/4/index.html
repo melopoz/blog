@@ -181,23 +181,24 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/22/%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E7%AE%97%E6%B3%95/">内存分配算法</a>
+        <a href="/blog/2021/03/22/Spring%20Cloud%20Alibaba/">Spring Cloud Alibaba</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/22/%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E7%AE%97%E6%B3%95/">
+        <a href="/blog/2021/03/22/Spring%20Cloud%20Alibaba/">
           
           
             
           
-          常见的内存分配器实现: jemalloc, ptmalloc, tcmallocptmalloc: per thread malloc
+          NacosSentinelSeata全局唯一事务ID + 三个组件（TC、TM、RM）
 
-基于glibc(glibc是linux系统中最底层的api)实现的, 是一个标准实现, 兼容性好
-由于过于考虑性能, 多线程之间内存不共享, 各线程使用独立内存, 所以在内存开销很大.
+TC：transaction coordinator 事务协调器
+TM：transaction Manager  事务管理器
+RM：Resource Managere 资源管理器
 
-tcmalloc: thread caching malloc
-
-为每个线
+http://seata.io/zh-cn/docs/overview/what-is-seata.html
+处理过程
+TM向T
         </a>
       </p>
 
@@ -205,237 +206,7 @@ tcmalloc: thread caching malloc
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:01" pubdate>
-              2021-03-23
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/OS/">OS</a>
-            
-              <a href="/blog/categories/Netty/">Netty</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
-            
-              <a href="/blog/tags/OS/">OS</a>
-            
-              <a href="/blog/tags/netty/">netty</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/03/22/%E5%B9%82%E7%AD%89%E6%80%A7%E8%AE%BE%E8%AE%A1/">幂等性设计</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/03/22/%E5%B9%82%E7%AD%89%E6%80%A7%E8%AE%BE%E8%AE%A1/">
-          
-          
-            
-          
-          如何保证幂等性
-
-在数据库利用唯一索引。
-
-比如生成订单的时候，不能因为网络延迟而创建两次这个订单，所以可以根据这个订单的唯一id。
-第一个 insert 执行之后已经有了这个订单，下次 insert 的时候会报错，可以直接 try-catch 这个异常，在catch中 select by id 查询这个订单，查询到的结果也就是 insert 的期望结果了。
-
-
-不过要利用这个唯一索引的话，订单的
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:01" pubdate>
-              2021-03-23
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/">架构设计</a>
-            
-              <a href="/blog/categories/%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1/">接口设计</a>
-            
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/03/22/%E5%BC%95%E5%AF%BC%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%A4%A7%E6%A6%82%E6%B5%81%E7%A8%8B/">一台计算机供电之后...</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/03/22/%E5%BC%95%E5%AF%BC%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%A4%A7%E6%A6%82%E6%B5%81%E7%A8%8B/">
-          
-          
-            
-          
-          给主板供电，让CPU运行BIOS，BIOS会按顺序走引导程序，装系统的时候不就是这样嘛  把macos系统引导放到了win boot前边就默认走macos了，the hackintosh。。
-
-BIOS（Base Input/Output System)一般存在主板的ROM（Read Only Memory）中。
-
-
-总线：数据总线，地址总线，控制总线。  总线其实就是数据线，一根传1位，32位有
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:01" pubdate>
-              2021-03-23
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/OS/">OS</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/BIOS/">BIOS</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/03/22/%E6%AD%BB%E9%94%81/">死锁</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/03/22/%E6%AD%BB%E9%94%81/">
-          
-          
-            
-          
-          https://blog.csdn.net/hd12370/article/details/82814348
-四个必要条件
-互斥
-请求和保持（占有并等待）
-不可剥夺（不能抢）
-环路等待（循环等待）
-
-预防死锁
-资源一次性分配（破坏请求条件）
-一次性获取所有资源，不能全部获取就释放所有（破坏保持条件）
-资源有序分配（按照一定算法对资源进行排序，按顺序拿资源）
-资源可抢夺（需要设置优先级）
-
-死锁检测
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:01" pubdate>
-              2021-03-23
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/%E5%B9%B6%E5%8F%91/">并发</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">并发</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/03/22/Spring%20Cloud/">Spring Cloud Alibaba</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/03/22/Spring%20Cloud/">
-          
-          
-            
-          
-          微服务架构要处理的四个问题：
-api
-通信：http、RPC
-服务注册和发现（解决高可用问题）
-熔断机制
-
-CAP原则：
-C    consistency    强一致性
-A     availability      可用性
-P      partition tolerance      分区容错性  （分区相当于对通信的时限要求）
-
-只能满足其中两点。P：当系统不能在时限内完成数据一致性，就需
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:01" pubdate>
+            <time datetime="2021-03-23 00:08" pubdate>
               2021-03-23
             </time>
           </div>
@@ -466,25 +237,29 @@ P      partition tolerance      分区容错性  （分区相当于对通信的�
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/22/redis/">Redis</a>
+        <a href="/blog/2021/03/22/WSL/">WSL</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/22/redis/">
+        <a href="/blog/2021/03/22/WSL/">
           
           
             
           
-          Redis配置文件示例
-http://download.redis.io/redis-stable/redis.conf
-参考
-https://www.cnblogs.com/kismetv/p/9137897.html
-
-本地缓存和分布式缓存
-本地缓存，比如java中的map，guava实现，轻量、快速，但是如果有多个实例，就需要每个实例都保存一份缓存，不具有一致性。
+          net stop LxssManager 停止子系统服务
+net start LxssManager 开启子系统服务
 
 
- 分布式缓存，比如re
+
+
+
+
+linux 查看进程相关参数的命令lsof -i:3306 查看3306端口
+netstat -tap |grep mysql 查看mysql进程占用的端口
+
+zsh
+安装 sudo apt-get install zsh
+设置默认shell chsh -s /bin/
         </a>
       </p>
 
@@ -492,7 +267,7 @@ https://www.cnblogs.com/kismetv/p/9137897.html
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:01" pubdate>
+            <time datetime="2021-03-23 00:08" pubdate>
               2021-03-23
             </time>
           </div>
@@ -501,7 +276,51 @@ https://www.cnblogs.com/kismetv/p/9137897.html
           <div class="post-meta mr-3">
             <i class="iconfont icon-category"></i>
             
-              <a href="/blog/categories/NoSQL/">NoSQL</a>
+              <a href="/blog/categories/Tools/">Tools</a>
+            
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/22/docker/">Docker</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/22/docker/">
+          
+          
+            
+          
+          DockerDocker本身是一个容器运行载体（或称为 管理引擎）。我们把应用程序和配置依赖打包成一个可交付的运行环境，这个环境就是image镜像文件。只有通过这个image才能生成Docker容器。
+image文件生成的容器实例，本身也是一个文件。
+一个容器运行一种服务，需要的时候就通过docker客户端创建一个对应的运行实例
+仓库就是存放一堆镜像的地方，可以吧镜像发布到仓库中，需要的时候pul
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-23 00:08" pubdate>
+              2021-03-23
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/docker/">docker</a>
             
           </div>
         
@@ -509,9 +328,173 @@ https://www.cnblogs.com/kismetv/p/9137897.html
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/blog/tags/DB/">DB</a>
+              <a href="/blog/tags/docker/">docker</a>
             
-              <a href="/blog/tags/%E7%BC%93%E5%AD%98/">缓存</a>
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/22/git/">Git</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/22/git/">
+          
+          
+            
+          
+          初始化成git仓库git init
+绑定到远程仓库git remote add origin https://xxx.git
+第一次push 的时候携带的参数git push -u origin master
+revertgit revert HEAD^  git revert HEAD^^  git revert HEAD~3   一个^就是前1次commit 
+git revert &lt;c
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-23 00:08" pubdate>
+              2021-03-23
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/Tools/">Tools</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/Tools/">Tools</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/22/hadoop/">Hadoop</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/22/hadoop/">
+          
+          
+            
+          
+          概念主要包括ResourceManager、NodeManager
+安装安装好jdk1.8的linux系统下
+
+创建hadoop用户
+$ sudo useradd -m hadoop -s /bin/bash  #创建hadoop用户，并使用/bin/bash作为shell
+$ sudo passwd hadoop                   #为hadoop用户设置密码，之后需要连续输入
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-23 00:08" pubdate>
+              2021-03-23
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+            
+              <a href="/blog/categories/%E5%88%86%E5%B8%83%E5%BC%8F/Hadoop/">Hadoop</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/22/Spring%20Cloud/">Spring Cloud</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/22/Spring%20Cloud/">
+          
+          
+            
+          
+          微服务架构要处理的四个问题：
+api
+通信：http、RPC
+服务注册和发现（解决高可用问题）
+熔断机制
+
+CAP原则：
+C    consistency    强一致性
+A     availability      可用性
+P      partition tolerance      分区容错性  （分区相当于对通信的时限要求）
+
+只能满足其中两点。P：当系统不能在时限内完成数据一致性，就需
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-23 00:08" pubdate>
+              2021-03-23
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
             
           </div>
         

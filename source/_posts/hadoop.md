@@ -1,6 +1,16 @@
+---
+title: hadoop
+tags: 分布式,hadoop
+categories: 分布式
+---
+
+
+
+
+
 ## 概念
 
-yarn 主要包括ResourceManager、NodeManager
+主要包括ResourceManager、NodeManager
 
 ## 安装
 

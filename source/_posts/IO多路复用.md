@@ -1,3 +1,11 @@
+---
+title: I/O多路复用
+tags: IO,select,epoll
+categories: IO
+---
+
+
+
 简单说 IO：读取/写入 若干字节 从/到 **单个文件描述符**
 
 

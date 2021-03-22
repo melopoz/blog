@@ -1,3 +1,11 @@
+---
+title: HDFS
+tags: 分布式
+categories: 分布式
+---
+
+
+
 目录树结构
 
 角色namenode datanode 角色即进程

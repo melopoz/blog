@@ -181,24 +181,21 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/22/Spring%20Cloud%20Alibaba/">Spring Cloud Alibaba</a>
+        <a href="/blog/2021/03/22/zookeeper/">zookeeper</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/22/Spring%20Cloud%20Alibaba/">
+        <a href="/blog/2021/03/22/zookeeper/">
           
           
             
           
-          NacosSentinelSeata全局唯一事务ID + 三个组件（TC、TM、RM）
+          zookeeper分布式协调服务，为其他分布式应用程序提供基本的同步和组服务
+为了可靠性，不能一个宕机就完蛋，也要搭建集群，搭建集群就分布式，分布式就要保证一致性，一致性的解决方案。。又是Paxos
+选举一个leader，发送提案，多半同意则发送提交，
 
-TC：transaction coordinator 事务协调器
-TM：transaction Manager  事务管理器
-RM：Resource Managere 资源管理器
-
-http://seata.io/zh-cn/docs/overview/what-is-seata.html
-处理过程
-TM向T
+这里会有个问题 https://www.zhihu.com/question/324291664
+https://www.zhihu.com/q
         </a>
       </p>
 
@@ -206,7 +203,7 @@ TM向T
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:08" pubdate>
+            <time datetime="2021-03-23 00:11" pubdate>
               2021-03-23
             </time>
           </div>
@@ -225,6 +222,8 @@ TM向T
             
               <a href="/blog/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
             
+              <a href="/blog/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E5%8D%8F%E8%B0%83%E6%9C%8D%E5%8A%A1/">分布式协调服务</a>
+            
           </div>
         
       </div>
@@ -237,29 +236,22 @@ TM向T
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/22/WSL/">WSL</a>
+        <a href="/blog/2021/03/22/%E4%B8%80%E8%87%B4%E6%80%A7hash/">一致性hash</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/22/WSL/">
+        <a href="/blog/2021/03/22/%E4%B8%80%E8%87%B4%E6%80%A7hash/">
           
           
             
           
-          net stop LxssManager 停止子系统服务
-net start LxssManager 开启子系统服务
+          哈希算法https://blog.csdn.net/cywosp/article/details/23397179
+哈希算法Hash，也叫摘要算法Digest
 
+输入一组任意长度的数据，计算得到一个固定长度的摘要数据。
 
-
-
-
-
-linux 查看进程相关参数的命令lsof -i:3306 查看3306端口
-netstat -tap |grep mysql 查看mysql进程占用的端口
-
-zsh
-安装 sudo apt-get install zsh
-设置默认shell chsh -s /bin/
+java中重写equals()方法,为什么要重写hashCode()?
+如果只是重写equals(), equals()=true，但hashCode()==false,这有悖于
         </a>
       </p>
 
@@ -267,7 +259,7 @@ zsh
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:08" pubdate>
+            <time datetime="2021-03-23 00:11" pubdate>
               2021-03-23
             </time>
           </div>
@@ -276,51 +268,9 @@ zsh
           <div class="post-meta mr-3">
             <i class="iconfont icon-category"></i>
             
-              <a href="/blog/categories/Tools/">Tools</a>
+              <a href="/blog/categories/algorithm/">algorithm</a>
             
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/03/22/docker/">Docker</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/03/22/docker/">
-          
-          
-            
-          
-          DockerDocker本身是一个容器运行载体（或称为 管理引擎）。我们把应用程序和配置依赖打包成一个可交付的运行环境，这个环境就是image镜像文件。只有通过这个image才能生成Docker容器。
-image文件生成的容器实例，本身也是一个文件。
-一个容器运行一种服务，需要的时候就通过docker客户端创建一个对应的运行实例
-仓库就是存放一堆镜像的地方，可以吧镜像发布到仓库中，需要的时候pul
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:08" pubdate>
-              2021-03-23
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/docker/">docker</a>
+              <a href="/blog/categories/algorithm/hash/">hash</a>
             
           </div>
         
@@ -328,7 +278,13 @@ image文件生成的容器实例，本身也是一个文件。
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/blog/tags/docker/">docker</a>
+              <a href="/blog/tags/%E6%91%98%E8%A6%81%E7%AE%97%E6%B3%95/">摘要算法</a>
+            
+              <a href="/blog/tags/algorithm/">algorithm</a>
+            
+              <a href="/blog/tags/hash/">hash</a>
+            
+              <a href="/blog/tags/redis/">redis</a>
             
           </div>
         
@@ -342,20 +298,23 @@ image文件生成的容器实例，本身也是一个文件。
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/22/git/">Git</a>
+        <a href="/blog/2021/03/22/%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E7%AE%97%E6%B3%95/">内存分配算法</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/22/git/">
+        <a href="/blog/2021/03/22/%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E7%AE%97%E6%B3%95/">
           
           
             
           
-          初始化成git仓库git init
-绑定到远程仓库git remote add origin https://xxx.git
-第一次push 的时候携带的参数git push -u origin master
-revertgit revert HEAD^  git revert HEAD^^  git revert HEAD~3   一个^就是前1次commit 
-git revert &lt;c
+          常见的内存分配器实现: jemalloc, ptmalloc, tcmallocptmalloc: per thread malloc
+
+基于glibc(glibc是linux系统中最底层的api)实现的, 是一个标准实现, 兼容性好
+由于过于考虑性能, 多线程之间内存不共享, 各线程使用独立内存, 所以在内存开销很大.
+
+tcmalloc: thread caching malloc
+
+为每个线
         </a>
       </p>
 
@@ -363,7 +322,7 @@ git revert &lt;c
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:08" pubdate>
+            <time datetime="2021-03-23 00:11" pubdate>
               2021-03-23
             </time>
           </div>
@@ -372,7 +331,9 @@ git revert &lt;c
           <div class="post-meta mr-3">
             <i class="iconfont icon-category"></i>
             
-              <a href="/blog/categories/Tools/">Tools</a>
+              <a href="/blog/categories/OS/">OS</a>
+            
+              <a href="/blog/categories/Netty/">Netty</a>
             
           </div>
         
@@ -380,7 +341,11 @@ git revert &lt;c
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/blog/tags/Tools/">Tools</a>
+              <a href="/blog/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
+            
+              <a href="/blog/tags/OS/">OS</a>
+            
+              <a href="/blog/tags/netty/">netty</a>
             
           </div>
         
@@ -394,21 +359,24 @@ git revert &lt;c
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/22/hadoop/">Hadoop</a>
+        <a href="/blog/2021/03/22/%E5%B9%82%E7%AD%89%E6%80%A7%E8%AE%BE%E8%AE%A1/">幂等性设计</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/22/hadoop/">
+        <a href="/blog/2021/03/22/%E5%B9%82%E7%AD%89%E6%80%A7%E8%AE%BE%E8%AE%A1/">
           
           
             
           
-          概念主要包括ResourceManager、NodeManager
-安装安装好jdk1.8的linux系统下
+          如何保证幂等性
 
-创建hadoop用户
-$ sudo useradd -m hadoop -s /bin/bash  #创建hadoop用户，并使用/bin/bash作为shell
-$ sudo passwd hadoop                   #为hadoop用户设置密码，之后需要连续输入
+在数据库利用唯一索引。
+
+比如生成订单的时候，不能因为网络延迟而创建两次这个订单，所以可以根据这个订单的唯一id。
+第一个 insert 执行之后已经有了这个订单，下次 insert 的时候会报错，可以直接 try-catch 这个异常，在catch中 select by id 查询这个订单，查询到的结果也就是 insert 的期望结果了。
+
+
+不过要利用这个唯一索引的话，订单的
         </a>
       </p>
 
@@ -416,7 +384,7 @@ $ sudo passwd hadoop                   #为hadoop用户设置密码，之后需�
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:08" pubdate>
+            <time datetime="2021-03-23 00:11" pubdate>
               2021-03-23
             </time>
           </div>
@@ -425,19 +393,12 @@ $ sudo passwd hadoop                   #为hadoop用户设置密码，之后需�
           <div class="post-meta mr-3">
             <i class="iconfont icon-category"></i>
             
-              <a href="/blog/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+              <a href="/blog/categories/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/">架构设计</a>
             
-              <a href="/blog/categories/%E5%88%86%E5%B8%83%E5%BC%8F/Hadoop/">Hadoop</a>
+              <a href="/blog/categories/%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1/">接口设计</a>
             
           </div>
         
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
-            
-          </div>
         
       </div>
     </article>
@@ -449,11 +410,11 @@ $ sudo passwd hadoop                   #为hadoop用户设置密码，之后需�
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/22/Spring%20Cloud/">Spring Cloud</a>
+        <a href="/blog/2021/03/22/SpringCloud/">SpringCloud</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/22/Spring%20Cloud/">
+        <a href="/blog/2021/03/22/SpringCloud/">
           
           
             
@@ -477,7 +438,7 @@ P      partition tolerance      分区容错性  （分区相当于对通信的�
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:08" pubdate>
+            <time datetime="2021-03-23 00:11" pubdate>
               2021-03-23
             </time>
           </div>
@@ -495,6 +456,65 @@ P      partition tolerance      分区容错性  （分区相当于对通信的�
             <i class="iconfont icon-tags"></i>
             
               <a href="/blog/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/22/redis/">Redis</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/22/redis/">
+          
+          
+            
+          
+          Redis配置文件示例
+http://download.redis.io/redis-stable/redis.conf
+参考
+https://www.cnblogs.com/kismetv/p/9137897.html
+
+本地缓存和分布式缓存
+本地缓存，比如java中的map，guava实现，轻量、快速，但是如果有多个实例，就需要每个实例都保存一份缓存，不具有一致性。
+
+
+ 分布式缓存，比如re
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-23 00:11" pubdate>
+              2021-03-23
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/NoSQL/">NoSQL</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/DB/">DB</a>
+            
+              <a href="/blog/tags/%E7%BC%93%E5%AD%98/">缓存</a>
             
           </div>
         

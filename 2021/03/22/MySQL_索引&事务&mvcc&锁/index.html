@@ -1,0 +1,621 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/favicon.png">
+  <link rel="icon" type="image/png" href="/blog/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Although things are always not as you wish, but effort will be lucy!">
+  <meta name="author" content="melopoz">
+  <meta name="keywords" content="">
+  <title>Mysql - 你不喜欢孤独 那就别停下来</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/blog/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.1.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"melopoz.github.io","root":"/blog/","version":"1.8.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"copy_btn":true,"image_zoom":{"enable":true},"lazyload":{"enable":true,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/blog/">&nbsp;<strong>Fluid</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/blog/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Mysql">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-03-23 00:01" pubdate>
+        2021年3月23日 凌晨
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.2k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      24
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Mysql</h1>
+            
+            <div class="markdown-body">
+              <h2 id="join"><a href="#join" class="headerlink" title="join"></a>join</h2><p>mysql优化器会让小表驱动大表，因为底层也是两次遍历比较，原理相当于两层for循环，如果使用BTree，查找一条数据的时间复杂度=log(n)，所以两种for嵌套的时间复杂度比较如下：</p>
+<blockquote>
+<p>大表.rows * log(小表.rows)      肯定&gt;    小表.rows * log(大表.rows)</p>
+<blockquote>
+<p>B+Tree 的最大深度 log(n)，n:节点数，而且是B+Tree，每次查询肯定都要找到叶子节点。所以肯定是log(n)</p>
+</blockquote>
+</blockquote>
+<p>但要注意，join on 的条件中，两个表的连接字段必须字符集相同&amp;类型相同。否则索引是不会生效的。</p>
+<p>而且join后的sql只有非驱动表的索引会生效。</p>
+<p>left join 左边的表是驱动表，但是驱动表的索引不会生效，比如</p>
+<img src="https://raw.githubusercontent.com/melopoz/pics/master/img/leftjoin%E5%B7%A6%E8%A1%A8%E9%A9%B1%E5%8A%A8%E6%97%A0%E6%95%88.png" srcset="/blog/img/loading.gif" style="zoom:50%;" />
+
+
+
+<h2 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h2><p>InnoDB 唯一主键，B+树（只有叶子节点存数据，普通索引的叶子节点不存数据，存的是主键索引，再通过主键索引(聚簇索引树)找到数据就是‘回表’）</p>
+<p>聚簇索引 （InnoDB）</p>
+<p>辅助索引（普通索引）</p>
+<p>联合索引</p>
+<p>InnoDB不支持哈希索引，只有一个自适应哈希索引</p>
+<h3 id="InnoDB自适应哈希索引（Adaptive-Hash-Index，AHI）"><a href="#InnoDB自适应哈希索引（Adaptive-Hash-Index，AHI）" class="headerlink" title="InnoDB自适应哈希索引（Adaptive Hash Index，AHI）"></a>InnoDB自适应哈希索引（Adaptive Hash Index，AHI）</h3><p>一条查询语句如果使用的是普通索引并需要回表，可能会因为无序导致多次随机IO。</p>
+<p>InnoDB监控对表的索引页的查询，如果<strong>满足要求</strong>就会建立哈希索引。</p>
+<p>这个哈希索引是通过缓存中的索引页构建的，而且也是放在buffer poll中，所以速度很快。</p>
+<blockquote>
+<p>查询：<code>show variables like &#39;%ap%hash_index&#39;;</code>      –innodb_adaptive_hash_index</p>
+<p>打开/关闭自适应哈希索引： <code>set global innodb_adaptive_hash_index=off / on</code></p>
+</blockquote>
+<p>哈希索引嘛，特点都一样：只能用等值查询；不能排序；有可能冲突</p>
+<p>要求：<strong>对这个页的访问模式是一样的</strong>。</p>
+<blockquote>
+<p>例如对（a，b）这个联合索引可能会有两种访问模式：A:<code>where a = ?</code>、B:<code>where a = ? and b = ?</code>，</p>
+<p>如果交替进行A、B两种查询，则不会构造AHI；</p>
+<p>必须以下方两种方式访问才会构造AHI。</p>
+<blockquote>
+<ol>
+<li>以A / B模式访问了100次</li>
+<li>页通过某一种模式被访问了<code>rows / 16</code>次</li>
+</ol>
+</blockquote>
+</blockquote>
+<p>自适应哈希索引不可以人为干预，</p>
+<h3 id="索引注意事项"><a href="#索引注意事项" class="headerlink" title="索引注意事项"></a>索引注意事项</h3><ol>
+<li><p>给千万级以上的数据量过大的表添加索引</p>
+<blockquote>
+<p>先把原表结构复制出<code>t_copy</code>，在<code>t_copy</code>中添加索引，然后将原表中的数据导入新表<code>t_copy</code>，然后重命名这两个表</p>
+</blockquote>
+</li>
+<li><p>联合索引设计</p>
+<blockquote>
+<p>常见的一些区分度不大的字段，比如<code>status</code>、<code>sex</code> 等等，在数据量很大的情况下，也可以添加索引，放再联合索引的左侧，不过为了让联合索引能生效，无论是否筛选<code>status</code>、<code>sex</code>都要在where条件语句中添加<code>status = ？ and  sex = ？</code>，如果不需要筛选就用<code>sex in (1,2)</code>即可。视情况而定</p>
+</blockquote>
+</li>
+<li></li>
+</ol>
+<h2 id="mysql缓存：buffer-pool"><a href="#mysql缓存：buffer-pool" class="headerlink" title="mysql缓存：buffer pool"></a>mysql缓存：buffer pool</h2><p>mysql 会在内存中存放： </p>
+<ul>
+<li><p>数据页(sql 必须完全一致才会命中缓存)；</p>
+</li>
+<li><p>索引页；</p>
+</li>
+<li><p>锁信息   lock info；</p>
+</li>
+<li><p>插入缓冲 insert buffer；(B+树实现)（非唯一 &amp; 辅助索引）</p>
+<blockquote>
+<p>对于非聚集索引的insert/update，先判断插入的非聚集索引页是否在缓冲池(缓存)中，若存在则直接插入；若不存在，则先放到insert buffer中，等待<strong>checkpoint</strong>机制将 insert buffer 和 辅助索引页的子节点进行merge；</p>
+<blockquote>
+<p>这通常可以将多个插入合并到一个操作中（因为在一个索引页中），提高了对非聚集索引的插入性能。</p>
+</blockquote>
+</blockquote>
+</li>
+<li><p>undo log；</p>
+</li>
+<li><p>自适应哈希索引 </p>
+</li>
+</ul>
+<blockquote>
+<p>其实mysql在缓存后边写入磁盘也是交给OS，OS还会有一层OS Cache，OS什么时候把cache刷到硬盘可就不知道了。。</p>
+</blockquote>
+<h2 id="分区"><a href="#分区" class="headerlink" title="分区"></a>分区</h2><p>mysql5.7自动就能搞定，相当于分表，而且比分表方便</p>
+<blockquote>
+<h1 id="todo"><a href="#todo" class="headerlink" title="todo"></a>todo</h1></blockquote>
+<h2 id="mysql-后台线程"><a href="#mysql-后台线程" class="headerlink" title="mysql 后台线程"></a>mysql 后台线程</h2><p><code>Master Thread</code>：处理用户查询线程；<del>将缓冲池中的数据刷新回磁盘，保证数据一致性</del>，<del>以及undo页回收(交由Page Cleaner Thread线程)</del>；</p>
+<p><code>IO Thread</code>：负责io请求的回调；(write x4、read x4、insert buffer thread、log IO thread)</p>
+<p><code>Purge Thread</code>：回收已经使用并分配的undo log页；</p>
+<p><code>Page Cleaner Thread</code>：1.2.x版本引入，专门负责脏页刷新回磁盘，减轻master thread压力</p>
+<h2 id="Checkpoint"><a href="#Checkpoint" class="headerlink" title="Checkpoint"></a>Checkpoint</h2><p>把页从缓冲池刷新回磁盘的机制</p>
+<p>作用： 1 缩短数据库的恢复时间；2 缓冲池不够用了就将脏页刷新到磁盘；3 重做日志不可用的时候，刷新脏页</p>
+<h2 id="脏数据-、-脏页"><a href="#脏数据-、-脏页" class="headerlink" title="脏数据 、 脏页"></a>脏数据 、 脏页</h2><p>脏页 是已提交的事务修改的数据更新到内存中，还未<code>fsync</code>到磁盘中；</p>
+<p>脏数据 是其他事务未提交的数据；</p>
+<p>fsync：同步信号</p>
+<h2 id="MVCC-快照机制"><a href="#MVCC-快照机制" class="headerlink" title="MVCC 快照机制"></a>MVCC 快照机制</h2><blockquote>
+<p>多版本并发控制</p>
+</blockquote>
+<p>可以省去锁的开销。</p>
+<p>mvcc的实现就是在每行添加两列（insertTime，deleteTime）</p>
+<p>每个事务在begin的时候会获取当前的系统版本号curTime，</p>
+<ul>
+<li>select：只查询 <code>insertTime &lt;= curTime</code> &amp; <code>deleteTime &gt; curTime</code> 的记录；</li>
+<li>insert：添加一行记录并 <code>set insertTime = curTime</code>；</li>
+<li>delete：对该行 <code>set deleteTime = curTime</code>；</li>
+<li>udpate：新增一条记录，<code>set insertTime = curTime</code>；对之前的记录 <code>set deleteTime = curTime</code></li>
+</ul>
+<h2 id="InnoDB事务的实现"><a href="#InnoDB事务的实现" class="headerlink" title="InnoDB事务的实现"></a>InnoDB事务的实现</h2><p>事务commit时，必须实现将事务的所有日志（redo + undo）写入到日志文件进行持久化。</p>
+<h3 id="redo-log-–-保证事务持久性D"><a href="#redo-log-–-保证事务持久性D" class="headerlink" title="redo log – 保证事务持久性D"></a>redo log – 保证事务持久性D</h3><p>是<strong>物理日志</strong>，存放在日志文件中；恢复提交事务修改的页操作；记录的是页的物理修改操作。</p>
+<ul>
+<li><p>将事务的执行日志<strong>顺序</strong>(基本上都是顺序写)记录下来，数据库运行的时候是不需要读redo log的。</p>
+</li>
+<li><p>每次将重做日志写入到日志文件之后都要调用<code>fsync</code>以确保日志写入磁盘，<code>fsync</code>的效率取决于磁盘性能，所以这等于放大了 磁盘性能对 数据库执行修改操作时的性能 的影响。</p>
+</li>
+</ul>
+<h3 id="undo-log-–-帮助事务进行回滚及MVCC功能"><a href="#undo-log-–-帮助事务进行回滚及MVCC功能" class="headerlink" title="undo log – 帮助事务进行回滚及MVCC功能"></a>undo log – 帮助事务进行回滚及MVCC功能</h3><p>是<strong>逻辑日志</strong>存放在数据库内部的一个<strong>undo段</strong>（<strong>undo segment</strong>，位于共享表空间），回滚行记录到某个特定版本</p>
+<blockquote>
+<p>可通过 py_innodb_page_info.py 工具查看到 <code>undo Log Page: 1234</code></p>
+</blockquote>
+<ul>
+<li><p>事务的回滚就是通过undo log 实现的</p>
+<blockquote>
+<p>比如 事务中执行了 insert，事务回滚的时候就会执行 delete，逻辑取消事务中执行的的修改操作。</p>
+</blockquote>
+<blockquote>
+<p>通过undo log，数据是恢复了，但是数据结构和页本身可能相差很大。（因为不能影响其他事务在这个空间的操作啊）</p>
+<blockquote>
+<p>比如执行 insert 10000条数据，表空间会增大，rollback之后，表空间并不会恢复到原来的大小。</p>
+</blockquote>
+</blockquote>
+</li>
+<li><p>实现MVCC的非锁定读取</p>
+<blockquote>
+<p>当这个事务中读取一行记录，但该记录已经被其他事务占用，则当前事务可以通过undo读取该行之前版本的信息。</p>
+</blockquote>
+</li>
+<li><p>由于undo log也需要持久性保护，所以生成undo log的时候会伴随生成redo log</p>
+<blockquote>
+<p>毕竟undo log也是在表中存的数据，是逻辑日志</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="purge-–-将缓冲池中的数据刷回磁盘时进行merge"><a href="#purge-–-将缓冲池中的数据刷回磁盘时进行merge" class="headerlink" title="purge – 将缓冲池中的数据刷回磁盘时进行merge"></a>purge – 将缓冲池中的数据刷回磁盘时进行merge</h3><p>delete操作可能并不会直接删除原有数据</p>
+<p>因为InnoDB支持MVCC，所以数据不能再事务提交之后就立即处理（其他事务可能也在引用这行数据）。</p>
+<p>在最后purge的时候才会真正完成 delete、update操作，update也是删除之前版本的那‘行’记录</p>
+<h2 id="InnoDB的锁"><a href="#InnoDB的锁" class="headerlink" title="InnoDB的锁"></a>InnoDB的锁</h2><p><code>Record Lock</code>行锁</p>
+<p><code>Gap Lock</code>间隙锁</p>
+<p><code>Next-Key Lock</code>       InnoDB对于行的查询都是采用这个锁定算法</p>
+<blockquote>
+<p>如果筛选条件为<code>where id = 10</code>，id是主键，则不会加间隙锁，Next-Key Lock会降级为Record Lock，只锁定id=10，此时insert id = 9 是不会阻塞的</p>
+</blockquote>
+<h3 id="InnoDB解决幻读："><a href="#InnoDB解决幻读：" class="headerlink" title="InnoDB解决幻读："></a>InnoDB解决幻读：</h3><p>使用 <code>Next-key Lock</code> (<code>Record Lock</code>+<code>Gap Lock</code>)机制</p>
+<blockquote>
+<p>锁定一个范围和该记录本身</p>
+</blockquote>
+<p>幻读就是： (幻象问题)</p>
+<blockquote>
+<p>事务A 执行 <code>select * from user wehre age &gt; 20 for update</code> … 还未完成；</p>
+<p>与此同时 事务B执行<code>insert into user  (...(age=)25...)</code> 并提交 已完成。</p>
+<p>事务A 再次执行<code>select * from user wehre age &gt; 20 for update</code> 会返回刚才事务B插入的数据。</p>
+</blockquote>
+<p>Next-Key Lock 会把范围 <code>age: (20, +∞)</code> 加锁，以至事务B不能执行该insert。</p>
+<p>如果where的是唯一索引 就会在索引上加锁。</p>
+<h1 id="一些其他DB问题及解决方案"><a href="#一些其他DB问题及解决方案" class="headerlink" title="一些其他DB问题及解决方案"></a>一些其他DB问题及解决方案</h1><h1 id="TiDB"><a href="#TiDB" class="headerlink" title="TiDB"></a>TiDB</h1><p>直接把mysql dump下来，加载到TiDB，非常简单地进行扩容</p>
+<blockquote>
+<h1 id="todo-1"><a href="#todo-1" class="headerlink" title="todo"></a>todo</h1></blockquote>
+<h1 id="分库分表"><a href="#分库分表" class="headerlink" title="分库分表"></a>分库分表</h1><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/J080624/article/details/86476027">https://blog.csdn.net/J080624/article/details/86476027</a></p>
+<blockquote>
+<h1 id="todo-2"><a href="#todo-2" class="headerlink" title="todo"></a>todo</h1></blockquote>
+<h1 id="数据备份-监听mysql的binlog"><a href="#数据备份-监听mysql的binlog" class="headerlink" title="数据备份 监听mysql的binlog"></a>数据备份 监听mysql的binlog</h1><blockquote>
+<h1 id="todo-3"><a href="#todo-3" class="headerlink" title="todo"></a>todo</h1></blockquote>
+<h1 id="infobright"><a href="#infobright" class="headerlink" title="infobright"></a>infobright</h1><blockquote>
+<h1 id="todo-4"><a href="#todo-4" class="headerlink" title="todo"></a>todo</h1></blockquote>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/categories/DB/">DB</a>
+                    
+                      <a class="hover-with-bg" href="/blog/categories/DB/MySQL/">MySQL</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/%E7%B4%A2%E5%BC%95/">索引</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/%E4%BA%8B%E5%8A%A1/">事务</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/mvcc/">mvcc</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/buffer-pool/">buffer pool</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2021/03/22/MySQL_function/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Mysql function应用</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2021/03/22/Nginx/">
+                        <span class="hidden-mobile">Nginx</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":200})
+    NProgress.start()
+    document.addEventListener('DOMContentLoaded', function() {
+      window.NProgress && window.NProgress.inc();
+    })
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.staticfile.org/jquery/3.5.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/debouncer.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/blog/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.12.0/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/blog/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/blog/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+
+</body>
+</html>

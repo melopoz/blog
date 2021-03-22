@@ -1,3 +1,14 @@
+---
+title: zookeeper
+tags: 
+  - 分布式
+  - 分布式协调服务
+categories: 
+  - [分布式]
+---
+
+
+
 # zookeeper
 
 分布式协调服务，为其他分布式应用程序提供基本的同步和组服务

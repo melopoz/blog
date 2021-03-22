@@ -1,3 +1,14 @@
+---
+title: tail 关键词高亮
+tags: 
+  - tools
+  - linux
+categories: 
+  - [tools]
+---
+
+
+
 ```
 tail -f system.log |grep "/write-down" |grep "payload=" | perl -pe 's/(visitType)|(visitTerminal)|(operateType)/\e[1;33m$1\e[0m\e[1;33m$2\e[0m\e[1;33m$3\e[0m/g'
 ```

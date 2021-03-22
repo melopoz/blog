@@ -1,7 +1,10 @@
 ---
 title: ElasticSearch
-tags: 分布式,ES
-categories: es
+tags: 
+  - 分布式
+  - 搜索引擎
+categories:
+  - [搜索引擎]
 ---
 
 

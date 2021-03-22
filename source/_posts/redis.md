@@ -1,3 +1,14 @@
+---
+title: Redis
+tags: 
+  - DB
+  - 缓存
+categories: 
+  - [NoSQL]
+---
+
+
+
 # Redis
 
 配置文件示例

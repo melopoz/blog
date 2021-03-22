@@ -1,3 +1,16 @@
+---
+title: 一致性hash
+tags: 
+  - 摘要算法
+  - algorithm
+  - hash
+  - redis
+categories: 
+  - [algorithm, hash]
+---
+
+
+
 # 哈希算法
 
 https://blog.csdn.net/cywosp/article/details/23397179

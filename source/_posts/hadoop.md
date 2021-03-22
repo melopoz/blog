@@ -1,7 +1,9 @@
 ---
-title: hadoop
-tags: 分布式,hadoop
-categories: 分布式
+title: Hadoop
+tags: 
+  - 分布式
+categories:
+  - [分布式, Hadoop]
 ---
 
 

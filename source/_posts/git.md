@@ -1,7 +1,7 @@
 ---
 title: Git
-tags: tools
-categories: tools
+tags: Tools
+categories: Tools
 ---
 
 

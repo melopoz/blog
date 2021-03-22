@@ -1,7 +1,12 @@
 ---
 title: I/O多路复用
-tags: IO,select,epoll
-categories: IO
+tags: 
+  - IO
+  - select
+  - epoll
+categories: 
+  - [OS]
+  - [IO]
 ---
 
 

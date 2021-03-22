@@ -1,5 +1,5 @@
 ---
-title: Spring Cloud Alibaba
+title: SpringCloudAlibaba
 tags: 
   - 分布式
 categories:

@@ -1,5 +1,5 @@
 ---
-title: Spring Cloud
+title: SpringCloud
 tags: 
   - 分布式
 categories:

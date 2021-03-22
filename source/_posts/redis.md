@@ -55,7 +55,7 @@ https://www.jianshu.com/p/8f2fb61097b8 这个图更清楚一点
 
 master线程监听多个socket，将产生的事件加入任务队列，事件分派器从队列中取出事件并执行，这也就保证按顺序执行。
 
-![](redis%E5%A4%84%E7%90%86%E4%B8%80%E6%AC%A1%E5%91%BD%E4%BB%A4%E8%BF%87%E7%A8%8B.png)
+![redis处理客户端一个命令的过程](https://raw.githubusercontent.com/melopoz/pics/master/img/redis%E5%A4%84%E7%90%86%E4%B8%80%E6%AC%A1%E5%91%BD%E4%BB%A4%E8%BF%87%E7%A8%8B.png)
 
 ### redis6线程模型
 

@@ -70,13 +70,13 @@ HDFS采用最近时间点的FsImage + 增量的EditsLog
 
 - 第n个block副本放在 随机节点。
 
-![hdfs-副本位置](images\hdfs-副本位置.pngx)
+<img src="https://raw.githubusercontent.com/melopoz/pics/master/img/hdfs-%E5%89%AF%E6%9C%AC%E4%BD%8D%E7%BD%AE.png" style="zoom:33%;" />
 
 
 
 ### HDFS写流程
 
-![hdfs-写流程](images\hdfs-写流程.pngx)
+<img src="https://raw.githubusercontent.com/melopoz/pics/master/img/hdfs-%E5%86%99%E6%B5%81%E7%A8%8B.png" />
 
 > block 块  packet小包(64kb)  chunk大块(512kb)
 >

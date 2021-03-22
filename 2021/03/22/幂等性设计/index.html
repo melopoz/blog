@@ -17,7 +17,7 @@
   <meta name="description" content="Although things are always not as you wish, but effort will be lucy!">
   <meta name="author" content="melopoz">
   <meta name="keywords" content="">
-  <title>你不喜欢孤独 那就别停下来</title>
+  <title>幂等性设计 - 你不喜欢孤独 那就别停下来</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
 
@@ -162,7 +162,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="">
+            <span class="h2" id="subtitle" title="幂等性设计">
               
             </span>
 
@@ -172,7 +172,7 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2021-03-22 22:32" pubdate>
+      <time datetime="2021-03-22 22:56" pubdate>
         2021年3月22日 晚上
       </time>
     </span>
@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      538 字
+      544 字
     </span>
   
 
@@ -224,7 +224,7 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none"></h1>
+            <h1 style="display: none">幂等性设计</h1>
             
             <div class="markdown-body">
               <p>如何保证幂等性</p>
@@ -243,21 +243,32 @@
 </li>
 <li><p>session-token 来防止表单重复提交</p>
 <blockquote>
-<p>前段生成表单之前先从后端得到一个 form-token ，请求到后端之后，后端先对这个token进行验证，然后修改session中的token。这样重复提交的表单所携带的token就会是无效的token。</p>
+<p>前端生成表单之前先从后端得到一个 form-token ，请求到后端之后，后端先对这个token进行验证，然后修改session中的token。这样重复提交的表单所携带的token就会是无效的token。</p>
 </blockquote>
 </li>
 <li><p>对外提供幂等接口</p>
 <blockquote>
-<p>10、对外提供接口的api如何保证幂等<br>如银联提供的付款接口：需要接入商户提交付款请求时附带：source来源，seq序列号；source+seq在数据库里面做唯一索引，防止多次付款(并发时，只能处理一个请求) 。<br>重点：对外提供接口为了支持幂等调用，接口有两个字段必须传，一个是来源source，一个是来源方序列号seq，这个两个字段在提供方系统里面做联合唯一索引，这样当第三方调用时，先在本方系统里面查询一下，是否已经处理过，返回相应处理结果；没有处理过，进行相应处理，返回结果。注意，为了幂等友好，一定要先查询一下，是否处理过该笔业务，不查询直接插入业务系统，会报错，但实际已经处理了。</p>
+<p>对外提供接口的api如何保证幂等<br>如银联提供的付款接口：需要接入商户提交付款请求时附带：source来源，seq序列号；source+seq在数据库里面做唯一索引，防止多次付款(并发时，只能处理一个请求) 。<br>重点：对外提供接口为了支持幂等调用，接口有两个字段必须传，一个是来源source，一个是来源方序列号seq，这个两个字段在提供方系统里面做联合唯一索引，这样当第三方调用时，先在本方系统里面查询一下，是否已经处理过，返回相应处理结果；没有处理过，进行相应处理，返回结果。注意，为了幂等友好，一定要先查询一下，是否处理过该笔业务，不查询直接插入业务系统，会报错，但实际已经处理了。</p>
 </blockquote>
 </li>
 </ol>
+<p>啥啊 todo todo todo </p>
+<p>参考：</p>
 <p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/linjiqin/p/9678022.html">https://www.cnblogs.com/linjiqin/p/9678022.html</a></p>
 
             </div>
             <hr>
             <div>
               <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/categories/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/">架构设计</a>
+                    
+                      <a class="hover-with-bg" href="/blog/categories/%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1/">接口设计</a>
+                    
+                  </div>
                 
                 
               </div>
@@ -269,9 +280,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/blog/2021/03/22/%E5%85%B3%E4%BA%8Espring%E4%BA%8B%E5%8A%A1/">
+                      <a href="/blog/2021/03/22/%E4%B8%80%E8%87%B4%E6%80%A7hash/">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">about Spring transaction</span>
+                        <span class="hidden-mobile">一致性hash</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -280,7 +291,7 @@
                     
                     
                       <a href="/blog/2021/03/22/%E6%AD%BB%E9%94%81/">
-                        <span class="hidden-mobile"></span>
+                        <span class="hidden-mobile">死锁</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

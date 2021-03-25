@@ -181,16 +181,22 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/22/Java_HashMap&ConcurrentHashMap/">Java_HashMap &amp; ConcurrentHashMap</a>
+        <a href="/blog/2021/03/25/Java_AQS%E6%BA%90%E7%A0%81/">AQS-JUC中锁的抽象模板</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/22/Java_HashMap&ConcurrentHashMap/">
+        <a href="/blog/2021/03/25/Java_AQS%E6%BA%90%E7%A0%81/">
           
           
             
           
-          HashMapHashMap 和 Hashtable 的区别HashMap 允许 key 和 value 为 null，Hashtable 不允许。HashMap 的默认初始容量为 16，Hashtable 为 11。HashMap 的扩容为原来的 2 倍，Hashtable 的扩容为原来的 2 倍加 1。HashMap 是非线程安全的，Hashtable是线程安全的。HashMap 的 hash
+          todo 
+https://www.cnblogs.com/waterystone/p/4920797.html
+AQS源码分析维护一个 volatile int 变量 state 代表加锁状态
+维护一个 队列代表请求锁资源的线程，head持有锁，后边的节点（线程）等待锁
+提供一套模板，实现类必须实现以下方法来实现自己加锁解锁的逻辑：
+
+boolean tryAcquire(int)：独占式 尝试
         </a>
       </p>
 
@@ -198,8 +204,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:14" pubdate>
-              2021-03-23
+            <time datetime="2021-03-25 19:59" pubdate>
+              2021-03-25
             </time>
           </div>
         
@@ -235,11 +241,65 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/22/Java_IO/">Java中的IO</a>
+        <a href="/blog/2021/03/25/Java_HashMap&ConcurrentHashMap/">Java_HashMap &amp; ConcurrentHashMap</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/22/Java_IO/">
+        <a href="/blog/2021/03/25/Java_HashMap&ConcurrentHashMap/">
+          
+          
+            
+          
+          HashMapHashMap 和 Hashtable 的区别HashMap 允许 key 和 value 为 null，Hashtable 不允许。HashMap 的默认初始容量为 16，Hashtable 为 11。HashMap 的扩容为原来的 2 倍，Hashtable 的扩容为原来的 2 倍加 1。HashMap 是非线程安全的，Hashtable是线程安全的。HashMap 的 hash
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-25 19:59" pubdate>
+              2021-03-25
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/Java/">Java</a>
+            
+              <a href="/blog/categories/Java/JUC/">JUC</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/JUC/">JUC</a>
+            
+              <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">并发</a>
+            
+              <a href="/blog/tags/%E5%90%8C%E6%AD%A5/">同步</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/25/Java_IO/">Java中的IO</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/25/Java_IO/">
           
           
             
@@ -259,8 +319,8 @@ buffers比如ByteBuffe
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:14" pubdate>
-              2021-03-23
+            <time datetime="2021-03-25 19:59" pubdate>
+              2021-03-25
             </time>
           </div>
         
@@ -283,11 +343,11 @@ buffers比如ByteBuffe
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/22/Java_fail-fast&fail-safe/">fail-fast &amp; happens-before</a>
+        <a href="/blog/2021/03/25/Java_fail-fast&fail-safe/">fail-fast &amp; happens-before</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/22/Java_fail-fast&fail-safe/">
+        <a href="/blog/2021/03/25/Java_fail-fast&fail-safe/">
           
           
             
@@ -303,8 +363,8 @@ fail-fast在使用迭代器遍历一个集合的时候，例如foreach(实现还
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:14" pubdate>
-              2021-03-23
+            <time datetime="2021-03-25 19:59" pubdate>
+              2021-03-25
             </time>
           </div>
         
@@ -327,11 +387,11 @@ fail-fast在使用迭代器遍历一个集合的时候，例如foreach(实现还
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/22/Java_%E5%AF%B9%E8%B1%A1%E9%80%83%E9%80%B8EA/">Java_对象逃逸</a>
+        <a href="/blog/2021/03/25/Java_%E5%AF%B9%E8%B1%A1%E9%80%83%E9%80%B8EA/">Java_对象逃逸</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/22/Java_%E5%AF%B9%E8%B1%A1%E9%80%83%E9%80%B8EA/">
+        <a href="/blog/2021/03/25/Java_%E5%AF%B9%E8%B1%A1%E9%80%83%E9%80%B8EA/">
           
           
             
@@ -354,8 +414,8 @@ https://blog.csdn.net/wolfcode_cn/article/details/83058235
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:14" pubdate>
-              2021-03-23
+            <time datetime="2021-03-25 19:59" pubdate>
+              2021-03-25
             </time>
           </div>
         
@@ -378,11 +438,11 @@ https://blog.csdn.net/wolfcode_cn/article/details/83058235
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/22/Java_%E9%94%81%E5%8D%87%E7%BA%A7/">Java_锁升级</a>
+        <a href="/blog/2021/03/25/Java_%E9%94%81%E5%8D%87%E7%BA%A7/">Java_锁升级</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/22/Java_%E9%94%81%E5%8D%87%E7%BA%A7/">
+        <a href="/blog/2021/03/25/Java_%E9%94%81%E5%8D%87%E7%BA%A7/">
           
           
             
@@ -405,8 +465,8 @@ https://blog.csdn.net/wolfcode_cn/article/details/83058235
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:14" pubdate>
-              2021-03-23
+            <time datetime="2021-03-25 19:59" pubdate>
+              2021-03-25
             </time>
           </div>
         
@@ -440,11 +500,11 @@ https://blog.csdn.net/wolfcode_cn/article/details/83058235
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/22/Kafka/">Kafka</a>
+        <a href="/blog/2021/03/25/Kafka/">Kafka</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/22/Kafka/">
+        <a href="/blog/2021/03/25/Kafka/">
           
           
             
@@ -462,8 +522,8 @@ https://blog.csdn.net/Dongguabai/article/d
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:14" pubdate>
-              2021-03-23
+            <time datetime="2021-03-25 19:59" pubdate>
+              2021-03-25
             </time>
           </div>
         
@@ -486,11 +546,11 @@ https://blog.csdn.net/Dongguabai/article/d
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/22/MySQL_function/">Mysql function应用</a>
+        <a href="/blog/2021/03/25/MySQL_function/">Mysql function应用</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/22/MySQL_function/">
+        <a href="/blog/2021/03/25/MySQL_function/">
           
           
             
@@ -508,8 +568,8 @@ from Employe
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:14" pubdate>
-              2021-03-23
+            <time datetime="2021-03-25 19:59" pubdate>
+              2021-03-25
             </time>
           </div>
         
@@ -534,11 +594,11 @@ from Employe
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/22/MySQL_%E7%B4%A2%E5%BC%95&%E4%BA%8B%E5%8A%A1&mvcc&%E9%94%81/">Mysql</a>
+        <a href="/blog/2021/03/25/MySQL_%E7%B4%A2%E5%BC%95&%E4%BA%8B%E5%8A%A1&mvcc&%E9%94%81/">Mysql</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/22/MySQL_%E7%B4%A2%E5%BC%95&%E4%BA%8B%E5%8A%A1&mvcc&%E9%94%81/">
+        <a href="/blog/2021/03/25/MySQL_%E7%B4%A2%E5%BC%95&%E4%BA%8B%E5%8A%A1&mvcc&%E9%94%81/">
           
           
             
@@ -555,8 +615,8 @@ B+Tree 的最大深度 log(n)，n:节点数，而且是B+Tree，每次查
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:14" pubdate>
-              2021-03-23
+            <time datetime="2021-03-25 19:59" pubdate>
+              2021-03-25
             </time>
           </div>
         
@@ -594,11 +654,11 @@ B+Tree 的最大深度 log(n)，n:节点数，而且是B+Tree，每次查
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/22/Nginx/">Nginx</a>
+        <a href="/blog/2021/03/25/Nginx/">Nginx</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/22/Nginx/">
+        <a href="/blog/2021/03/25/Nginx/">
           
           
             
@@ -618,8 +678,8 @@ nginx通过请求的请求头中的Host获取要访问的server,
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:14" pubdate>
-              2021-03-23
+            <time datetime="2021-03-25 19:59" pubdate>
+              2021-03-25
             </time>
           </div>
         
@@ -640,58 +700,6 @@ nginx通过请求的请求头中的Host获取要访问的server,
               <a href="/blog/tags/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86/">反向代理</a>
             
               <a href="/blog/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">负载均衡</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/03/22/OS/">OS</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/03/22/OS/">
-          
-          
-            
-          
-          操作系统四大特征：并发两个事件在同一段时间内发生，即宏观上同时运行；并行是两个事件在统一时刻发生，多(核)CPU可支持并行
-共享（资源复用）多个并发执行的进程共同使用同一系统资源，比如内存
-
-互斥共享：同一时刻只有一个进程可以访问，需要同步机制来实现互斥。互斥的资源成为临界资源。e.g.:摄像头
-同时访问：允许多个进程在同一段时间内访问同一资源，即宏观上的同时。（微观上还是交替进行）e.g.:磁盘
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-23 00:14" pubdate>
-              2021-03-23
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/OS/">OS</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
             
           </div>
         

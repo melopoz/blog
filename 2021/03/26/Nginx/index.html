@@ -1,0 +1,717 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/favicon.png">
+  <link rel="icon" type="image/png" href="/blog/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Although things are always not as you wish, but effort will be lucy!">
+  <meta name="author" content="melopoz">
+  <meta name="keywords" content="">
+  <title>Nginx - 你不喜欢孤独 那就别停下来</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/blog/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.1.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"melopoz.github.io","root":"/blog/","version":"1.8.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"copy_btn":true,"image_zoom":{"enable":true},"lazyload":{"enable":true,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/blog/">&nbsp;<strong>Fluid</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/blog/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Nginx">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-03-26 13:36" pubdate>
+        2021年3月26日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.7k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      33
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Nginx</h1>
+            
+            <div class="markdown-body">
+              <p>官方中文文档：<a target="_blank" rel="noopener" href="https://www.nginx.cn/doc">https://www.nginx.cn/doc</a></p>
+<p>功能：免费开源的 <strong>高性能的HTTP服务器</strong>、<strong>反向代理</strong>、<strong>IMAP/POP3代理服务器</strong>。</p>
+<p>特点：稳定，轻量级，配置简单，资源消耗低，功能丰富！</p>
+<p>相同功能还有Apache的Httpd，架构比较笨重，性能不如nginx，主要不会玩。</p>
+<h1 id="配置服务器名称（域名）"><a href="#配置服务器名称（域名）" class="headerlink" title="配置服务器名称（域名）"></a>配置服务器名称（域名）</h1><blockquote>
+<p>nginx通过请求的请求头中的Host获取要访问的server,</p>
+</blockquote>
+<p>可用<code>精确名称</code>、<code>通配符</code>、<code>正则表达式</code></p>
+<p>按照顺序选择第一个匹配：</p>
+<blockquote>
+<p>精确名称，以’<em>‘开头的最长的通配符，以’</em>‘结尾的最长的通配符，第一个匹配的正则表达式</p>
+</blockquote>
+<pre><code class="hljs nginx"><span class="hljs-section">server</span> &#123;
+    <span class="hljs-attribute">listen</span>       <span class="hljs-number">80</span>;
+    <span class="hljs-comment"># 精确名称</span>
+    <span class="hljs-attribute">server_name</span>  example.org  www.example.org;
+    <span class="hljs-comment"># 或 *开头的通配符（以&#x27;example.org&#x27;结尾的都算）</span>
+    <span class="hljs-attribute">server_name</span>  <span class="hljs-regexp">*.example.org</span>;<span class="hljs-comment">#如果有&#x27;*&#x27;，则&#x27;*&#x27;必须在&#x27;.&#x27;的旁边</span>
+    <span class="hljs-comment"># 或 *结尾的通配符（以&#x27;mail.&#x27;开头的都算）</span>
+    <span class="hljs-attribute">server_name</span>  <span class="hljs-regexp">mail.*</span>;
+    <span class="hljs-comment"># 或 正则</span>
+    <span class="hljs-attribute">server_name</span>  ~^(?&lt;user&gt;.+)\.example\.net$;<span class="hljs-comment"># 使用正则表达式时，服务器名称必须使用波浪线&#x27;~’开头</span>
+    
+    ...
+&#125;</code></pre>
+
+<blockquote>
+<p>精确名称、以星号开头的通配符、以星号结尾的通配符是分别被存储在绑定到监听端口上的三张哈希表中。</p>
+<p>存放精确名称的哈希表最先被搜索；其次以星号开头的通配符哈希表；最后搜索以星号结尾的哈希表。</p>
+</blockquote>
+<p>一种特殊形式的通配符<code>.example.org</code>可以用来匹配精确名称<code>example.org</code>和通配符<code>*.example.org</code>  ,这种特殊的通配符形式<code>.example.org</code>是存储在通配符名称的哈希表中。</p>
+<p>所以能写</p>
+<pre><code class="hljs nginx"><span class="hljs-section">server</span> &#123;
+    <span class="hljs-attribute">listen</span> <span class="hljs-number">80</span>;
+    <span class="hljs-attribute">server_name</span> example.org  www.example.org  <span class="hljs-regexp">*.example.org</span>;<span class="hljs-comment">#更高效</span>
+    <span class="hljs-attribute">server_name</span> .example.org;
+    ...
+&#125;</code></pre>
+
+
+
+
+
+<h5 id="指定正则表达式捕获片段之后可以当做一个变量来使用："><a href="#指定正则表达式捕获片段之后可以当做一个变量来使用：" class="headerlink" title="指定正则表达式捕获片段之后可以当做一个变量来使用："></a>指定<strong>正则</strong>表达式<strong>捕获片段</strong>之后可以<strong>当做一个变量</strong>来使用：</h5><blockquote>
+<pre><code class="hljs nginx"><span class="hljs-section">server</span> &#123;
+    <span class="hljs-attribute">server_name</span>   ~^(www\.)?(?&lt;domain&gt;.+)$;
+    <span class="hljs-attribute">location</span> / &#123;
+        <span class="hljs-attribute">root</span>   /sites/$domain;
+    &#125;
+&#125;</code></pre>
+
+<p>PCRE库支持以下语法使用捕获片段：</p>
+<blockquote>
+<p><code>?&lt;name&gt;</code>： Perl 5.10兼容语法，从PCRE-7.0开始支持<br><code>?&#39;name&#39;</code>： Perl 5.10兼容语法，从PCRE-7.0开始支持<br><code>?P&lt;name&gt;</code>： Python兼容语法，从PCRE-4.0开始支持</p>
+</blockquote>
+<p>如果 NGINX 启动失败，并且显示错误信息：<br><code>pcre_compile() failed: unrecognized character after (?&lt; in ...</code><br>说明PCRE库太老了，这种语法“?P<name>”应该被替换。</p>
+<p>捕获片段也可以使用数字形式引用：</p>
+<blockquote>
+<p>这种使用方式尽量限制在简单案例中使用，因为数字引用形式很容易被覆盖。</p>
+<pre><code class="hljs nginx"><span class="hljs-section">server</span> &#123;
+    <span class="hljs-attribute">server_name</span>   ~^(www\.)?(.+)$;
+    <span class="hljs-attribute">location</span> / &#123;
+        <span class="hljs-attribute">root</span>   /sites/<span class="hljs-variable">$2</span>;
+    &#125;
+&#125;</code></pre>
+</blockquote>
+</blockquote>
+<h5 id="如果请求头中没有Host，则会用默认服务器来处理请求，"><a href="#如果请求头中没有Host，则会用默认服务器来处理请求，" class="headerlink" title="如果请求头中没有Host，则会用默认服务器来处理请求，"></a>如果请求头中没有Host，则会用<strong>默认服务器</strong>来处理请求，</h5><blockquote>
+<pre><code class="hljs nginx"><span class="hljs-section">http</span> &#123;
+    <span class="hljs-comment"># 如果没有显式声明 default server 则第一个 server 会被隐式的设为 default server,建议显示声明一下default server</span>
+    <span class="hljs-section">server</span> &#123;
+        <span class="hljs-attribute">listen</span> <span class="hljs-number">80</span>;
+        <span class="hljs-attribute">server_name</span> www.aaa.com;
+        ...
+    &#125;
+    <span class="hljs-section">server</span> &#123;
+        <span class="hljs-attribute">listen</span> <span class="hljs-number">80</span>;
+        <span class="hljs-attribute">server_name</span> www.bbb.com;
+        ...
+    &#125;
+    <span class="hljs-comment"># 显示的定义一个 default server</span>
+    <span class="hljs-section">server</span> &#123;
+        <span class="hljs-attribute">listen</span> <span class="hljs-number">80</span> default_server;
+        <span class="hljs-attribute">server_name</span> _;
+        <span class="hljs-attribute">return</span> <span class="hljs-number">403</span>; <span class="hljs-comment"># 403 forbidden</span>
+    &#125;
+    <span class="hljs-comment">#---让default server返回403，可以禁止ip访问，也可以禁止未知域名访问</span>
+&#125;</code></pre>
+</blockquote>
+<p>如果请求直接输入ip，nginx会把请求随机分配到某个域名上，</p>
+<h5 id="如果想让直接用ip的请求打到指定的某个域名上"><a href="#如果想让直接用ip的请求打到指定的某个域名上" class="headerlink" title="如果想让直接用ip的请求打到指定的某个域名上"></a>如果想让直接用ip的请求打到指定的某个域名上</h5><p>则需要配置该server为</p>
+<pre><code class="hljs nginx"><span class="hljs-section">server</span> &#123;
+    <span class="hljs-attribute">listen</span> x.x.x.x:<span class="hljs-number">80</span>;
+    <span class="hljs-comment">#或者</span>
+    <span class="hljs-attribute">listen</span> x.x.x.x;<span class="hljs-comment">#（默认80嘛）</span>
+    <span class="hljs-attribute">server_name</span> _;
+    ...
+&#125;</code></pre>
+
+
+
+<h1 id="配置HTTPS"><a href="#配置HTTPS" class="headerlink" title="配置HTTPS"></a>配置HTTPS</h1><p>在server块中监听指令后 <code>启用ssl</code> 并指定证书和私钥的位置</p>
+<pre><code class="hljs nginx"><span class="hljs-section">server</span> &#123;
+    <span class="hljs-attribute">listen</span> <span class="hljs-number">443</span> ssl;<span class="hljs-comment">#启用ssl</span>
+    <span class="hljs-comment">#-----或-------</span>
+    <span class="hljs-attribute">listen</span> <span class="hljs-number">443</span>;
+    <span class="hljs-attribute">ssl</span> <span class="hljs-literal">on</span>;
+    <span class="hljs-comment">#--------------</span>
+    <span class="hljs-attribute">server_name</span> www.melopoz.top;
+    <span class="hljs-attribute">ssl_certificate</span> /usr/local/crt/melopoz.top.pem;<span class="hljs-comment">#证书位置</span>
+    <span class="hljs-attribute">ssl_certificate_key</span> /usr/local/crt/melopoz.top.key;<span class="hljs-comment">#私钥位置</span>
+
+	<span class="hljs-attribute">ssl_protocols</span> TLSv1 TLSv1.<span class="hljs-number">1</span> TLSv1.<span class="hljs-number">2</span>;<span class="hljs-comment">#默认的不用写 不过每个版本不太一样</span>
+    <span class="hljs-attribute">ssl_ciphers</span> HIGH:!aNULL:!MD5;<span class="hljs-comment">#默认的不用写 不过每个版本不太一样</span>
+    ...
+&#125;
+<span class="hljs-section">server</span> &#123;
+    <span class="hljs-attribute">listen</span> <span class="hljs-number">80</span>;
+    <span class="hljs-attribute">server_name</span> melopoz.top;
+    <span class="hljs-comment">#将请求转成https</span>
+    <span class="hljs-attribute">rewrite</span><span class="hljs-regexp"> ^(.*)$</span> https://$host<span class="hljs-variable">$1</span> <span class="hljs-literal">permanent</span>;
+&#125;</code></pre>
+
+<p>私钥应该限制访问权限，如果证书和私钥都在一个文件里的话，也只有证书会发送到客户端。</p>
+<h4 id="虚拟主机，多个域名都监听443端口，但证书不同"><a href="#虚拟主机，多个域名都监听443端口，但证书不同" class="headerlink" title="虚拟主机，多个域名都监听443端口，但证书不同"></a>虚拟主机，多个域名都监听443端口，但证书不同</h4><p>配置如下：</p>
+<pre><code class="hljs nginx"><span class="hljs-section">server</span> &#123;
+    <span class="hljs-attribute">listen</span>          <span class="hljs-number">443</span> ssl;
+    <span class="hljs-attribute">server_name</span>     www.aaa.com;
+    <span class="hljs-attribute">ssl_certificate</span> www.aaa.com.crt;
+    ...
+&#125;
+<span class="hljs-section">server</span> &#123;
+    <span class="hljs-attribute">listen</span>          <span class="hljs-number">443</span> ssl;
+    <span class="hljs-attribute">server_name</span>     www.bbb.org;
+    <span class="hljs-attribute">ssl_certificate</span> www.bbb.org.crt;
+    ...
+&#125;</code></pre>
+
+<p>因为https是先建立SSL连接，再建立HTTP连接，在进行SSL连接的时候还不知道请求的服务器的名称（域名）是什么(不懈怠)，所以nginx只能把默认的服务器证书(aaa的crt)给到客户端，如果请求的是bbb，按说应该是行不通的。。。。。</p>
+<p>后来，2006年，TLS协议加入了一个<a target="_blank" rel="noopener" href="http://tools.ietf.org/html/rfc4366">Server Name Indication扩展</a>，请求可以携带客户端要访问的域名。</p>
+<p><strong>所以如上配置现在是没问题的，ssl握手也可以正确拿到要请求的域名对应的证书</strong></p>
+<h4 id="多个域名的SSL证书"><a href="#多个域名的SSL证书" class="headerlink" title="多个域名的SSL证书"></a>多个域名的SSL证书</h4><p>还有其他方法允许在几个HTTPS虚拟主机服务器之间共享单个IP地址。然而，他们都有自己的缺点。其中一种方法是在证书的 SubjectAltName 字段中使用多个名称，例如 <code>www.example.com</code> 和 <code>www.example.org</code> 。 但是， SubjectAltName 字段长度有限。</p>
+<p>另一种方法是使用带有通配符名称的证书，例如 <code>*.example.org</code> 。 通配符证书能保护指定域的所有子域，但只限一个级别。此证书与 <code>www.example.org</code> 匹配，但不匹配 <code>example.org</code> 和 <code>www.sub.example.org</code> 。这两种方法也可以结合。证书可以在 SubjectAltName 字段中包含完全匹配和通配符名称，例如 <code>example.org</code> 和 <code>*.example.org</code> 。</p>
+<p>最好在配置文件的 <code>http</code>区块中放置具有多个名称的证书文件及其私钥文件，以在所有其下的虚拟主机服务器中继承其单个内存副本：</p>
+<pre><code class="hljs nginx"><span class="hljs-attribute">ssl_certificate</span>     common.crt;
+<span class="hljs-attribute">ssl_certificate_key</span> common.key;<span class="hljs-comment">#通用</span>
+<span class="hljs-section">server</span> &#123;
+    <span class="hljs-attribute">listen</span>          <span class="hljs-number">443</span> ssl;
+    <span class="hljs-attribute">server_name</span>     www.example.com;
+    ...
+&#125;
+<span class="hljs-section">server</span> &#123;
+    <span class="hljs-attribute">listen</span>          <span class="hljs-number">443</span> ssl;
+    <span class="hljs-attribute">server_name</span>     www.example.org;
+    ...
+&#125;</code></pre>
+
+<p>从<code>github 的 nginx-tutorial</code>nginx-教程 看到</p>
+<h1 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h1><p>可选策略：</p>
+<ul>
+<li>轮询（默认）</li>
+<li>最少连接（下次请求分配给 连接数最少的机器（分给最不忙的机器））</li>
+<li>IP哈希（基于客户端的IP地址进行hash，一个客户端的请求每次都是被同一个机器处理（机器没有下线））</li>
+</ul>
+<pre><code class="hljs nginx"><span class="hljs-section">http</span> &#123;
+    <span class="hljs-attribute">upstream</span> myapp1 &#123;
+        <span class="hljs-comment"># ---这里配置使用的负载均衡策略</span>
+        <span class="hljs-comment"># 默认轮询</span>
+        <span class="hljs-comment"># least_conn</span>
+        <span class="hljs-comment"># ip_hash</span>
+                
+        <span class="hljs-attribute">server</span> srv1.example.com weight=<span class="hljs-number">3</span>;<span class="hljs-comment">#可以根据机器的性能分配一个合适的权重</span>
+        <span class="hljs-attribute">server</span> srv2.example.com;
+        <span class="hljs-attribute">server</span> srv3.example.com;
+    &#125;
+    <span class="hljs-section">server</span> &#123;
+        <span class="hljs-attribute">listen</span> <span class="hljs-number">80</span>;
+        <span class="hljs-attribute">location</span> / &#123;
+            <span class="hljs-attribute">proxy_pass</span> http://myapp1;<span class="hljs-comment"># 如果是https 则直接用https即可</span>
+        &#125;
+    &#125;
+&#125;</code></pre>
+
+
+
+<h1 id="压缩-解压"><a href="#压缩-解压" class="headerlink" title="压缩/解压"></a>压缩/解压</h1><p>由于压缩在运行时发生，所以会增加处理开销，这可能会对性能产生负面影响。 </p>
+<p>在向客户端发送响应之前，NGINX 会执行压缩，但不会“重复压缩”已经压缩过的响应。</p>
+<h4 id="启用压缩"><a href="#启用压缩" class="headerlink" title="启用压缩"></a>启用压缩</h4><p>要启用压缩，在 gzip 指令上请使用<code>on</code>参数:</p>
+<pre><code class="hljs nginx"><span class="hljs-attribute">gzip</span> <span class="hljs-literal">on</span>;</code></pre>
+
+<p>默认情况下，NGINX 仅压缩使用MIME 类型 为 <code>text/html</code>的响应。要压缩其他 MIME 类型的响应，请包含<code>gzip_types</code>指令并列出相应的类型。</p>
+<pre><code class="hljs applescript">gzip_types <span class="hljs-built_in">text</span>/plain <span class="hljs-built_in">application</span>/xml;</code></pre>
+
+<p>要指定要压缩的响应的最小长度，请使用<code>gzip_min_length</code>指令。默认值为20字节，下面示例调整为1000：</p>
+<pre><code class="hljs abnf">gzip_min_length <span class="hljs-number">1000</span><span class="hljs-comment">;</span></code></pre>
+
+<p>默认情况下，NGINX 不会压缩对代理请求的响应（来自代理服务器的请求）。请求是否来自代理服务器是由请求中 <code>Via</code> 头字段的是否存来确定的。</p>
+<p>使用<code>gzip_proxied</code> 配置这些响应的压缩，该指令具有多个参数来指定 NGINX 应压缩哪种代理请求。</p>
+<p>例如，仅对不会在代理服务器上缓存的请求进行压缩响应，为此，<code>gzip_proxied</code>指令具有指示 NGINX 在响应中检查 <code>Cache-Control</code> 头字段的参数，如果值是 no-cache、no-store 或 private，则压缩响应。</p>
+<p>另外，您必须包括 expired 的参数来检查 <code>Expires</code> 头字段的值。这些参数在以下示例中与 auth 参数一起设置，该参数检查<code>Authorization</code>头字段的存在（授权响应特定于最终用户，并且通常不被缓存）：</p>
+<pre><code class="hljs nginx"><span class="hljs-attribute">gzip_proxied</span> <span class="hljs-literal">no</span>-cache <span class="hljs-literal">no</span>-store private expired auth;</code></pre>
+
+<p>与大多数其他指令一样，配置压缩的指令可以包含在<code>http</code>上下文中，也可以包含在 <code>server</code> 或 <code>location</code> 块中。</p>
+<p>gzip 压缩的整体配置可能如下所示。</p>
+<pre><code class="hljs nginx"><span class="hljs-section">server</span> &#123;
+    <span class="hljs-attribute">gzip</span> <span class="hljs-literal">on</span>;
+    <span class="hljs-attribute">gzip_types</span>      text/plain application/xml;
+    <span class="hljs-attribute">gzip_proxied</span>    <span class="hljs-literal">no</span>-cache <span class="hljs-literal">no</span>-store private expired auth;
+    <span class="hljs-attribute">gzip_min_length</span> <span class="hljs-number">1000</span>;
+    ...
+&#125;</code></pre>
+
+<h4 id="启用解压"><a href="#启用解压" class="headerlink" title="启用解压"></a>启用解压</h4><pre><code class="hljs crmsh"><span class="hljs-keyword">location</span> <span class="hljs-title">/storage</span>/ &#123;
+    gunzip on;
+    ...
+&#125;</code></pre>
+
+<p><code>gunzip</code>指令也可以在与<code>gzip</code>指令相同的上下文中指定：</p>
+<pre><code class="hljs abnf">server &#123;
+    gzip on<span class="hljs-comment">;</span>
+    gzip_min_length <span class="hljs-number">1000</span><span class="hljs-comment">;</span>
+    gunzip on<span class="hljs-comment">;</span>
+    ...
+&#125;</code></pre>
+
+
+<p>请注意，此指令在单独的模块中定义（见<code>ngx_http_gunzip_module</code><a target="_blank" rel="noopener" href="http://nginx.org/en/docs/http/ngx_http_gunzip_module.html">http://nginx.org/en/docs/http/ngx_http_gunzip_module.html</a>），默认情况下可能不包含在开源 NGINX 构建中。</p>
+<h4 id="发送压缩文件"><a href="#发送压缩文件" class="headerlink" title="发送压缩文件"></a>发送压缩文件</h4><p>要将文件的压缩版本发送到客户端而不是常规文件，请在适当的上下文中将<code>gzip_static</code>指令设置为 on。</p>
+<pre><code class="hljs crmsh"><span class="hljs-keyword">location</span> <span class="hljs-title">/ &#123;</span>
+<span class="hljs-title">    gzip_static</span> on;
+&#125;</code></pre>
+
+
+<p>在这种情况下，为了服务<code>/path/to/file</code>的请求，NGINX 尝试查找并发送文件<code>/path/to/file.gz</code>。如果文件不存在，或客户端不支持 gzip，则 NGINX 将发送未压缩版本的文件。</p>
+<p>请注意，<code>gzip_static</code>指令不启用即时压缩。它只是使用压缩工具预先压缩的文件。要在运行时压缩内容（而不仅仅是静态内容），请使用<code>gzip</code>指令。</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>Ubuntu：</p>
+<p>sudo apt-get update</p>
+<p>sudo apt-get install nginx</p>
+<blockquote>
+<p>若安装过程报错：</p>
+<p>W: GPG error: <a target="_blank" rel="noopener" href="http://nginx.org/packages/ubuntu">http://nginx.org/packages/ubuntu</a> xenial Release: The following signatures couldn’t be verified because the public key is not available: NO_PUBKEY $key</p>
+<p>则先执行<code>sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $key</code></p>
+<p>再执行安装</p>
+</blockquote>
+<p>启动</p>
+<p>sudo service nginx start</p>
+<p>访问localhost即可(默认80端口)</p>
+<h1 id="改了配置-重新加载"><a href="#改了配置-重新加载" class="headerlink" title="改了配置 重新加载"></a>改了配置 重新加载</h1><p><code>nginx -s reload</code></p>
+<h1 id="绑核"><a href="#绑核" class="headerlink" title="绑核"></a>绑核</h1><p>处理相同线程都用同一个CPU可以保证L1L2缓存的使用，减缓因切换使用的CPU带来的开销，所以如果指定进程使用的CPU可以提高性能。</p>
+<p>因为是要用cpu的L1、L2缓存，所以这里绑定的是物理核心！</p>
+<p>如果是四核四线程的CPU，则直接配置即可，如果是四核八线程(泛指这种虚拟核心的情况)，要先查看指定的CPU core id</p>
+<h4 id="可以通过-cat-proc-cpuinfo-grep-quot-core-id-quot-命令查看CPU核心"><a href="#可以通过-cat-proc-cpuinfo-grep-quot-core-id-quot-命令查看CPU核心" class="headerlink" title="可以通过 cat /proc/cpuinfo |grep &quot;core id&quot; 命令查看CPU核心"></a>可以通过 <code>cat /proc/cpuinfo |grep &quot;core id&quot;</code> 命令查看CPU核心</h4><p>四核四线程：</p>
+<blockquote>
+<p>core id         : 0<br>core id         : 1<br>core id         : 2<br>core id         : 3</p>
+</blockquote>
+<p>四核八线程：</p>
+<blockquote>
+<p>可能是</p>
+<p>core id         : 0<br>core id         : 1<br>core id         : 2<br>core id         : 3<br>core id         : 0<br>core id         : 1<br>core id         : 2<br>core id         : 3</p>
+<p>可能是</p>
+<p>core id         : 0<br>core id         : 0<br>core id         : 1<br>core id         : 1<br>core id         : 2<br>core id         : 2<br>core id         : 3<br>core id         : 3</p>
+</blockquote>
+<h4 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h4><p>如果是第一种四核八线程需要配置 affinity 为：</p>
+<pre><code class="hljs nginx"><span class="hljs-attribute">worker_processes</span> auto;<span class="hljs-comment"># cpu 核心数</span>
+<span class="hljs-attribute">worker_cpu_affinity</span> <span class="hljs-number">0001</span> <span class="hljs-number">0010</span> <span class="hljs-number">0100</span> <span class="hljs-number">1000</span>;<span class="hljs-comment">#15 26 37 48分为四组，保证一个物理核心的两个逻辑核心处理的进程都用这个物理cpu</span>
+<span class="hljs-attribute">worker_cpu_affinity</span> auto;<span class="hljs-comment"># cpu亲和性 就是绑核 1.9.几来着 可以设置 auto 了</span></code></pre>
+
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/HTTP%E6%9C%8D%E5%8A%A1%E5%99%A8/">HTTP服务器</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86/">反向代理</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">负载均衡</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2021/03/26/MySQL_%E7%B4%A2%E5%BC%95&amp;%E4%BA%8B%E5%8A%A1&amp;mvcc&amp;%E9%94%81/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Mysql</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2021/03/26/OS/">
+                        <span class="hidden-mobile">OS</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":200})
+    NProgress.start()
+    document.addEventListener('DOMContentLoaded', function() {
+      window.NProgress && window.NProgress.inc();
+    })
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.staticfile.org/jquery/3.5.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/debouncer.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/blog/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.12.0/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/blog/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/blog/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+
+</body>
+</html>

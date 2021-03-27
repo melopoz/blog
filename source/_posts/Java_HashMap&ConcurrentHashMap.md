@@ -11,36 +11,216 @@ categories:
 
 
 
-# HashMap
+# java.util.Map
 
-### HashMap 和 Hashtable 的区别
-
-|                 | HashMap                     | HashTable                                   |
-| --------------- | --------------------------- | ------------------------------------------- |
-| key,value为null | 允许，且只能有一个key为null | 不允许                                      |
-| 默认初始容量    | 16                          | 11                                          |
-| 扩容            | 原容量的2倍                 | 原来的2倍+1                                 |
-|                 | 重                          | 直接使用hashCode()                          |
-| 线程安全        | 非线程安全                  | 线程安全，就是HashMap的方法加个synchronized |
-|                 |                             |                                             |
-|                 |                             |                                             |
-|                 |                             |                                             |
-|                 |                             |                                             |
-|                 |                             |                                             |
-
-HashMap 允许 key 和 value 为 null，Hashtable 不允许。
-HashMap 的默认初始容量为 16，Hashtable 为 11。
-HashMap 的扩容为原来的 2 倍，Hashtable 的扩容为原来的 2 倍加 1。
-HashMap 是非线程安全的，Hashtable是线程安全的。
-HashMap 的 hash 值重新计算过，Hashtable 直接使用 hashCode。
-HashMap 去掉了 Hashtable 中的 contains 方法。
-HashMap 继承自 AbstractMap 类，Hashtable 继承自 Dictionary 类。
+<img src="https://raw.githubusercontent.com/melopoz/pics/master/img/java-util-map.png" style="zoom:50%;" />
 
 
 
-### 数据结构
+## 常用实现
 
-HashMap 的底层是个 Node 数组（Node<K,V>[] table），在数组的具体索引位置，如果存在多个节点，则可能是以链表或红黑树的形式存在。
+1. HashMap
+
+   根据hashCode存储数据，访问速度快，遍历顺序不确定，允许一个key为null，允许任意value为null，非线程安全，同一时刻多个线程同时对一个hashMap进行put，可能会导致数据不一致。
+
+   > 可用Collections#synchronizedMap方法得到一个线程安全的map（直接synchronized入参的map对象）
+   >
+   > 或者用ConcurrentHashMap
+
+2. HashTable
+
+   遗留类，不建议用，一般也不用这玩意了。常用功能和HashMap类似，不过HashTable是`extends Dictionary implements Map`，线程安全，但并发性不如ConcurrentHashMap，他的方法是synchronized的。
+
+3. LinkedHashMap
+
+   继承自HashMap，记录了key的插入顺序
+
+   > accessOrder参数：默认false，是根据第一次插入该key的顺序排序；true：每次访问都更新排序，也就是get(k)、再put(k,v)都会将k放到最后。
+
+4. TreeMap
+
+   实现NavigableMap接口(navigable:可导航的)，NavigableMap继承SortedMap接口。Entry根据key排序，默认按照key升序排序，也可以指定用于排序的比较器。
+
+   > 使用TreeMap时，key必须实现Comparable接口或者在TreeMap的构造函数中传入自定义的Comparator，否则运行时会throw ClassCastException。
+
+
+
+## HashMap内部实现
+
+### 数据结构 & 属性
+
+数组 + 链表 / 红黑树(1.8增加红黑树)
+
+<img src="https://raw.githubusercontent.com/melopoz/pics/master/img/HashMap%E7%BB%93%E6%9E%84.png" style="zoom:50%;" />
+
+#### `Node<K, V>[] table；`
+
+哈希桶数组，每个元素都是一个键值对：`Node<K,V> implements Map.Entry`。
+
+> hash可能会冲突，可以采用开放地址法、链地址法。HashMap采用链地址法。
+>
+> > 开放地址法：每当目标位置不是空的，就像下寻找，直到找到空位置。
+>
+> 这种结构必然要权衡空间成本和时间成本，需要用好的hash算法和扩容机制来让table占据空间小，又不容易发生hash碰撞。
+>
+> table默认长度`length`为`16`，负载因子`loadFactor`为`0.75`。
+>
+> 阈值`threshold` = `length * loadFactor`，table中的元素个数超过threshold之后就要resize()。
+>
+> > 时间效率要求极高就减小threshold，内存紧张就调大threshold。
+
+#### table.length
+
+必须为2的n次方，扩容(resize)就 *2
+
+> 因为他用key的hash值对（length-1）取模（&）。**为了减少hash冲突**。可以看resize()的代码和下文**确定node在table中的索引位置**。
+>
+> ```java
+> final Node<K,V>[] resize() {
+>         Node<K,V>[] oldTab = table;// 旧table
+>         int oldCap = (oldTab == null) ? 0 : oldTab.length;// 旧容量
+>         int oldThr = threshold;// 旧阈值
+>         int newCap, newThr = 0;// 新容量 新阈值
+>         if (oldCap > 0) {
+>         	...
+>             else if ((newCap = oldCap << 1) < MAXIMUM_CAPACITY &&
+>                      oldCap >= DEFAULT_INITIAL_CAPACITY)
+>                 // 新容量 = 旧容量 * 2
+>                 newThr = oldThr << 1; // double threshold
+>         }
+>         ...
+>         if (oldTab != null) {
+>             for (int j = 0; j < oldCap; ++j) {// 把entry放到新数组对应的位置
+>                 newTab[e.hash & (newCap - 1)] = e;// 用entry.key的hash对 新容量-1 取模，这样就能用上所有的bit
+>                 // 举个例子 16-1=15，二进制为`.. 0000 1111`，这样有效位是后四位全部，而且还在容量范围之内。
+>         ...
+> }
+> ```
+>
+> 对比HashTable来看，hashTable扩容是`*2-1`，初始容量是个素数`11`，但是扩容后就不一定了。
+>
+> 一般来说容量是素数更能减少hash冲突（如果直接对length取模）（二进制的情况下1多0少），hashMap容量是2，但是他取模的时候巧妙的用的`length-1`，这样同样也是为了二进制下1多0少，让hash值&运算的时候能有更多有效bit。
+>
+> > ps：Ali，DiDi面试好像都问到这个了，当时由于脑子空白，也忘了回答的啥了 T.T。
+> >
+> > > 啊！我想起来了，dalao问有什么比取余效率更高的。。其实就是让hash & (length-1)，位运算-&运算肯定比数学运算-%取余 效率要高啊。
+> > >
+> > > 我以后应该不会说`取模/模以length`了，我以为我在说 & 运算，其实对方可能以为我说的是数学的取余。T.T
+> > >
+> > > 突然想起高中数学老师如果改行敲代码应该也会是个大佬...
+
+#### modCount
+
+记录hashMap内部结构发生变化的次数，主要用于迭代的快速失败（fail-fast）。
+
+> put新Entry算，put已存在的key(覆盖)不算。
+
+> 可以看`java.util.HashMap.HashIterator#nextNode`的代码，很简单。
+>
+> ```java
+> abstract class HashIterator {
+>     Node<K,V> next;        // next entry to return
+>     Node<K,V> current;     // current entry
+>     int expectedModCount;  // for fast-fail
+>     int index;             // current slot
+> 
+>     HashIterator() {
+>         expectedModCount = modCount;// 开始迭代的时候 map实例的修改次数(其实可以理解为版本号嘛)
+>         Node<K,V>[] t = table;
+>         current = next = null;
+>         index = 0;
+>         if (t != null && size > 0) { // advance to first entry
+>             do {} while (index < t.length && (next = t[index++]) == null);
+>         }
+>     }
+> 
+>     public final boolean hasNext() {
+>         return next != null;
+>     }
+> 
+>     final Node<K,V> nextNode() {
+>         Node<K,V>[] t;
+>         Node<K,V> e = next;
+>         if (modCount != expectedModCount)// 迭代的时候如果map的结构被改动过
+>             throw new ConcurrentModificationException();// 熟悉的exception
+>         if (e == null)
+>             throw new NoSuchElementException();
+>         if ((next = (current = e).next) == null && (t = table) != null) {
+>             do {} while (index < t.length && (next = t[index++]) == null);
+>         }
+>         return e;
+>     }
+> 
+>     public final void remove() {// 所以推荐用iter.remove()
+>         Node<K,V> p = current;
+>         if (p == null)
+>             throw new IllegalStateException();
+>         if (modCount != expectedModCount)
+>             throw new ConcurrentModificationException();
+>         current = null;
+>         K key = p.key;
+>         removeNode(hash(key), key, null, false, false);
+>         expectedModCount = modCount;// 会更新期望版本号
+>     }
+> }
+> ```
+>
+> `java.util.ListIterator`的代码也是如此，调用迭代器的iterator的remove()方法会更新`modCount`和`expectedModCount`，不会`throw new ConcurrentModificationException()`。
+
+
+
+### 功能实现
+
+#### 确定node在table中的索引位置
+
+确定元素在table中的位置总的来说，就是`hash值 & (length-1)`，得到一个0~length的位置。
+
+```java
+// 求key的hash，让高位也参与了运算
+static final int hash(Object key) {
+    int h;
+    // hash值 异或 hash值的高位(前16位)
+    return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);// 逻辑右移，移动完第一位符号位肯定是0，是个正整数了
+}
+// Object#hashCode
+public native int hashCode();// int 32位
+// 比如resize()方法重新计算位置的时候,前边有介绍了
+// newTab[e.hash & (newCap - 1)] = e;
+```
+
+
+
+#### put(K, V)方法
+
+流程就是这样，就是判断是否扩容，改index一共有多少个Node，多了就红黑树，少了就链表。所以就记一下触发这些操作的条件吧
+
+<img src="https://raw.githubusercontent.com/melopoz/pics/master/img/HashMap" style="zoom:40%;" />
+
+#### 扩容 resize()
+
+table是数组，不能扩容，所以肯定开辟新空间，再复制过去。
+
+由于扩容是旧容量*2：`newCap = oldCap << 1`，key的hash值是固定的，举个例子：(就只看后八位了)
+
+> 假设  hash(key1) = `0000 0101`，hash(key2) = `0001 0101`
+>
+> oldCap= 16（15的二进制：`0000 1111`）
+>
+> 这两个key通过`hash(key)&(length-1)`运算得到的位置都是5 `0101`。
+
+扩容之后：
+
+> newCap：32（31的二进制：`0001 1111`）
+>
+> key1对应的位置：`0000 0101` & `0001 1111` = 5（ `0000 0101`）
+>
+> key2对应的位置：`0001 0101` & `0001 1111` = 21（ `0001 0101`）
+
+所以
+
+#### 链表 还是 红黑树
+
+
 
 ### api及实现
 
@@ -59,7 +239,7 @@ HashMap 的底层是个 Node 数组（Node<K,V>[] table），在数组的具体�
 >
 > 3）将`新hash值`和`table.length-1`进行与运算 找到该位置。
 
-该位置存放的是链表的`head`节点。如果该接单
+该位置存放的是链表的`head`节点。如果该节点
 
 
 
@@ -106,27 +286,27 @@ get()
 >
 > ```java
 > public V get(Object key) {
->         Node<K,V>[] tab; Node<K,V> e, p; int n, eh; K ek;
->         int h = spread(key.hashCode());//散列 得到key在数组中的位置
->         if ((tab = table) != null && (n = tab.length) > 0 &&
->             (e = tabAt(tab, (n - 1) & h)) != null) {
->             if ((eh = e.hash) == h) {
->                 if ((ek = e.key) == key || (ek != null && key.equals(ek)))
->                     return e.val;
->             }
->             else if (eh < 0)
->                 return (p = e.find(h, key)) != null ? p.val : null;
->             while ((e = e.next) != null) {
->                 if (e.hash == h &&
->                     ((ek = e.key) == key || (ek != null && key.equals(ek))))
->                     return e.val;
->             }
->         }
->         return null;
->     }
+>      Node<K,V>[] tab; Node<K,V> e, p; int n, eh; K ek;
+>      int h = spread(key.hashCode());//散列 得到key在数组中的位置
+>      if ((tab = table) != null && (n = tab.length) > 0 &&
+>          (e = tabAt(tab, (n - 1) & h)) != null) {
+>          if ((eh = e.hash) == h) {
+>              if ((ek = e.key) == key || (ek != null && key.equals(ek)))
+>                  return e.val;
+>          }
+>          else if (eh < 0)
+>              return (p = e.find(h, key)) != null ? p.val : null;
+>          while ((e = e.next) != null) {
+>              if (e.hash == h &&
+>                  ((ek = e.key) == key || (ek != null && key.equals(ek))))
+>                  return e.val;
+>          }
+>      }
+>      return null;
+>  }
 > @SuppressWarnings("unchecked")
 > static final <K,V> Node<K,V> tabAt(Node<K,V>[] tab, int i) {
->     return (Node<K,V>)U.getObjectVolatile(tab, ((long)i << ASHIFT) + ABASE);
+>  return (Node<K,V>)U.getObjectVolatile(tab, ((long)i << ASHIFT) + ABASE);
 > }
 > ```
 >
@@ -138,86 +318,86 @@ put()
 >
 > ```java
 > public V put(K key, V value) {
->     return putVal(key, value, false);
+>  return putVal(key, value, false);
 > }
 > 
 > /** Implementation for put and putIfAbsent */
 > final V putVal(K key, V value, boolean onlyIfAbsent) {
->     if (key == null || value == null) throw new NullPointerException();
->     int hash = spread(key.hashCode());
->     int binCount = 0;
->     for (Node<K,V>[] tab = table;;) {
->         Node<K,V> f; int n, i, fh;
->         if (tab == null || (n = tab.length) == 0)
->             tab = initTable();
->         else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {
->             // put到空容器中 不需要锁 cas即可
->             if (casTabAt(tab, i, null,
->                          new Node<K,V>(hash, key, value, null)))
->                 break;   // no lock when adding to empty bin
->         }
->         else if ((fh = f.hash) == MOVED)
->             // 如果正在调整大小，则帮助转移
->             tab = helpTransfer(tab, f);
->         else {
->             V oldVal = null;
->             // 否则就是添加新元素。需要synchronized 获取当前node的锁
->             synchronized (f) {
->                 if (tabAt(tab, i) == f) {
->                     if (fh >= 0) {
->                         binCount = 1;
->                         for (Node<K,V> e = f;; ++binCount) {
->                             K ek;
->                             if (e.hash == hash &&
->                                 ((ek = e.key) == key ||
->                                  (ek != null && key.equals(ek)))) {
->                                 oldVal = e.val;
->                                 if (!onlyIfAbsent)
->                                     e.val = value;
->                                 break;
->                             }
->                             Node<K,V> pred = e;
->                             if ((e = e.next) == null) {
->                                 pred.next = new Node<K,V>(hash, key,
->                                                           value, null);
->                                 break;
->                             }
->                         }
->                     }
->                     else if (f instanceof TreeBin) {
->                         Node<K,V> p;
->                         binCount = 2;
->                         if ((p = ((TreeBin<K,V>)f).putTreeVal(hash, key,
->                                                               value)) != null) {
->                             oldVal = p.val;
->                             if (!onlyIfAbsent)
->                                 p.val = value;
->                         }
->                     }
->                 }
->             }
->             if (binCount != 0) {
->                 if (binCount >= TREEIFY_THRESHOLD)
->                     treeifyBin(tab, i);
->                 if (oldVal != null)
->                     return oldVal;
->                 break;
->             }
->         }
->     }
->     addCount(1L, binCount);
->     return null;
+>  if (key == null || value == null) throw new NullPointerException();
+>  int hash = spread(key.hashCode());
+>  int binCount = 0;
+>  for (Node<K,V>[] tab = table;;) {
+>      Node<K,V> f; int n, i, fh;
+>      if (tab == null || (n = tab.length) == 0)
+>          tab = initTable();
+>      else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {
+>          // put到空容器中 不需要锁 cas即可
+>          if (casTabAt(tab, i, null,
+>                       new Node<K,V>(hash, key, value, null)))
+>              break;   // no lock when adding to empty bin
+>      }
+>      else if ((fh = f.hash) == MOVED)
+>          // 如果正在调整大小，则帮助转移
+>          tab = helpTransfer(tab, f);
+>      else {
+>          V oldVal = null;
+>          // 否则就是添加新元素。需要synchronized 获取当前node的锁
+>          synchronized (f) {
+>              if (tabAt(tab, i) == f) {
+>                  if (fh >= 0) {
+>                      binCount = 1;
+>                      for (Node<K,V> e = f;; ++binCount) {
+>                          K ek;
+>                          if (e.hash == hash &&
+>                              ((ek = e.key) == key ||
+>                               (ek != null && key.equals(ek)))) {
+>                              oldVal = e.val;
+>                              if (!onlyIfAbsent)
+>                                  e.val = value;
+>                              break;
+>                          }
+>                          Node<K,V> pred = e;
+>                          if ((e = e.next) == null) {
+>                              pred.next = new Node<K,V>(hash, key,
+>                                                        value, null);
+>                              break;
+>                          }
+>                      }
+>                  }
+>                  else if (f instanceof TreeBin) {
+>                      Node<K,V> p;
+>                      binCount = 2;
+>                      if ((p = ((TreeBin<K,V>)f).putTreeVal(hash, key,
+>                                                            value)) != null) {
+>                          oldVal = p.val;
+>                          if (!onlyIfAbsent)
+>                              p.val = value;
+>                      }
+>                  }
+>              }
+>          }
+>          if (binCount != 0) {
+>              if (binCount >= TREEIFY_THRESHOLD)
+>                  treeifyBin(tab, i);
+>              if (oldVal != null)
+>                  return oldVal;
+>              break;
+>          }
+>      }
+>  }
+>  addCount(1L, binCount);
+>  return null;
 > }
 > 
 > @SuppressWarnings("unchecked")
 > static final <K,V> Node<K,V> tabAt(Node<K,V>[] tab, int i) {
->     return (Node<K,V>)U.getObjectVolatile(tab, ((long)i << ASHIFT) + ABASE);
+>  return (Node<K,V>)U.getObjectVolatile(tab, ((long)i << ASHIFT) + ABASE);
 > }
 > 
 > // 使用cas操作
 > static final <K,V> boolean casTabAt(Node<K,V>[] tab, int i,
->                                     Node<K,V> c, Node<K,V> v) {
->     return U.compareAndSwapObject(tab, ((long)i << ASHIFT) + ABASE, c, v);
+>                                  Node<K,V> c, Node<K,V> v) {
+>  return U.compareAndSwapObject(tab, ((long)i << ASHIFT) + ABASE, c, v);
 > }
 > ```
 >

@@ -181,270 +181,11 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/26/Java_HashMap&ConcurrentHashMap/">Java_HashMap &amp; ConcurrentHashMap</a>
+        <a href="/blog/2021/03/27/Kafka/">Kafka</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/26/Java_HashMap&ConcurrentHashMap/">
-          
-          
-            
-          
-          HashMapHashMap 和 Hashtable 的区别HashMap 允许 key 和 value 为 null，Hashtable 不允许。HashMap 的默认初始容量为 16，Hashtable 为 11。HashMap 的扩容为原来的 2 倍，Hashtable 的扩容为原来的 2 倍加 1。HashMap 是非线程安全的，Hashtable是线程安全的。HashMap 的 hash
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-26 13:36" pubdate>
-              2021-03-26
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/Java/">Java</a>
-            
-              <a href="/blog/categories/Java/JUC/">JUC</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/JUC/">JUC</a>
-            
-              <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">并发</a>
-            
-              <a href="/blog/tags/%E5%90%8C%E6%AD%A5/">同步</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/03/26/Java_IO/">Java中的IO</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/03/26/Java_IO/">
-          
-          
-            
-          
-          IO1.4之前， 传统io，阻塞 所以又叫BIO（Blocking IO）
-数据的读取写入必须阻塞在一个线程内等待其完成。
-比如用socket，想要多个client同时访问就要开同样多个线程来处理client的链接，线程资源太宝贵了，这不OK。
-NIONew IO / Non blocking IO
-核心组件：
-channels通道是双向的，流的读写是单向的
-
-buffers比如ByteBuffe
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-26 13:36" pubdate>
-              2021-03-26
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/Java/">Java</a>
-            
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/03/26/Java_fail-fast&fail-safe/">fail-fast &amp; happens-before</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/03/26/Java_fail-fast&fail-safe/">
-          
-          
-            
-          
-          https://blog.csdn.net/Kato_op/article/details/80356618
-fail-fast在使用迭代器遍历一个集合的时候，例如foreach(实现还是iterator)，如果遍历过程中修改了集合对象的内容，会抛出ConcurrentModificationException异常。
-
-补充： 实现Iterator接口就能进行迭代，外部写foreach也是用的这个
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-26 13:36" pubdate>
-              2021-03-26
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/Java/">Java</a>
-            
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/03/26/Java_%E5%AF%B9%E8%B1%A1%E9%80%83%E9%80%B8EA/">Java_对象逃逸</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/03/26/Java_%E5%AF%B9%E8%B1%A1%E9%80%83%E9%80%B8EA/">
-          
-          
-            
-          
-          逃逸分析 Escape Analysis  简称 EAEA允许java编译器在多种情况下优化我们的代码。
-https://blog.csdn.net/wolfcode_cn/article/details/83058235
-对象逃逸 的 三种状态
-全局级别逃逸 全局逃逸状态
-
-一个对象可能从一个方法或当前线程中逃逸。
-
-如果一个对象被作为方法的返回值，
-
-作为类静态字段 static field
-
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-26 13:36" pubdate>
-              2021-03-26
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/Java/">Java</a>
-            
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/03/26/Java_%E9%94%81%E5%8D%87%E7%BA%A7/">Java_锁升级</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/03/26/Java_%E9%94%81%E5%8D%87%E7%BA%A7/">
-          
-          
-            
-          
-          todo todo  大写的todo！！！！https://blog.csdn.net/lengxiao1993/article/details/81568130
-无锁
-偏向锁
-轻量级锁
-重量级锁
-无锁-&gt;偏向锁
-也就是无锁加锁过程
-
-
-如果为可偏向状态（可以用jvm参数设置为不启用偏向锁    -XX:-UseBiasedLocking）
-如果 CAS 操作成功， 则认为已经获取到该对象的
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-26 13:36" pubdate>
-              2021-03-26
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/Java/">Java</a>
-            
-              <a href="/blog/categories/Java/%E5%90%8C%E6%AD%A5/">同步</a>
-            
-              <a href="/blog/categories/Java/JUC/">JUC</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/synchronized/">synchronized</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/03/26/Kafka/">Kafka</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/03/26/Kafka/">
+        <a href="/blog/2021/03/27/Kafka/">
           
           
             
@@ -462,8 +203,8 @@ https://blog.csdn.net/Dongguabai/article/d
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-26 13:36" pubdate>
-              2021-03-26
+            <time datetime="2021-03-28 01:35" pubdate>
+              2021-03-28
             </time>
           </div>
         
@@ -486,11 +227,11 @@ https://blog.csdn.net/Dongguabai/article/d
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/26/MySQL_function/">Mysql function应用</a>
+        <a href="/blog/2021/03/27/MySQL_function/">Mysql function应用</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/26/MySQL_function/">
+        <a href="/blog/2021/03/27/MySQL_function/">
           
           
             
@@ -508,8 +249,8 @@ from Employe
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-26 13:36" pubdate>
-              2021-03-26
+            <time datetime="2021-03-28 01:35" pubdate>
+              2021-03-28
             </time>
           </div>
         
@@ -534,11 +275,11 @@ from Employe
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/26/MySQL_%E7%B4%A2%E5%BC%95&%E4%BA%8B%E5%8A%A1&mvcc&%E9%94%81/">Mysql</a>
+        <a href="/blog/2021/03/27/MySQL_%E7%B4%A2%E5%BC%95&%E4%BA%8B%E5%8A%A1&mvcc&%E9%94%81/">Mysql</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/26/MySQL_%E7%B4%A2%E5%BC%95&%E4%BA%8B%E5%8A%A1&mvcc&%E9%94%81/">
+        <a href="/blog/2021/03/27/MySQL_%E7%B4%A2%E5%BC%95&%E4%BA%8B%E5%8A%A1&mvcc&%E9%94%81/">
           
           
             
@@ -555,8 +296,8 @@ B+Tree 的最大深度 log(n)，n:节点数，而且是B+Tree，每次查
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-26 13:36" pubdate>
-              2021-03-26
+            <time datetime="2021-03-28 01:35" pubdate>
+              2021-03-28
             </time>
           </div>
         
@@ -594,11 +335,11 @@ B+Tree 的最大深度 log(n)，n:节点数，而且是B+Tree，每次查
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/26/Nginx/">Nginx</a>
+        <a href="/blog/2021/03/27/Nginx/">Nginx</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/26/Nginx/">
+        <a href="/blog/2021/03/27/Nginx/">
           
           
             
@@ -618,8 +359,8 @@ nginx通过请求的请求头中的Host获取要访问的server,
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-26 13:36" pubdate>
-              2021-03-26
+            <time datetime="2021-03-28 01:35" pubdate>
+              2021-03-28
             </time>
           </div>
         
@@ -653,11 +394,11 @@ nginx通过请求的请求头中的Host获取要访问的server,
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/26/OS/">OS</a>
+        <a href="/blog/2021/03/27/OS/">OS</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/26/OS/">
+        <a href="/blog/2021/03/27/OS/">
           
           
             
@@ -674,8 +415,8 @@ nginx通过请求的请求头中的Host获取要访问的server,
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-26 13:36" pubdate>
-              2021-03-26
+            <time datetime="2021-03-28 01:35" pubdate>
+              2021-03-28
             </time>
           </div>
         
@@ -694,6 +435,264 @@ nginx通过请求的请求头中的Host获取要访问的server,
               <a href="/blog/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
             
           </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/27/RPC/">RPC:Remote Procedure Call</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/27/RPC/">
+          
+          
+            
+          
+          RPC和HTTP区别在OSI中所处的层就不同，HTTP是在TCP的基础上，RPC是自己实现的传输层协议。
+OSI分层
+
+应用层（应用层+表示层+会话层）
+传输层
+网络层
+链路层
+物理层
+
+HTTP是应用层的协议，自己是此案
+性能对两者来说并不是重点,因为RPC也有使用HTTP协议的,比如JSON-RPC,使用场景是两者的最大区别:RPC场景是公司内部互相调用.最大的好处是包装合理的RPC你会觉得他
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-28 01:35" pubdate>
+              2021-03-28
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a>
+            
+              <a href="/blog/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/OSI/">OSI</a>
+            
+              <a href="/blog/tags/RPC/">RPC</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/27/RabbitMQ/">RabbitMQ</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/27/RabbitMQ/">
+          
+          
+            
+          
+          查看所有的队列：rabbitmqctl list_queues
+清除所有的队列：rabbitmqctl reset
+
+停止：service rabbitmq-server stop
+启动：service rabbitmq-server start
+重启:   service rabbitmq-server restart
+查看状态：service rabbitmq-server status
+关闭
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-28 01:35" pubdate>
+              2021-03-28
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/MQ/">MQ</a>
+            
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/27/RocketMQ/">RocketMQ</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/27/RocketMQ/">
+          
+          
+            
+          
+          todo。。
+
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-28 01:35" pubdate>
+              2021-03-28
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/MQ/">MQ</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E4%BA%8B%E5%8A%A1%E6%B6%88%E6%81%AF/">事务消息</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/27/TCP/">TCP连接</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/27/TCP/">
+          
+          
+            
+          
+          图。。 todo todo todo
+https://blog.csdn.net/Shuffle_Ts/article/details/93778635
+为什么三次握手简单点说，TCP是面向连接，也就是要双方都在通信中能发送能接受，并在建立连接时证明自己能发送且发送的信息被接受了。
+一次请求可能携带 syn+ack，但是第一次请求只能是ack请求建立连接嘛，没收到过消息怎么能发送ack呢；
+所以一
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-28 01:35" pubdate>
+              2021-03-28
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/3%E6%8F%A1%E6%89%8B4%E6%8C%A5%E6%89%8B/">3握手4挥手</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/27/WSL/">WSL</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/27/WSL/">
+          
+          
+            
+          
+          net stop LxssManager 停止子系统服务
+net start LxssManager 开启子系统服务
+
+
+
+
+
+
+linux 查看进程相关参数的命令lsof -i:3306 查看3306端口
+netstat -tap |grep mysql 查看mysql进程占用的端口
+
+zsh
+安装 sudo apt-get install zsh
+设置默认shell chsh -s /bin/
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-28 01:35" pubdate>
+              2021-03-28
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/Tools/">Tools</a>
+            
+          </div>
+        
         
       </div>
     </article>

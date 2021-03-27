@@ -1,0 +1,764 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/favicon.png">
+  <link rel="icon" type="image/png" href="/blog/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Although things are always not as you wish, but effort will be lucy!">
+  <meta name="author" content="melopoz">
+  <meta name="keywords" content="">
+  <title>Docker - 你不喜欢孤独 那就别停下来</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/blog/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.1.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"melopoz.github.io","root":"/blog/","version":"1.8.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"copy_btn":true,"image_zoom":{"enable":true},"lazyload":{"enable":true,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/blog/">&nbsp;<strong>Fluid</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/blog/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Docker">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-03-28 01:35" pubdate>
+        2021年3月28日 凌晨
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.1k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      40
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Docker</h1>
+            
+            <div class="markdown-body">
+              <h1 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h1><p>Docker本身是一个容器运行载体（或称为 管理引擎）。我们把应用程序和配置依赖打包成一个可交付的运行环境，这个环境就是image镜像文件。只有通过这个image才能生成Docker容器。</p>
+<pre><code>image文件生成的容器实例，本身也是一个文件。
+一个容器运行一种服务，需要的时候就通过docker客户端创建一个对应的运行实例
+仓库就是存放一堆镜像的地方，可以吧镜像发布到仓库中，需要的时候pull。就像Git
+</code></pre>
+<h2 id="三要素"><a href="#三要素" class="headerlink" title="三要素"></a>三要素</h2><blockquote>
+<p>仓库 镜像image 容器</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>docker</th>
+<th>java</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>仓库</td>
+<td>包(存放多个镜像)</td>
+</tr>
+<tr>
+<td>镜像</td>
+<td>类</td>
+</tr>
+<tr>
+<td>容器</td>
+<td>对象</td>
+</tr>
+</tbody></table>
+<h2 id="Dockerfile-镜像描述文件"><a href="#Dockerfile-镜像描述文件" class="headerlink" title="Dockerfile 镜像描述文件"></a>Dockerfile 镜像描述文件</h2><p>Dockerfile可以解放手工操作，保证环境统一</p>
+<p>docker build 命令会根据Dockerfile文件自动构建镜像</p>
+<blockquote>
+<p>Hello.java    –&gt;  Hello.class<br>DockerFile   –&gt;  Docker images</p>
+</blockquote>
+<h2 id="Dockerfile-基础命令"><a href="#Dockerfile-基础命令" class="headerlink" title="Dockerfile 基础命令"></a>Dockerfile 基础命令</h2><ol>
+<li><p>FROM</p>
+<pre><code class="hljs dockerfile"><span class="hljs-comment"># 制作基准镜像</span>
+<span class="hljs-keyword">FROM</span> 镜像
+<span class="hljs-comment"># 比如我们要发布一个应用到tomcat里，那么的第一步就是FROM tomcat</span>
+<span class="hljs-keyword">FROM</span> tomcat&lt;:tags&gt;</code></pre>
+</li>
+<li><p>LABEL &amp; MAINTAINER</p>
+<pre><code class="hljs dockerfile"><span class="hljs-comment"># MAINTAINER：维护员，一般写个人id或组织id</span>
+<span class="hljs-comment"># LABEL 就是注释，纯注释。方便阅读的，纯注释说明。不会对Dockerfile造成任何影响</span>
+<span class="hljs-keyword">MAINTAINER</span> melopoz.com
+<span class="hljs-keyword">LABEL</span><span class="bash"> version = <span class="hljs-string">&quot;1.0.0&quot;</span></span>
+<span class="hljs-keyword">LABEL</span><span class="bash"> description = <span class="hljs-string">&quot;my project&quot;</span></span></code></pre>
+</li>
+<li><p>WORKDIR</p>
+<pre><code class="hljs dockerfile"><span class="hljs-comment"># 类似Linux的cd。不同点是如果没有这个目录，WORKDIR就创建</span>
+<span class="hljs-keyword">WORKDIR</span><span class="bash"> /usr/<span class="hljs-built_in">local</span>/mpdir</span></code></pre>
+</li>
+<li><p>ADD &amp; COPY</p>
+<pre><code class="hljs dockerfile"><span class="hljs-comment"># COPY 拷贝文件到镜像的某个路径下</span>
+<span class="hljs-keyword">COPY</span><span class="bash"> test1.txt /usr/<span class="hljs-built_in">local</span>/mpdir/<span class="hljs-built_in">test</span></span>
+<span class="hljs-comment"># 拷贝所有 abc 开头的文件到testdir目录下</span>
+<span class="hljs-keyword">COPY</span><span class="bash"> abc* /testdir/</span>
+<span class="hljs-comment"># ? 是单个字符的占位符，比如匹配文件 abc1.log</span>
+<span class="hljs-keyword">COPY</span><span class="bash"> abc?.<span class="hljs-built_in">log</span> /testdir/</span></code></pre>
+
+<pre><code class="hljs dockerfile"><span class="hljs-comment"># 拷贝文件到镜像的某个路径下，如果路径不存在则创建</span>
+<span class="hljs-keyword">ADD</span><span class="bash"> test1.txt /usr/<span class="hljs-built_in">local</span>/mpdir/test1</span>
+<span class="hljs-comment"># 如果ADD的是tar.gz则将解压缩的内容拷贝到镜像的某个路径下</span>
+<span class="hljs-keyword">ADD</span><span class="bash"> test1.tar.gz /usr/<span class="hljs-built_in">local</span>/mpdir/test1</span></code></pre>
+
+<p>如果是从远程复制文件，尽量使用curl、wget代替ADD。因为ADD会创建更多镜像层。</p>
+</li>
+<li><p>ENV</p>
+<pre><code class="hljs dockerfile"><span class="hljs-comment"># ENV 设置环境变量，便于下文使用  其他地方都可用$&#123;JAVA_HOME&#125;引用</span>
+<span class="hljs-keyword">ENV</span> JAVA_HOME=/usr/local/jdk1.<span class="hljs-number">8</span></code></pre>
+</li>
+<li><p>RUN &amp; CMD &amp; ENTRYPOINT</p>
+<pre><code class="hljs dockerfile"><span class="hljs-comment"># RUN 在构建镜像时运行，可以修改镜像内部的文件, 有两种命令格式</span>
+<span class="hljs-keyword">RUN</span><span class="bash"> [<span class="hljs-string">&quot;echo&quot;</span>, <span class="hljs-string">&quot;image is building...&quot;</span>]</span></code></pre>
+
+<blockquote>
+<ul>
+<li>SHELL 命令格式 生成一个子shell进程去执行脚本，执行完退出子进程，回到父进程</li>
+</ul>
+<pre><code class="hljs dockerfile"><span class="hljs-keyword">RUN</span><span class="bash"> yum -y install vim</span></code></pre>
+
+<ul>
+<li>EXEC 命令格式 用exec进程替换当前进程，保持PID不变，执行完退出，且不会退回原来的进程</li>
+</ul>
+<pre><code class="hljs dockerfile"><span class="hljs-keyword">RUN</span><span class="bash"> [<span class="hljs-string">&quot;yum&quot;</span>, <span class="hljs-string">&quot;-y&quot;</span>, <span class="hljs-string">&quot;install&quot;</span>, <span class="hljs-string">&quot;vim&quot;</span>]</span></code></pre>
+
+<p>shell会创建子进程执行，EXEC不会创建子进程。<strong>推荐使用EXEC进程</strong>。</p>
+</blockquote>
+<pre><code class="hljs dockerfile"><span class="hljs-comment"># CMD 在容器启动时执行,如果启动时有其他额外命令，则CMD命令不生效。</span>
+<span class="hljs-keyword">CMD</span><span class="bash"> [<span class="hljs-string">&quot;echo&quot;</span>, <span class="hljs-string">&quot;container starting...&quot;</span>]</span></code></pre>
+
+<pre><code class="hljs dockerfile"><span class="hljs-comment"># ENTRYPOINT 在容器创建时执行，且Dockerfile中只有最后一个ENTRYPOINT会被执行</span>
+<span class="hljs-keyword">ENTRYPOINT</span><span class="bash"> [<span class="hljs-string">&quot;ps&quot;</span>, <span class="hljs-string">&quot;-ef&quot;</span>]</span></code></pre>
+
+
+
+</li>
+</ol>
+<h2 id="docker-服务相关命令"><a href="#docker-服务相关命令" class="headerlink" title="docker 服务相关命令"></a>docker 服务相关命令</h2><pre><code>sudo systemctl status docker//查看docker状态
+sudo systemctl restart docker// 重启docker
+sudo vim /etc/docker/daemon.json// 修改配置文件 需要reload
+sudo systemctl daemon-reload// 重新加载配置文件
+</code></pre>
+<h2 id="docker-操作命令"><a href="#docker-操作命令" class="headerlink" title="docker 操作命令"></a>docker 操作命令</h2><h5 id="镜像操作"><a href="#镜像操作" class="headerlink" title="镜像操作"></a>镜像操作</h5><pre><code class="hljs awk">docker images <span class="hljs-regexp">//</span>列出本地主机上的镜像
+docker search 镜像名 <span class="hljs-regexp">//</span> 从hub.docker.com查找镜像
+    -s <span class="hljs-number">20</span> 镜像名 <span class="hljs-regexp">//</span>筛选点赞数超过<span class="hljs-number">20</span>的镜像
+    -no-trunc 镜像名 <span class="hljs-regexp">//</span>显示完整描述信息
+    -automated 镜像名 <span class="hljs-regexp">//</span>只列出automated build的镜像
+docker pull 镜像名:<span class="hljs-number">9.0</span> <span class="hljs-regexp">//</span>从镜像加速器(如果有配置，没配就是从hub.docker)拉取镜像到本地;版本号不写默认laster
+docker rmi 唯一镜像名(或id) <span class="hljs-regexp">//</span>删除本地镜像 可直接空格连接多个id全部删除
+    -f <span class="hljs-regexp">//</span> 强制删除  --force <span class="hljs-regexp">//</span>如果在使用也删除
+docker run 镜像名 <span class="hljs-regexp">//</span>启动一个容器
+
+docker commit <span class="hljs-regexp">//</span>提交容器副本使之成为一个新的镜像
+    -m=<span class="hljs-string">&quot;描述信息&quot;</span> -a=<span class="hljs-string">&quot;作者&quot;</span> 容器id 要创建的目标镜像名:[标签名]</code></pre>
+<h6 id="构建镜像"><a href="#构建镜像" class="headerlink" title="构建镜像"></a>构建镜像</h6><pre><code class="hljs jboss-cli">docker build * <span class="hljs-string">//</span>使用Dockerfile创建镜像；Dockerfile可以是本地、在线、自定义的。
+    docker build [options] PATH | URL | - <span class="hljs-string">//</span>语法
+        <span class="hljs-params">--build-arg=</span>[] :设置镜像创建时的变量；
+        <span class="hljs-params">--cpu-shares</span> :设置 cpu 使用权重；
+        <span class="hljs-params">--cpu-period</span> :限制 CPU CFS周期；
+        <span class="hljs-params">--cpu-quota</span> :限制 CPU CFS配额；
+        <span class="hljs-params">--cpuset-cpus</span> :指定使用的CPU id；
+        <span class="hljs-params">--cpuset-mems</span> :指定使用的内存 id；
+        <span class="hljs-params">--disable-content-trust</span> :忽略校验，默认开启；
+        -f :指定要使用的Dockerfile路径
+        <span class="hljs-params">--force-rm</span> :设置镜像过程中删除中间容器；
+        <span class="hljs-params">--isolation</span> :使用容器隔离技术；
+        <span class="hljs-params">--label=</span>[] :设置镜像使用的元数据
+        -m :设置内存最大值；
+        <span class="hljs-params">--memory-swap</span> :设置Swap的最大值为内存+swap，<span class="hljs-string">&quot;-1&quot;</span>表示不限swap；
+        <span class="hljs-params">--no-cache</span> :创建镜像的过程不使用缓存；
+        <span class="hljs-params">--pull</span> :尝试去更新镜像的新版本；
+        -q, <span class="hljs-params">--quiet</span> :安静模式，成功后只输出镜像 ID；
+        <span class="hljs-params">--rm</span> :设置镜像成功后删除中间容器；
+        <span class="hljs-params">--shm-size</span> :设置<span class="hljs-string">/dev/shm</span>的大小，默认值是64M；
+        <span class="hljs-params">--ulimit</span> <span class="hljs-function">:Ulimit</span>配置。
+        <span class="hljs-params">--t</span>, <span class="hljs-params">--tag</span>: 镜像的名字及标签，通常 name<span class="hljs-function">:tag</span> 或者 name 格式；可以在一次构建中为一个镜像设置多个标签。
+        <span class="hljs-params">--network</span>: 默认 default。在构建期间设置RUN指令的网络模式</code></pre>
+
+<p>例如</p>
+<pre><code class="hljs applescript">当前目录下有Dockerfile和hims<span class="hljs-number">-0.1</span>.jar
+创建镜像：
+    docker build -t hims:<span class="hljs-number">0.1</span> .
+查看镜像：
+    docker images
+    结果：
+    hims   <span class="hljs-number">0.1</span>   ...<span class="hljs-built_in">id</span>...     <span class="hljs-number">5</span> seconds ago    <span class="hljs-number">713</span>MB
+运行镜像：
+    docker <span class="hljs-built_in">run</span> -d <span class="hljs-number">0</span></code></pre>
+
+<h5 id="启动容器-start"><a href="#启动容器-start" class="headerlink" title="启动容器 start"></a>启动容器 start</h5><pre><code class="hljs isbl"><span class="hljs-variable">docker</span> <span class="hljs-variable">start</span> 镜像<span class="hljs-function"><span class="hljs-title">id</span>(或容器名)</span></code></pre>
+<h5 id="新建并启动容器-run"><a href="#新建并启动容器-run" class="headerlink" title="新建并启动容器 run"></a>新建并启动容器 run</h5><pre><code class="hljs awk">docker run [options] IMAGE [command][arg]
+    --name=<span class="hljs-string">&quot;容器新名字&quot;</span><span class="hljs-regexp">//</span> 为容器指定一个名称
+    -d <span class="hljs-regexp">//</span>后台运行容器，返回容器id，即启动守护式容器
+    -i <span class="hljs-regexp">//</span>以交互模式运行容器，通常与-t同时使用
+    -t <span class="hljs-regexp">//</span>为容器重新分配一个伪输入终端
+    -P <span class="hljs-regexp">//</span>随机端口映射
+    -p <span class="hljs-regexp">//</span>指定端口映射有四种格式 一般使用 主机端口:docker容器端口
+        ip:hostPort:containerPort
+        ip::containerPort
+        hostPort:containerPort
+        containerPort</code></pre>
+<h5 id="运行时命令"><a href="#运行时命令" class="headerlink" title="运行时命令"></a>运行时命令</h5><pre><code class="hljs awk">docker ps<span class="hljs-regexp">//</span> 查看正在运行的容器   --no-trunc 不截断输出,显示完整containerID
+    -a <span class="hljs-regexp">//</span>列出当前所有正在运行的容器 + 历史上运行过的
+    -l <span class="hljs-regexp">//</span>显示最近创建的容器
+    -n <span class="hljs-number">3</span> <span class="hljs-regexp">//</span>显示最近创建的<span class="hljs-number">3</span>个容器
+    -q <span class="hljs-regexp">//</span>静默模式，只显示容器编号(可用于批量关闭容器)
+    --no-trunc <span class="hljs-regexp">//</span> 不截断输出</code></pre>
+<h5 id="停止容器"><a href="#停止容器" class="headerlink" title="停止容器"></a>停止容器</h5><pre><code class="hljs isbl"><span class="hljs-variable">docker</span> <span class="hljs-variable">stop</span> 容器<span class="hljs-function"><span class="hljs-title">id</span>(或容器名)</span></code></pre>
+<h5 id="强制停止容器"><a href="#强制停止容器" class="headerlink" title="强制停止容器"></a>强制停止容器</h5><pre><code class="hljs isbl"><span class="hljs-variable">docker</span> <span class="hljs-variable">kill</span> 容器<span class="hljs-function"><span class="hljs-title">id</span>(或容器名)</span></code></pre>
+<h5 id="删除已停止容器"><a href="#删除已停止容器" class="headerlink" title="删除已停止容器"></a>删除已停止容器</h5><pre><code class="hljs powershell">docker <span class="hljs-built_in">rm</span> <span class="hljs-operator">-f</span> 容器id
+docker <span class="hljs-built_in">rm</span> 容器id(或容器名)
+    <span class="hljs-operator">-f</span> // 关闭并删除</code></pre>
+<h5 id="删除多个容器"><a href="#删除多个容器" class="headerlink" title="删除多个容器"></a>删除多个容器</h5><pre><code class="hljs powershell">docker <span class="hljs-built_in">rm</span> <span class="hljs-operator">-f</span> <span class="hljs-variable">$</span>(docker <span class="hljs-built_in">ps</span> <span class="hljs-literal">-a</span> <span class="hljs-literal">-q</span>) 或者 docker <span class="hljs-built_in">ps</span> <span class="hljs-literal">-a</span> <span class="hljs-literal">-q</span> | xargs docker <span class="hljs-built_in">rm</span></code></pre>
+<h5 id="退出容器"><a href="#退出容器" class="headerlink" title="退出容器"></a>退出容器</h5><pre><code class="hljs awk"><span class="hljs-keyword">exit</span> <span class="hljs-regexp">//</span> 容器停止退出
+ctrl+P+Q <span class="hljs-regexp">//</span> 不停止容器退出</code></pre>
+<h5 id="重新进入正在运行的容器"><a href="#重新进入正在运行的容器" class="headerlink" title="重新进入正在运行的容器"></a>重新进入正在运行的容器</h5><pre><code class="hljs arduino">docker attach 容器id  <span class="hljs-comment">// 直接进入容器启动命令的终端，不会启动新进程</span></code></pre>
+<h5 id="在容器内执行命令"><a href="#在容器内执行命令" class="headerlink" title="在容器内执行命令"></a>在容器内执行命令</h5><pre><code class="hljs mel">docker <span class="hljs-keyword">exec</span> -t 容器id 命令 <span class="hljs-comment">// 在容器中打开新终端，并且可以启动新进程</span>
+    比如sentos容器：docker <span class="hljs-keyword">exec</span> -t centosiID <span class="hljs-keyword">ls</span> -l /tmp  <span class="hljs-comment">//就会返回该容器的tmp目录</span></code></pre>
+<h5 id="查看日志"><a href="#查看日志" class="headerlink" title="查看日志"></a>查看日志</h5><pre><code>docker logs 容器id
+    -t // 显示日志打印的时间
+    -f // =tail -f 
+    -tail 3 // 看三行  可以和-f 一起用
+</code></pre>
+<h5 id="查看容器信息-json格式"><a href="#查看容器信息-json格式" class="headerlink" title="查看容器信息 json格式"></a>查看容器信息 json格式</h5><pre><code>docker inspect 容器id
+</code></pre>
+<h5 id="复制容器内文件"><a href="#复制容器内文件" class="headerlink" title="复制容器内文件"></a>复制容器内文件</h5><pre><code>(比如centos容器)
+docker cp centosID:/容器内文件路径 /目的路径
+</code></pre>
+<h2 id="Docker数据卷"><a href="#Docker数据卷" class="headerlink" title="Docker数据卷"></a>Docker数据卷</h2><h3 id="容器内添加"><a href="#容器内添加" class="headerlink" title="容器内添加"></a>容器内添加</h3><h5 id="1-直接命令添加-v"><a href="#1-直接命令添加-v" class="headerlink" title="1. 直接命令添加  -v"></a>1. 直接命令添加  -v</h5><pre><code class="hljs awk">docker run -it -v <span class="hljs-regexp">/宿主机绝对路径:/</span>容器内路径 镜像名 <span class="hljs-regexp">//</span>双方都可读写并同步
+<span class="hljs-regexp">//</span> 可以通过【docker inspect 容器id】查看到VolumesRW.containerDir为true</code></pre>
+<pre><code class="hljs awk">docker run -it -v <span class="hljs-regexp">/hostDir:/</span>containerDir:ro 镜像名 <span class="hljs-regexp">//</span> 只有host可执行写操作，容器只能读
+<span class="hljs-regexp">//</span> 可以通过【docker inspect 容器id】查看到VolumesRW.containerDir为false</code></pre>
+<h5 id="2-DockerFile添加"><a href="#2-DockerFile添加" class="headerlink" title="2. DockerFile添加"></a>2. DockerFile添加</h5><pre><code class="hljs plain">docker的dockerfile就像linux的脚本文件。
+dockerfile不能创建host的本地目录来实现数据卷，只能创建一个&#x2F;多个容器内数据卷。</code></pre>
+<p>创建dockerfile（touch /mydocker/Dockerfile）</p>
+<pre><code class="hljs dockerfile"><span class="hljs-keyword">FROM</span> centos
+<span class="hljs-keyword">VOLUME</span><span class="bash"> [<span class="hljs-string">&quot;/dataVolumeContainer1&quot;</span>,<span class="hljs-string">&quot;/dataVolumeContainer2&quot;</span>]</span>
+<span class="hljs-keyword">CMD</span><span class="bash"> <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;finished,--------success1&quot;</span></span>
+<span class="hljs-keyword">CMD</span><span class="bash"> /bin/bash</span></code></pre>
+<p>创建dockerfile   单独例2</p>
+<pre><code class="hljs jboss-cli">FORM java<span class="hljs-function">:8</span> <span class="hljs-string">//</span>依赖java8
+EXPOSE 8080 <span class="hljs-string">//</span>暴露8080端口
+
+VOLUME <span class="hljs-string">/tmp</span> <span class="hljs-string">//</span>
+
+ENV TZ=Asia/Shanghai
+RUN ln -sf <span class="hljs-string">/usr/share/zoneinfo/</span>&#123;TZ&#125; <span class="hljs-string">/etc/localtime</span> &amp;&amp; <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;&#123;TZ&#125;&quot;</span> &gt; <span class="hljs-string">/etc/timezone</span>
+
+ADD hims-0.0.1-SNAPSHOT.jar <span class="hljs-string">/app.jar</span> <span class="hljs-string">//</span>将项目jar包添加到容器并设置别名为app.jar
+RUN bash -c &#x27;touch <span class="hljs-string">/app.jar</span>&#x27;
+ENTRYPOINT [<span class="hljs-string">&quot;java&quot;</span>,<span class="hljs-string">&quot;-jar&quot;</span>,<span class="hljs-string">&quot;/app.jar&quot;</span>] <span class="hljs-string">//</span> 启动命令为 java -jar app.jar</code></pre>
+<p>构建镜像</p>
+<pre><code class="hljs awk">docker build -f <span class="hljs-regexp">/mydocker/</span>Dockerfile -t melopoz/centos</code></pre>
+<p>创建容器并运行</p>
+<pre><code class="hljs awk">docker run -it melopoz<span class="hljs-regexp">/centos /</span>bin<span class="hljs-regexp">/bash （/</span>bin/bash可以不写）</code></pre>
+<p>虽然没有指定宿主机(运行docker的服务器)上与数据卷绑定的路径，但是可以通过<code>docker inspect 容器id</code>查看默认生成的宿主机数据卷路径</p>
+<p>Volumes：{dataVolumeContainer1:/var/lib/docker/…, dataVolumeContainer2:/var/…}</p>
+<h5 id="3-备注"><a href="#3-备注" class="headerlink" title="3. 备注"></a>3. 备注</h5><p>如果Docker挂载主机目录Dokcer访问出现cannot open directory.:Permission denied</p>
+<p>就在挂载目录后加参数<code>--privileged=true</code></p>
+<p>即<code>docker run -it -v /myDir:/containerDir --privileged=true 镜像名</code></p>
+<h2 id="镜像分层-概念"><a href="#镜像分层-概念" class="headerlink" title="镜像分层 概念"></a>镜像分层 概念</h2><p>以tomcat镜像为例</p>
+<pre><code class="hljs dockerfile"><span class="hljs-keyword">FROM</span> tomcat:latest
+<span class="hljs-keyword">MAINTAINER</span> melopoz.com
+<span class="hljs-keyword">WORKDIR</span><span class="bash"> /usr/<span class="hljs-built_in">local</span>/tomcat/webapps</span>
+<span class="hljs-keyword">ADD</span><span class="bash"> helloworld ./helloworld</span></code></pre>
+
+<p>Dockerfile内容4行，执行过程也是4行：</p>
+<pre><code class="hljs gradle">Sending build context to Docker daemon <span class="hljs-number">3.584</span>kB
+<span class="hljs-keyword">Step</span> <span class="hljs-number">1</span>/<span class="hljs-number">4</span> : <span class="hljs-keyword">FROM</span> tomcat:latest
+ ---&gt; aaaaaaa
+<span class="hljs-keyword">Step</span> <span class="hljs-number">2</span>/<span class="hljs-number">4</span> : MAINTAINER melopoz.com
+ ---&gt; Running in bbbbbbb
+Removing intermediate container bbbbbbb
+<span class="hljs-keyword">Step</span> <span class="hljs-number">3</span><span class="hljs-regexp">/4 : WORKDIR /u</span>sr<span class="hljs-regexp">/local/</span>tomcat/webapps
+ ---&gt; Running in ccccccc
+<span class="hljs-keyword">Step</span> <span class="hljs-number">4</span><span class="hljs-regexp">/4 : ADD helloworld ./</span>helloworld
+ ---&gt; ddddddd
+Successfully build ddddddd
+Successfully tagged melopoz.com/test-helloworld:<span class="hljs-number">1.0</span>.<span class="hljs-number">0</span></code></pre>
+
+<p>将Dockerfile中的内容改为</p>
+<pre><code class="hljs dockerfile"><span class="hljs-keyword">FROM</span> tomcat:latest
+<span class="hljs-keyword">MAINTAINER</span> melopoz.com
+<span class="hljs-keyword">WORKDIR</span><span class="bash"> /usr/<span class="hljs-built_in">local</span>/tomcat/webapps</span>
+<span class="hljs-keyword">ADD</span><span class="bash"> helloworld ./helloworld</span>
+<span class="hljs-keyword">ADD</span><span class="bash"> helloworld ./helloworld2 <span class="hljs-comment">#多部署一份helloworld到容器的helloworld2目录</span></span></code></pre>
+
+<p>再次build之后输出为：</p>
+<pre><code class="hljs ada">Step <span class="hljs-number">1</span>/<span class="hljs-number">4</span> : <span class="hljs-type">FROM</span> tomcat:latest
+ <span class="hljs-comment">---&gt; aaaaaaa</span>
+Step <span class="hljs-number">2</span>/<span class="hljs-number">4</span> : <span class="hljs-type">MAINTAINER</span> melopoz.com
+ <span class="hljs-comment">---&gt; Using cache</span>
+ <span class="hljs-comment">---&gt; Running in bbbbbbb</span>
+Step <span class="hljs-number">3</span>/<span class="hljs-number">4</span> : <span class="hljs-type">WORKDIR</span> /usr/local/tomcat/webapps
+ <span class="hljs-comment">---&gt; Using cache</span>
+ <span class="hljs-comment">---&gt; Running in ccccccc</span>
+Step <span class="hljs-number">4</span>/<span class="hljs-number">4</span> : <span class="hljs-type">ADD</span> helloworld ./helloworld
+ <span class="hljs-comment">---&gt; Using cache</span>
+ <span class="hljs-comment">---&gt; ddddddd</span>
+Step <span class="hljs-number">4</span>/<span class="hljs-number">4</span> : <span class="hljs-type">ADD</span> helloworld ./helloworld
+ <span class="hljs-comment">---&gt; eeeeeee</span>
+Successfully build eeeeeee
+Successfully <span class="hljs-keyword">tagged</span> melopoz.com/test-helloworld:<span class="hljs-number">1.0</span>.<span class="hljs-number">0</span></code></pre>
+
+<p>前四步没有重复创建容器而是使用了Cache，step1没有UsingCache是由于从本地仓库直接拉取了tomcat:latest镜像作为基础镜像。</p>
+<h1 id="demo"><a href="#demo" class="headerlink" title="demo"></a>demo</h1><h2 id="Docker-mysql"><a href="#Docker-mysql" class="headerlink" title="Docker   mysql"></a>Docker   mysql</h2><h3 id="查找-拉取镜像"><a href="#查找-拉取镜像" class="headerlink" title="查找 拉取镜像"></a>查找 拉取镜像</h3><p><code>docker pull mysql:5.7（版本自定义或者不写默认laster)</code></p>
+<h3 id="启动容器"><a href="#启动容器" class="headerlink" title="启动容器"></a>启动容器</h3><pre><code class="hljs awk">docker run -p <span class="hljs-number">3306</span>:<span class="hljs-number">3306</span> --name:mysql_docker
+-v ...<span class="hljs-regexp">/container_cfgfiles/my</span>sql<span class="hljs-regexp">/conf:/</span>etc<span class="hljs-regexp">/mysql/</span>conf.d
+-v ...<span class="hljs-regexp">/container_cfgfiles/my</span>sql<span class="hljs-regexp">/logs:/</span>logs
+-v ...<span class="hljs-regexp">/container_cfgfiles/my</span>sql<span class="hljs-regexp">/conf:/</span>var<span class="hljs-regexp">/lib/my</span>sql
+-e MYSQL_ROOT_PASSWORD=<span class="hljs-number">123456</span>
+-d mysql:<span class="hljs-number">5.7</span>
+<span class="hljs-regexp">//</span> 指定配置文件 容器名 后台运行 。。</code></pre>
+<h3 id="进入容器"><a href="#进入容器" class="headerlink" title="进入容器"></a>进入容器</h3><pre><code class="hljs python">docker <span class="hljs-built_in">exec</span> -it 容器<span class="hljs-built_in">id</span> /<span class="hljs-built_in">bin</span>/bash
+mysql -uroot -p
+输入密码</code></pre>
+<h3 id="数据备份"><a href="#数据备份" class="headerlink" title="数据备份"></a>数据备份</h3><p>在docker宿主机终端</p>
+<pre><code class="hljs haskell"><span class="hljs-title">docker</span> exec mysql容器id sh -<span class="hljs-type">C</span> &#x27;
+<span class="hljs-title">exec</span> mysqldump <span class="hljs-comment">--all-databases -uroot -p&quot;123456&quot;</span>
+&#x27; &gt; /<span class="hljs-class"><span class="hljs-keyword">data</span>/docker_mysql_data/all-databases.sql</span></code></pre>
+
+
+<h2 id="Docker-redis"><a href="#Docker-redis" class="headerlink" title="Docker   redis"></a>Docker   redis</h2><h3 id="启动-这是是在创建容器的时候就启动了redis-server，也可以之后使用exec启动"><a href="#启动-这是是在创建容器的时候就启动了redis-server，也可以之后使用exec启动" class="headerlink" title="启动 这是是在创建容器的时候就启动了redis-server，也可以之后使用exec启动"></a>启动 这是是在创建容器的时候就启动了redis-server，也可以之后使用exec启动</h3><pre><code class="hljs awk">docker run -p <span class="hljs-number">6379</span>:<span class="hljs-number">6379</span>
+-v ...<span class="hljs-regexp">/container_cfgfiles/</span>redis<span class="hljs-regexp">/data:/</span>data
+-v ...<span class="hljs-regexp">/container_cfgfiles/</span>redis<span class="hljs-regexp">/redis.conf:/u</span>sr<span class="hljs-regexp">/local/</span>etc<span class="hljs-regexp">/redis/</span>redis.conf
+-d redis:版本号 redis-server <span class="hljs-regexp">/usr/</span>local<span class="hljs-regexp">/etc/</span>redis/redis.conf
+--appendonly yes</code></pre>
+<p>开启了redis AOF</p>
+<h6 id="连接redis-cli"><a href="#连接redis-cli" class="headerlink" title="连接redis-cli"></a>连接redis-cli</h6><pre><code class="hljs applescript">docker exec -<span class="hljs-keyword">it</span> redis容器<span class="hljs-built_in">id</span> redis-cli</code></pre>
+
+
+<h1 id="Docker-image-提交到阿里云仓库"><a href="#Docker-image-提交到阿里云仓库" class="headerlink" title="Docker image 提交到阿里云仓库"></a>Docker image 提交到阿里云仓库</h1><h5 id="用实例容器生成最新镜像"><a href="#用实例容器生成最新镜像" class="headerlink" title="用实例容器生成最新镜像"></a>用实例容器生成最新镜像</h5><pre><code class="hljs awk"><span class="hljs-regexp">//</span> docker commit -a 作者 -m <span class="hljs-string">&quot;提交信息&quot;</span> 正在运行的容器id 镜像名:版本号
+docker commit -a melopoz -m <span class="hljs-string">&quot;centos1.3 to 1.4 with vim,ifconfig&quot;</span> xxxx mycentos:<span class="hljs-number">1.4</span></code></pre>
+<h5 id="查看生成的镜像"><a href="#查看生成的镜像" class="headerlink" title="查看生成的镜像"></a>查看生成的镜像</h5><p><code>docker images mycentos</code></p>
+<h5 id="推送到云仓库"><a href="#推送到云仓库" class="headerlink" title="推送到云仓库"></a>推送到云仓库</h5><h6 id="阿里云-容器镜像服务"><a href="#阿里云-容器镜像服务" class="headerlink" title="阿里云-容器镜像服务"></a>阿里云-容器镜像服务</h6><ol>
+<li>创建镜像仓库(需要命名空间)</li>
+<li>阿里云给了推送命令 复制即可<pre><code class="hljs stylus"><span class="hljs-comment">//将镜像推送到Registry</span>
+sudo docker login --username=xxx registry<span class="hljs-selector-class">.cn-beijing</span><span class="hljs-selector-class">.aliyuncs</span>.com
+<span class="hljs-comment">// 输入密码</span>
+sudo docker tag <span class="hljs-selector-attr">[ImageId]</span> registry<span class="hljs-selector-class">.cn-beijing</span><span class="hljs-selector-class">.aliyuncs</span>.com/命名空间/仓库名:<span class="hljs-selector-attr">[镜像版本号]</span>
+sudo docker push registry<span class="hljs-selector-class">.cn-beijing</span><span class="hljs-selector-class">.aliyuncs</span>.com/xx/xx:<span class="hljs-selector-attr">[镜像版本号]</span>
+<span class="hljs-comment">//根据实际镜像信息替换示例中的[ImageId]和[镜像版本号]参数。</span></code></pre></li>
+<li>从阿里云拉取镜像<pre><code class="hljs stylus">sudo docker pull registry<span class="hljs-selector-class">.cn-beijing</span><span class="hljs-selector-class">.aliyuncs</span>.com/命名空间/仓库名:<span class="hljs-selector-attr">[镜像版本号]</span></code></pre>
+
+</li>
+</ol>
+<h1 id="踩坑"><a href="#踩坑" class="headerlink" title="踩坑"></a>踩坑</h1><h2 id="多个仓库引用一个镜像时-要删除镜像"><a href="#多个仓库引用一个镜像时-要删除镜像" class="headerlink" title="多个仓库引用一个镜像时 要删除镜像"></a>多个仓库引用一个镜像时 要删除镜像</h2><p>先使用镜像名删除</p>
+<hr>
+<hr>
+<hr>
+<hr>
+<hr>
+<hr>
+<h2 id="记第一次启动tomcat，启动成功，访问404"><a href="#记第一次启动tomcat，启动成功，访问404" class="headerlink" title="记第一次启动tomcat，启动成功，访问404"></a>记第一次启动tomcat，启动成功，访问404</h2><p>启动成功没有页面可能是tomcat下没有页面，需要进入tomcat下的webapps</p>
+<pre><code class="hljs elixir">docker exec -it 容器id /bin/bash
+root<span class="hljs-variable">@f37547416a87</span><span class="hljs-symbol">:/usr/local/tomcat</span><span class="hljs-comment"># ls -l // 查看目录 </span>
+root<span class="hljs-variable">@f37547416a87</span><span class="hljs-symbol">:/usr/local/tomcat</span><span class="hljs-comment"># cd webapps // 为空。。而webapps.dist不为空</span>
+    把dist复制到webapps，再访问即可
+webapps.dist下的内容：ROOT  docs  examples  host-manager  manager</code></pre>
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/categories/docker/">docker</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/docker/">docker</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2021/03/27/WSL/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">WSL</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2021/03/27/git/">
+                        <span class="hidden-mobile">Git</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":200})
+    NProgress.start()
+    document.addEventListener('DOMContentLoaded', function() {
+      window.NProgress && window.NProgress.inc();
+    })
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.staticfile.org/jquery/3.5.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/debouncer.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/blog/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.12.0/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/blog/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/blog/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+
+</body>
+</html>

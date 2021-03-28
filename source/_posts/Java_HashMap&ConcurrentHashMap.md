@@ -708,6 +708,10 @@ private transient volatile Node<K,V>[] nextTable;
 
 // 扩容子任务对应的table的索引位
 transient volatile int transferIndex; 
+// 参与扩容的线程领取扩容子任务时，要减去的扩容步长，如果能减成功,则成功领取一个扩容子任务
+// transferIndex = transferIndex - stride(扩容步长)
+// transferIndex减到0时,代表没有可以领取的扩容子任务
+// 每个线程一次转移一个区间段的数据，一个区间段（转移步长）的默认长度是16，实际运行过程中会动态计算(最小16)
 
 // 最小转移步长：由于在扩容过程中，会把一个待转移的数组分为多个区间段（转移步长-stride）
 private static final int MIN_TRANSFER_STRIDE = 16;
@@ -1068,6 +1072,11 @@ final Node<K,V>[] helpTransfer(Node<K,V>[] tab, Node<K,V> f) {
 
 
 #### transfer() 扩容
+
+> 参与扩容的线程领取扩容子任务时，要减去的扩容步长，如果能减成功,则成功领取一个扩容子任务
+> transferIndex = transferIndex - stride(扩容步长)
+> transferIndex减到0时,代表没有可以领取的扩容子任务
+> 每个线程一次转移一个区间段的数据，一个区间段（转移步长）的默认长度是16，实际运行过程中会动态计算(最小16)
 
 ##### 步骤
 

@@ -172,7 +172,7 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2021-03-28 23:27" pubdate>
+      <time datetime="2021-03-28 23:33" pubdate>
         2021年3月28日 晚上
       </time>
     </span>
@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      9.8k 字
+      10k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      141
+      143
        分钟
     </span>
   
@@ -772,6 +772,10 @@ newTab[e.hash &amp; (newCap - <span class="hljs-number">1</span>)] = e;</code></
 
 <span class="hljs-comment">// 扩容子任务对应的table的索引位</span>
 <span class="hljs-keyword">transient</span> <span class="hljs-keyword">volatile</span> <span class="hljs-keyword">int</span> transferIndex; 
+<span class="hljs-comment">// 参与扩容的线程领取扩容子任务时，要减去的扩容步长，如果能减成功,则成功领取一个扩容子任务</span>
+<span class="hljs-comment">// transferIndex = transferIndex - stride(扩容步长)</span>
+<span class="hljs-comment">// transferIndex减到0时,代表没有可以领取的扩容子任务</span>
+<span class="hljs-comment">// 每个线程一次转移一个区间段的数据，一个区间段（转移步长）的默认长度是16，实际运行过程中会动态计算(最小16)</span>
 
 <span class="hljs-comment">// 最小转移步长：由于在扩容过程中，会把一个待转移的数组分为多个区间段（转移步长-stride）</span>
 <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> MIN_TRANSFER_STRIDE = <span class="hljs-number">16</span>;
@@ -1075,7 +1079,10 @@ newTab[e.hash &amp; (newCap - <span class="hljs-number">1</span>)] = e;</code></
 
 
 
-<h4 id="transfer-扩容"><a href="#transfer-扩容" class="headerlink" title="transfer() 扩容"></a>transfer() 扩容</h4><h5 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h5><blockquote>
+<h4 id="transfer-扩容"><a href="#transfer-扩容" class="headerlink" title="transfer() 扩容"></a>transfer() 扩容</h4><blockquote>
+<p>参与扩容的线程领取扩容子任务时，要减去的扩容步长，如果能减成功,则成功领取一个扩容子任务<br>transferIndex = transferIndex - stride(扩容步长)<br>transferIndex减到0时,代表没有可以领取的扩容子任务<br>每个线程一次转移一个区间段的数据，一个区间段（转移步长）的默认长度是16，实际运行过程中会动态计算(最小16)</p>
+</blockquote>
+<h5 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h5><blockquote>
 <ol>
 <li><p>开辟新table空间：<code>nextTable</code></p>
 </li>

@@ -1,25 +1,20 @@
 ---
-title: Java_HashMap不止是HashMap
+title: Java_HashMap 不止是HashMap
 tags: 
   - JUC
   - 并发
   - 同步
-  - 1.8优化
-  - hash优化
+  - java1.8优化
+  - hash散列的优化
 categories:
-  - [Java,JUC]
   - [Java]
 ---
 
-> 算是面试吃瘪后，  https://tech.meituan.com/2016/06/24/java-hashmap.html  的读后感吧 :)
->
-> 一个字一个字写真是费劲啊... 这大概是最仔细的笔记了。
->
-> todo：去掉一些头脑发热的废话。
+
 
 # java.util.Map
 
-<img src="https://raw.githubusercontent.com/melopoz/pics/master/img/java-util-map.png" style="zoom:50%;" />
+<img alt="Map接口结构，图在github" src="https://raw.githubusercontent.com/melopoz/pics/master/img/java-util-map.png" style="zoom:50%;" />
 
 
 
@@ -29,13 +24,11 @@ categories:
 
    根据hashCode存储数据，访问速度快，遍历顺序不确定，允许一个key为null，允许任意value为null，非线程安全，同一时刻多个线程同时对一个hashMap进行put，可能会导致数据不一致。
 
-   > 可用Collections#synchronizedMap方法得到一个线程安全的map（直接synchronized入参的map对象）
-   >
-   > 或者用ConcurrentHashMap
+   > 可用Collections#synchronizedMap方法得到一个线程安全的map（该类直接是对map对象加锁）或者用ConcurrentHashMap
 
 2. HashTable
 
-   遗留类，不建议用，一般也不用这玩意了。常用功能和HashMap类似，不过HashTable是`extends Dictionary implements Map`，线程安全，但并发性不如ConcurrentHashMap，他的方法是synchronized的。
+   遗留类，不建议用，一般也不用这玩意了。常用功能和HashMap类似，不过HashTable是`extends Dictionary implements Map`，线程安全，但并发性不如ConcurrentHashMap，他的方法都是synchronized的。
 
 3. LinkedHashMap
 
@@ -45,7 +38,9 @@ categories:
 
 4. TreeMap
 
-   实现NavigableMap接口(navigable:可导航的)，NavigableMap继承SortedMap接口。Entry根据key排序，默认按照key升序排序，也可以指定用于排序的比较器。
+   实现NavigableMap接口(navigable:可导航的)，NavigableMap继承SortedMap接口。
+
+   红黑树结构，Entry根据key排序，默认按照key升序排序，也可以在构造函数中指定用于排序的比较器Comparator。
 
    > 使用TreeMap时，key必须实现Comparable接口或者在TreeMap的构造函数中传入自定义的Comparator，否则运行时会throw ClassCastException。
 
@@ -57,67 +52,83 @@ categories:
 
 数组 + 链表 / 红黑树(1.8增加红黑树)
 
-<img src="https://raw.githubusercontent.com/melopoz/pics/master/img/HashMap%E7%BB%93%E6%9E%84.png" style="zoom:50%;" />
+<img alt="HashMap数据结构，图在github" src="https://raw.githubusercontent.com/melopoz/pics/master/img/HashMap%E7%BB%93%E6%9E%84.png" style="zoom:50%;" />
 
-#### `Node<K, V>[] table；`
+#### hash数组：`Node<K, V>[] table；`
 
-哈希桶数组，每个元素都是一个键值对：`Node<K,V> implements Map.Entry`。
+哈希桶数组，每个元素都是一个键值对：`Node<K,V> implements Map.Entry`。并维护下一个节点的引用`next`。
+
+```java
+static class Node<K,V> implements Map.Entry<K,V> {
+    final int hash;
+    final K key;
+    V value;
+    Node<K,V> next;
+
+    Node(int hash, K key, V value, Node<K,V> next) {
+        this.hash = hash;
+        this.key = key;
+        this.value = value;
+        this.next = next;
+    }
+
+    public final K getKey()        { return key; }
+    public final V getValue()      { return value; }
+    public final String toString() { return key + "=" + value; }
+
+    public final int hashCode() {
+        // hashCode函数如果参数是null，都返回0，所以key=null的都是存到table[0]
+        return Objects.hashCode(key) ^ Objects.hashCode(value);
+    }
+    ...
+}
+```
 
 > hash可能会冲突，可以采用开放地址法、链地址法。HashMap采用链地址法。
 >
-> > 开放地址法：每当目标位置不是空的，就像下寻找，直到找到空位置。
+> > 开放地址法：每当目标位置不是空的，就向下寻找(index+1)，直到找到空位置。
 >
-> 这种结构必然要权衡空间成本和时间成本，需要用好的hash算法和扩容机制来让table占据空间小，又不容易发生hash碰撞。
->
-> table默认长度`length`为`16`，负载因子`loadFactor`为`0.75`。
->
-> 阈值`threshold` = `length * loadFactor`，table中的元素个数超过threshold之后就要resize()。
->
-> > 时间效率要求极高就减小threshold，内存紧张就调大threshold。
+> 数组size小了，再好的hash函数也会很容易冲突，这种结构必然要权衡空间成本和时间成本，需要用好的hash算法和扩容机制来让table占据空间小，又不容易发生hash碰撞。
 
-#### table.length
 
-必须为2的n次方，扩容(resize)就 *2
 
-> 因为他用key的hash值对（length-1）取模（&）。**为了减少hash冲突**。可以看resize()的代码和下文**确定node在table中的索引位置**。
+#### 数组容量：table.length 默认16
+
+负载因子`loadFactor`默认为`0.75`
+
+阈值`threshold` = `length * loadFactor`，table中的元素个数超过threshold之后就要扩容`resize()`。
+
+> 时间效率要求极高就**减小threshold**，容量大了hash冲突就少了，时间复杂度更趋向于O(1)；
 >
-> ```java
-> final Node<K,V>[] resize() {
->         Node<K,V>[] oldTab = table;// 旧table
->         int oldCap = (oldTab == null) ? 0 : oldTab.length;// 旧容量
->         int oldThr = threshold;// 旧阈值
->         int newCap, newThr = 0;// 新容量 新阈值
->         if (oldCap > 0) {
->         	...
->             else if ((newCap = oldCap << 1) < MAXIMUM_CAPACITY &&
->                      oldCap >= DEFAULT_INITIAL_CAPACITY)
->                 // 新容量 = 旧容量 * 2
->                 newThr = oldThr << 1; // double threshold
->         }
->         ...
->         if (oldTab != null) {
->             for (int j = 0; j < oldCap; ++j) {// 把entry放到新数组对应的位置
->                 newTab[e.hash & (newCap - 1)] = e;// 用entry.key的hash对 新容量-1 取模，这样就能用上所有的bit
->                 // 举个例子 16-1=15，二进制为`.. 0000 1111`，这样有效位是后四位全部，而且还在容量范围之内。
->         ...
-> }
-> ```
+> 内存紧张就**调大threshold**，减少table使用的空间。
+
+
+
+#### table.length 必须为2的n次方
+
+扩容(resize)就 *2，**也是1.8HashMap的一个优化**。更多见下文[**确定node在table中的索引位置**](#确定node在table中的索引位置)
+
+因为这种根据hash在table中找位置都是用位运算`hash值 & (length-1)`，所以这个掩码的1越多，结果就越均匀。
+
+> 对比HashTable扩容是`* 2 - 1`，初始容量是个素数`11`，但是HashTable扩容后的数字并不理想，扩容后的length二进制标识就三个1:
 >
-> 对比HashTable来看，hashTable扩容是`*2-1`，初始容量是个素数`11`，但是扩容后就不一定了。
->
-> 一般来说容量是素数更能减少hash冲突（如果直接对length取模）（二进制的情况下1多0少），hashMap容量是2，但是他取模的时候巧妙的用的`length-1`，这样同样也是为了二进制下1多0少，让hash值&运算的时候能有更多有效bit。
->
-> > ps：Ali，DiDi面试好像都问到这个了，当时由于脑子空白，也忘了回答的啥了 T.T。
+> > 11=8+2+1   `0000 1011`
 > >
-> > > 啊！我想起来了，dalao问有什么比取余效率更高的。。其实就是让hash & (length-1)，位运算-&运算肯定比数学运算-%取余 效率要高啊。
-> > >
-> > > 我以后应该不会说`取模/模以length`了，我以为我在说 & 运算，其实对方可能以为我说的是数学的取余。T.T
-> > >
-> > > 突然想起高中数学老师如果改行敲代码应该也会是个大佬...
+> > 21=16+4+1   `0001 0101`，相当于每次把高位的`101`左移一位
+> >
+> > 41=32+8+1   `0010 1001`，找hash对应位置的时候还要把最低位的1减掉..
+> >
+> > 81=64+16+1   `0101 0001`
+>
+> 本来mask取素数应该是为了取余(flag&mask)的时候，mask有更多的1，相当于让flag有更多有效位，结果1.7的实现并不理想。
 
-#### modCount
+HashMap中length必须是2的n次方，`16`binaryStr: `0001 0000`，减1就直接把唯一一个高电平位的右边全置为1：`16-1`binaryStr：`0000 1111`，这样node在table中的分配就更均匀了。
 
-记录hashMap内部结构发生变化的次数，主要用于迭代的快速失败（fail-fast）。
+
+
+#### 结构变化次数：modCount
+
+记录hashMap内部结构发生变化的次数，主要用于迭代时的快速失败（fail-fast）。
 
 > put新Entry算，put已存在的key(覆盖)不算。
 
@@ -179,28 +190,62 @@ categories:
 
 #### 确定node在table中的索引位置
 
-确定元素在table中的位置总的来说，就是`hash值 & (length-1)`，得到一个0~length的位置。
+确定元素在table中的位置总的来说，就是hash值对table.length取余，得到一个[0,length)的值，就是那个位置咯。
+
+位运算`hash值 & (length-1)`，也是得到一个[0,length)的值，位运算效率肯定比数学运算要高。
+
+先看看1.7的代码（jdk1.8没有这个方法）
 
 ```java
-// 求key的hash，让高位也参与了运算
+static int indexFor(int h, int length) {
+     return h & (length-1);  // 直接取模运算
+}
+```
+
+再看1.8的优化：hash值 ^ hash值的高16位，这样能在容量比较小的情况下hash值的高位也能影响到node在table中的位置
+
+```java
+// 1.求key的hash时，让高位也参与了运算
 static final int hash(Object key) {
     int h;
-    // hash值 异或 hash值的高位(前16位)
-    return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);// 逻辑右移，移动完第一位符号位肯定是0，是个正整数了
+                                     // key.hash值 异或 hash值的高16位
+    return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+    // >>>:逻辑右移，忽略符号位，移动完第一位符号位肯定是0，是个正整数了
 }
+
 // Object#hashCode
 public native int hashCode();// int 32位
-// 比如resize()方法重新计算位置的时候,前边有介绍了
-// newTab[e.hash & (newCap - 1)] = e;
+
+// 2.确定位置：flag&mask（hash&(length-1)）  掩码mask:length是2的n次方，减1之后原来的1变为0，右边的位都是1，结果就是[0,length)范围内的数
+// 比如resize()方法重新计算位置的时候的代码,前边有介绍了
+newTab[e.hash & (newCap - 1)] = e;
 ```
+
+> > ps：曾经，dalao问我有什么比取余效率更高的，应该就是想听我说`&运算`吧 。
+> >
+> > 所以不要把`&`说成取余了，它毕竟是个数学的词，对方完全可以认为你说的是`%`。
+> >
+> > 位运算`hash & (length-1)`肯定比数学运算-取余`hash % (length-1)`效率要高啊。
+> >
+> > 哦，dalao还问redis怎么让那些key分布更均匀一些，应该想听让高位也参与运算吧，当然还得有好的hash函数。
+
+相关的优化还有一个，就是`resize()`扩容时的 **oldCap作mask 重hash优化**，key的`newIndex`只可能是`oldIndex`或`oldIndex+oldCap`，决定因素就是oldCap这个位`1 还是 0`。见下方[扩容 resize()](扩容 resize())
 
 
 
 #### put(K, V)方法
 
-流程就是这样，就是判断是否扩容，改index一共有多少个Node，多了就红黑树，少了就链表。所以就记一下触发这些操作的条件吧
+流程：
 
-<img src="https://raw.githubusercontent.com/melopoz/pics/master/img/HashMap" style="zoom:40%;" />
+1. 是否需要初始化？需要就扩容；
+2. `table[hash&(length-1)] `是不是`null`？
+   - 是`null`：直接插入；
+   - 有`node`：key相同吗？
+     - 相同：覆盖
+     - 不同：`instance of TreeNode` ？`红黑树插入` : `遍历链表覆盖或加到tail.next`,并判断是否需要转红黑树`treeifyBin()`；
+3. 最后**都**要再判断size是否超过阈值`threshold`，超过就扩容(扩容会`rehash`哦)。
+
+<img alt="put()流程图，图在github" src="https://raw.githubusercontent.com/melopoz/pics/master/img/HashMap" style="zoom:40%;" />
 
 ```java
 public V put(K key, V value) {
@@ -224,7 +269,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict) {
                 if ((e = p.next) == null) {// table[i]处就一个节点
                     p.next = newNode(hash, key, value, null);
                     if (binCount >= TREEIFY_THRESHOLD - 1) // -1 for 1st  
-                        treeifyBin(tab, hash); // TREEIFY_THRESHOLD=8，所以如果当前节点是第9个就会转换成红黑树
+                        treeifyBin(tab, hash); // TREEIFY_THRESHOLD=8，所以如果当前节点是第8个就会转换成红黑树
                     break;
                 }
                 if (e.hash == hash &&
@@ -256,7 +301,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict) {
 
 table是数组，不能扩容，所以肯定开辟新空间，再复制过去。
 
-由于扩容是旧容量*2：`newCap = oldCap << 1`，key的hash值是固定的，so，举个例子：(就只看后八位了)
+由于扩容是旧容量*2：`newCap = oldCap << 1`，key的hash值是固定的，举个例子：(就只看后八位了)
 
 > 假设  hash(key1) = `0000 0101`，hash(key2) = `0001 0101`
 >
@@ -276,13 +321,19 @@ table是数组，不能扩容，所以肯定开辟新空间，再复制过去。
 >
 > key2对应的位置：`0001 0101` & `0001 1111` = **21**（ `0001 0101`）
 
-<img src="https://raw.githubusercontent.com/melopoz/pics/master/img/resize-key%E7%9A%84%E6%96%B0%E7%B4%A2%E5%BC%95%E4%BD%8D%E7%BD%AE.png" style="zoom: 50%;" />
+<img alt="rehash demo，图在github" src="https://raw.githubusercontent.com/melopoz/pics/master/img/resize-key%E7%9A%84%E6%96%B0%E7%B4%A2%E5%BC%95%E4%BD%8D%E7%BD%AE.png" style="zoom: 50%;" />
 
-这么看来key在新table中的位置只有两种可能：`oldIndex`或者`oldIndex + oldCap`，决定因素就是`hash(key)`在`mask的高位新增位(上图红色的1)` 对应的bit是1还是0，这个只有一位高电平的mask(`0001 0000`)，不就是oldCap嘛。**哦，这就是1.8的其中一个优化**。
+这么看来key在新table中的位置只有两种可能：`oldIndex`或者`oldIndex + oldCap`。
 
-> Ctrl+F 搜索`"oldCap做mask 重hash优化"`找到对应的代码  :)
+其决定因素就是`hash(key)`在`mask的高位新增位(上图红色的1)` 对应的bit是1还是0，这个`binaryStr只有一个1的`mask(`0001 0000`)正是`oldCap`。所以
 
-resize()源码，淦
+> `hash & oldCap == `**0**：`newIndex = oldIndex  `
+>
+> `hash & oldCap == `**1**：`newIndex = oldIndex + oldCap`
+
+> Ctrl+F 搜索`"oldCap作mask 重hash优化"`找到对应的代码  :)
+
+##### resize()源码
 
 ```java
 static final int DEFAULT_INITIAL_CAPACITY = 1 << 4; // aka 16 // 初始化容量
@@ -319,7 +370,7 @@ final Node<K,V>[] resize() {
         newThr = (newCap < MAXIMUM_CAPACITY && ft < (float)MAXIMUM_CAPACITY ?
                   (int)ft : Integer.MAX_VALUE);
     }
-    // 开始
+    // 从这里开始
     threshold = newThr;
     @SuppressWarnings({"rawtypes","unchecked"})
     Node<K,V>[] newTab = (Node<K,V>[])new Node[newCap];// 开辟newTab空间
@@ -329,36 +380,36 @@ final Node<K,V>[] resize() {
             Node<K,V> e;
             if ((e = oldTab[j]) != null) {
                 oldTab[j] = null;// 去掉以前的引用 help GC
-                if (e.next == null)// 说明这个位置就一个node
-                    newTab[e.hash & (newCap - 1)] = e;// 放到新table对应的位置
+                if (e.next == null)// 说明这个位置原本只有一个node
+                    newTab[e.hash & (newCap - 1)] = e;// 放到newTable对应的位置即可
                 else if (e instanceof TreeNode)// 是红黑树节点
-                    ((TreeNode<K,V>)e).split(this, newTab, j, oldCap);// todo todo todo 
-                else /*这个位置是链表*/{ // preserve order  保存顺序
-                    Node<K,V> loHead = null, loTail = null;// 假设容量是从16扩容到32，loHead就是table[15]这个head
-                    Node<K,V> hiHead = null, hiTail = null;// 那么hiHead就是table[31]这个head
+                    ((TreeNode<K,V>)e).split(this, newTab, j, oldCap);// todo 红黑树操作 
+                else /*这个位置是链表*/{ // preserve order
+                    Node<K,V> loHead = null, loTail = null;// 假设容量是从16扩容到32，loHead就是newTable[15]这个head节点
+                    Node<K,V> hiHead = null, hiTail = null;// 那么hiHead就是newTable[31]这个head节点
                     Node<K,V> next;
-                    do {// 先去看下边while条件，就是遍历这个链表
+                    do {// 遍历这个链表
                         next = e.next;// 先留一份当前node的next的指针,while的时候用
-                        // 这就是上边说的那个   "oldCap做mask 重hash优化"
-                        // 因为只可能是这两个位置，所以操作这两个index的head和tail指针就ok了（上边声明的四个变量）
-                        if ((e.hash & oldCap) == 0) {// 说明该元素在新table中的位置还是oldIndex
-                            if (loTail == null)// 只有第一次来newTable[j]这个位置肯定是null
+                        // 这里就是"oldCap作mask 重hash优化"中对 newIndex只有两种可能 的处理
+                        if ((e.hash & oldCap) == 0) {// 在newTable中的位置还是 oldIndex
+                            if (loTail == null)// 第一次来newTable[j]这个位置肯定是null
                                 loHead = e;// loHead指针直接指向这个新node
                             else
-                                loTail.next = e;// 第二次之后插入到table[j]对应链表的tail之后
-                            loTail = e;// 更新tail节点指向新的node嘛
+                                loTail.next = e;// 第二次之后插入到table[j]对应链表的tail之后，可见1.8这里是用的尾插法。
+                            loTail = e;// 无论如何总是要更新tail节点指向新的node
                         }
-                        else {// 说明该元素在新table中的位置是 oldIndex + oldCap
+                        else {// 在newTable中的位置是 oldIndex + oldCap，同上
                             if (hiTail == null)
                                 hiHead = e;
                             else
                                 hiTail.next = e;
-                            hiTail = e;// 这里和上边就一个意思了
+                            hiTail = e;
                         }
                     } while ((e = next) != null);
+                    // do-while结束，newTable[j]和newTable[j+oldCap]对应的链表已经生成，放到newTable即可
                     if (loTail != null) {// 说明newTable[j]这个位置有节点
                         loTail.next = null;
-                        newTab[j] = loHead;// loHead 和 hiHead 都已经指向该指向的节点了，loHead放到newTable的低索引位
+                        newTab[j] = loHead;// loHead放到newTable的低索引位
                     }
                     if (hiTail != null) {
                         hiTail.next = null;
@@ -385,8 +436,8 @@ void transfer (Entry[] newTable){
             do {
                 Entry<K, V> next = e.next;// 持有一份当前node的next指针
                 int i = indexFor(e.hash, newCapacity); // 重新计算每个元素在数组中的位置 还是用的 e.hash & (newCapacity-1)
-                e.next = newTable[i]; // 将newTable[i]处的链表接到当前node后边。（！死循环就是这里的问题）
-                newTable[i] = e;      // 将当前node放到newTable[i]处    头插法！
+                e.next = newTable[i]; // 将newTable[i]处的链表接到当前node(新head)后边。  - 头插法！死循环
+                newTable[i] = e;      // 将当前node放到newTable[i]处
                 e = next;
             } while (e != null);
         }
@@ -397,13 +448,20 @@ static int indexFor(int h, int length) {
 }
 ```
 
-1.8用的是尾插法，1.7的代码中用的是头插法，元素位置会倒置，而且可能死循环
+1.8用的是尾插法，链表元素不会倒置，1.7的代码中用的是头插法，元素位置会倒置，而且可能死循环
 
 
 
-#### 树化操作 treeifyBin()
+#### 树化操作 treeifyBin() - 两个条件
 
-put()方法中，如果一个hash槽的节点数>8，就会调用treeifyBin(..)方法进行树化。
+如果`hash槽的node个数>=8`，就会调用treeifyBin(..)方法进行树化。
+
+```java
+if (binCount >= TREEIFY_THRESHOLD)
+    treeifyBin(tab, i);
+```
+
+treeifyBin(..)方法中会再次判断，**只有table的容量`table.length`>=64**，才会转为红黑树，否则只是扩容`resize()`。
 
 ```java
 final void treeifyBin(Node<K,V>[] tab, int hash) {
@@ -426,11 +484,15 @@ final void treeifyBin(Node<K,V>[] tab, int hash) {
             hd.treeify(tab);
     }
 }
+
+TreeNode<K,V> replacementTreeNode(Node<K,V> p, Node<K,V> next) {
+    return new TreeNode<>(p.hash, p.key, p.value, next);
+}
 ```
 
-
-
-#### 红黑树
+```
+replacementTreeNode
+```
 
 
 
@@ -467,6 +529,8 @@ final void treeifyBin(Node<K,V>[] tab, int hash) {
 ###### 怎么解决1.7那个死循环的？
 
 > 1.7是把node放到newTable[j]处的head（头插法），1.8是放到newTable[j]的tail.next（尾插法）。即使线程不安全，出问题也就是可能node会有重复
+
+
 
 
 

@@ -1,4 +1,7 @@
 ---
+
+
+
 title: Java_HashMap 不止是HashMap
 tags: 
   - JUC
@@ -186,7 +189,7 @@ HashMap中length必须是2的n次方，`16`binaryStr: `0001 0000`，减1就直�
 
 
 
-### 功能实现
+### 功能 & 实现
 
 #### 确定node在table中的索引位置
 
@@ -297,7 +300,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict) {
 
 
 
-#### 扩容 resize()
+#### resize() 扩容
 
 table是数组，不能扩容，所以肯定开辟新空间，再复制过去。
 
@@ -452,7 +455,7 @@ static int indexFor(int h, int length) {
 
 
 
-#### 树化操作 treeifyBin() - 两个条件
+#### treeifyBin() 转红黑树 - 两个条件
 
 如果`hash槽的node个数>=8`，就会调用treeifyBin(..)方法进行树化。
 
@@ -536,137 +539,835 @@ replacementTreeNode
 
 # ConcurrentHashMap
 
->  key和value不能为null，key不能，value不能因为多线程使用，有歧义
+## JDK1.7
 
-jdk1.7 使用segment分段锁
+### 数据结构
 
-### jdk1.8
+<img alt="jdk1.7-ConcurrentHashMap数据结构，图在github" src="https://raw.githubusercontent.com/melopoz/pics/master/img/926638-20170809132445011-2033999443.png" style="zoom: 67%;" />
 
-get()
+#### Segment数组 & HashEntry数组
+
+每个Segment是一个HashEntry数组，每个HashEntry的结构和HashMap相同。
+
+> 用分段锁把锁的粒度变细，以提高并发性。
+
+Segment数组和HashEntry数组的容量都是2的n次方；
+
+`segment数组初始容量16`，只能用16位二进制标识，所以`最大值65536`；
+
+HashEntry`初始容量为1，最小容量为2`。
+
+
+
+### 功能 & 实现
+
+```java
+// Segment是继承自ReentrantLock的
+static class Segment<K,V> extends ReentrantLock implements Serializable {...}
+```
+
+
+
+#### put(K, V)
+
+1. 如果该Segment还未初始化，就CAS进行初始化；
+
+2. 二次hash，从HashEntry数组中找到key对应的HashEntry
+
+   用tryLock()加锁，失败会自旋，自旋超过指定次数就挂起当前线程，等待被唤醒。
+
+
+
+#### get(K)
+
+和HashMap的区别就是需要两次hash，并对Segment加锁
+
+
+
+#### size()
+
+在thread1计算size的时候，其他线程可能在thread1计算过的segment插入过数据。
+
+1. 先不加锁，多次计算size，比较计算的结果和前一次的结果，如果一致就返回（最多三次）
+2. 如果不一致就把所有segment加锁再计算
+
+代码如下：
+
+```java
+try {
+    for (;;) {
+        if (retries++ == RETRIES_BEFORE_LOCK) {// RETRIES_BEFORE_LOCK 加锁之前重试次数 3
+            for (int j = 0; j < segments.length; ++j)
+                ensureSegment(j).lock(); // force creation
+        }
+        sum = 0L;
+        size = 0;// size
+        overflow = false;
+        for (int j = 0; j < segments.length; ++j) {
+            Segment<K,V> seg = segmentAt(segments, j);
+            if (seg != null) {
+                sum += seg.modCount; 
+                int c = seg.count; 
+                if (c < 0 || (size += c) < 0)
+                	overflow = true;// 溢出
+            }
+        }
+        if (sum == last)// 计算过程中结构没有变过
+            break;// 只有锁定所有segment 或者 真的没有别的线程改变过map的结构，才会到这里
+        last = sum;// 保存本次计算size 的结果，用于下次计算完size的比较 
+    }
+} finally {
+    if (retries > RETRIES_BEFORE_LOCK) {// 如果重试次数超过3，肯定都加上锁再计算的
+        for (int j = 0; j < segments.length; ++j)// 所有segment都解锁
+            segmentAt(segments, j).unlock();
+    }
+}
+```
+
+
+
+
+
+## JDK1.8
+
+### 数据结构 & 属性
+
+取消了segments字段，直接使用`transient volatile Node<K,V>[] table`保存数据，与JDK1.8的HashMap类似。
+
+> 保留了Segment的数据结构，但是简化了属性，只是兼容旧版本
+
+
+
+##### Node<K,V>[]  table
+
+```java
+// 存放node的数组
+transient volatile Node<K,V>[] table;
+
+// 和HashMap的Node有些差异，不允许修改Node的value了
+static class Node<K,V> implements Map.Entry<K,V> {
+    ...
+    public final V setValue(V value) {
+        throw new UnsupportedOperationException();// 和HashMap的Node相似但是只允许查找，不允许修改
+    }
+}
+```
+
+
+
+##### int sizeCtl   -控制标识符
+
+用来控制table的初始化和扩容的操作，不同的值有不同的含义。
+
+- 当为负数时：-1代表正在初始化；-N代表有N-1个线程正在 进行扩容
+- 当为0时：代表当时的table还没有被初始化
+- 当为正数时：表示`初始化时/触发扩容时`的阈值（size达到这个值就要扩容）
+
+> 也可以只分为`<0`和`>=0`两种情况，因为=0的时候也相当于是个阈值，触发扩容，不过这个扩容是初始化
+
+```java
+// 扩容时sizeCtl有两部分组成，第一部分是扩容戳，占据sizeCtl的高16位;第二部分是参与扩容的线程数，占低16位。
+// 每个新线程协助扩容时sizeCtl+1，直到所有的低有效位被占满，低有效位默认占16位（最高位为符号位），所以扩容线程数默认最大为65535。
+private transient volatile int sizeCtl;
+```
+
+
+
+##### long baseCount  -基础计数器
+
+```java
+// 代表Map中元素个数的的基础计数器，当无竞争时直接使用CAS方式更新该数值 
+transient volatile long baseCount;
+
+// 存储Map中元素的计数器，当并发量较高时`baseCount`竞争较为激烈，更新效率较低，所以把变化的数值更新到`counterCells`中的某个节点上
+// 计算size()时需要统计每个`counterCells`的大小再加上`baseCount`的数值。
+transient volatile CounterCell[] counterCells;
+
+// 扩容或者创建CounterCells时使用的自旋锁（使用CAS实现）；
+transient volatile int cellsBusy;
+```
+
+
+
+##### 常量
+
+```java
+static final int MOVED     = -1; // hash for forwarding nodes 转移节点的hash都是-1
+static final int TREEBIN   = -2; // hash for roots of trees  红黑树节点hash都是-2
+static final int RESERVED  = -3; // hash for transient reservations
+static final int HASH_BITS = 0x7fffffff; // usable bits of normal node hash 普通hash的有效位 相当于最基本的掩码吧
+```
+
+
+
+##### 扩容相关的变量/属性
+
+```java
+// 也就是newTable（仅在扩容的时候不为null）
+private transient volatile Node<K,V>[] nextTable;
+
+// 扩容子任务对应的table的索引位
+transient volatile int transferIndex; 
+
+// 最小转移步长：由于在扩容过程中，会把一个待转移的数组分为多个区间段（转移步长-stride）
+private static final int MIN_TRANSFER_STRIDE = 16;
+
+// 可用处理器数量 用来计算扩容任务的步长
+static final int NCPU = Runtime.getRuntime().availableProcessors();
+
+// 因为要使用乐观的cas更新变量来保证线程安全性，肯定需要Unsafe(根据内存偏移量 直接从内存中读取修改对象属性）
+static final sun.misc.Unsafe U;
+```
+
+
+
+### 内部类
+
+##### ForwardingNode 转发节点
+
+在扩容时用来标记这个节点已经处理过了。这类节点的hash值为  -1
+
+```java
+static final class ForwardingNode<K,V> extends Node<K,V> {
+    final Node<K,V>[] nextTable;// 扩容时新table的引用
+    ForwardingNode(Node<K,V>[] tab) {
+        // 常量MOVED = -1
+        super(/*hash*/MOVED, /*k*/null, /*v*/null, /*next*/null);
+        this.nextTable = tab;
+    }
+    ...
+}
+```
+
+
+
+##### TreeNode 红黑树节点
+
+继承自 Map.Node  维护了二叉树节点的属性
+
+```java
+static final class TreeNode<K,V> extends Node<K,V> {
+    TreeNode<K,V> parent;  // red-black tree links
+    TreeNode<K,V> prev;    // needed to unlink next upon deletion
+    TreeNode<K,V> left, right;
+    boolean red;// 节点颜色
+
+    final TreeNode<K,V> findTreeNode(int h, Object k, Class<?> kc) {
+        ...
+    }
+}
+```
+
+
+
+##### TreeBin 存储树的容器
+
+封装 TreeNode 的容器，它提供转换黑红树的一些条件和锁的控制
+
+```java
+static final class TreeBin<K,V> extends Node<K,V> {
+    TreeNode<K,V> root;
+    volatile TreeNode<K,V> first;
+    volatile Thread waiter;
+    volatile int lockState;// 锁状态
+    // values for lockState 
+    static final int WRITER = 1; // set while holding write lock
+    static final int WAITER = 2; // set when waiting for write lock
+    static final int READER = 4; // increment value for setting read lock
+    
+    private final void lockRoot() {
+        if (!U.compareAndSwapInt(this, LOCKSTATE, 0, WRITER)) // 如果cas失败就去 竞争锁
+            contendedLock(); // offload to separate method
+    }
+    private final void unlockRoot() {
+        lockState = 0;
+    }
+    
+	// 阻塞等待root锁
+    private final void contendedLock() {
+        boolean waiting = false;
+        for (int s;;) {
+            if (((s = lockState) & ~WAITER) == 0) {
+                if (U.compareAndSwapInt(this, LOCKSTATE, s, WRITER)) {
+                    if (waiting)
+                        waiter = null;
+                    return;
+                }
+            }
+            else if ((s & WAITER) == 0) {
+                if (U.compareAndSwapInt(this, LOCKSTATE, s, s | WAITER)) {
+                    waiting = true;
+                    waiter = Thread.currentThread();
+                }
+            }
+            else if (waiting)
+                LockSupport.park(this);// 挂起当前线程
+        }
+    }
+
+```
+
+
+
+### 线程安全机制
+
+synchronized、 CAS
+
+通过一系列对volatile变量的Unsafe操作来保证读到最新的数据
+
+```java
+static final <K,V> Node<K,V> tabAt(Node<K,V>[] tab, int i) {
+    return (Node<K,V>)U.getObjectVolatile(tab, ((long)i << ASHIFT) + ABASE);// JDK源码中好多都是记录该值相对于当前对象的偏移量
+}
+static final <K,V> boolean casTabAt(Node<K,V>[] tab, int i,
+                                    Node<K,V> c, Node<K,V> v) {
+    return U.compareAndSwapObject(tab, ((long)i << ASHIFT) + ABASE, c, v);
+}
+static final <K,V> void setTabAt(Node<K,V>[] tab, int i, Node<K,V> v) {
+    U.putObjectVolatile(tab, ((long)i << ASHIFT) + ABASE, v);
+}
+```
+
+
+
+### 功能 & 实现
+
+> 先看看大致步骤吧，不然文字很难描述的那么多分支，直线往下看会有点找不着北。
+
+
+
+
+
+#### 构造函数
+
+构造函数中没有任何操作，即使是有参数的构造函数，也只是设置`sizeCtl`等一些字段的值。
+
+除非参数中有Map实例，会调用`putAll(map)`。 真正的初始化是在put()方法里。
+
+```java
+public ConcurrentHashMap() {
+}
+public ConcurrentHashMap(int initialCapacity) {
+    if (initialCapacity < 0)
+        throw new IllegalArgumentException();
+    int cap = ((initialCapacity >= (MAXIMUM_CAPACITY >>> 1)) ?
+               MAXIMUM_CAPACITY :
+               tableSizeFor(initialCapacity + (initialCapacity >>> 1) + 1));
+    this.sizeCtl = cap;
+}
+public ConcurrentHashMap(Map<? extends K, ? extends V> m) {
+    this.sizeCtl = DEFAULT_CAPACITY;
+    putAll(m);// 只有传入map实例，才会调用put而真正初始化ConcurrentHashMap
+}
+```
+
+
+
+#### 三个原子操作
+
+```java
+// 获取tab在i位置上的节点
+static final <K,V> Node<K,V> tabAt(Node<K,V>[] tab, int i) {
+    return (Node<K,V>)U.getObjectVolatile(tab, ((long)i << ASHIFT) + ABASE);
+}
+
+// CAS更新tab[i]
+static final <K,V> boolean casTabAt(Node<K,V>[] tab, int i, Node<K,V> c, Node<K,V> v) {
+    return U.compareAndSwapObject(tab, ((long)i << ASHIFT) + ABASE, c, v);
+}
+
+// 设置节点位置的值，只在持有锁的时候被调用
+static final <K,V> void setTabAt(Node<K,V>[] tab, int i, Node<K,V> v) {
+    U.putObjectVolatile(tab, ((long)i << ASHIFT) + ABASE, v);
+}
+```
+
+
+
+#### get(K)
 
 > 使用volatile修饰变量，直接get，不会获取到旧值。
 >
 > ```java
 > public V get(Object key) {
->      Node<K,V>[] tab; Node<K,V> e, p; int n, eh; K ek;
->      int h = spread(key.hashCode());//散列 得到key在数组中的位置
->      if ((tab = table) != null && (n = tab.length) > 0 &&
->          (e = tabAt(tab, (n - 1) & h)) != null) {
->          if ((eh = e.hash) == h) {
->              if ((ek = e.key) == key || (ek != null && key.equals(ek)))
->                  return e.val;
->          }
->          else if (eh < 0)
->              return (p = e.find(h, key)) != null ? p.val : null;
->          while ((e = e.next) != null) {
->              if (e.hash == h &&
->                  ((ek = e.key) == key || (ek != null && key.equals(ek))))
->                  return e.val;
->          }
->      }
->      return null;
->  }
-> @SuppressWarnings("unchecked")
-> static final <K,V> Node<K,V> tabAt(Node<K,V>[] tab, int i) {
->  return (Node<K,V>)U.getObjectVolatile(tab, ((long)i << ASHIFT) + ABASE);
+>   Node<K,V>[] tab; Node<K,V> e, p; int n, eh; K ek;
+>   int h = spread(key.hashCode());//散列 得到key在数组中的位置
+>   if ((tab = table) != null && (n = tab.length) > 0 &&
+>       (e = tabAt(tab, (n - 1) & h)) != null) {// table不为空，table[i]不为空
+>       if ((eh = e.hash) == h) {
+>           if ((ek = e.key) == key || (ek != null && key.equals(ek)))
+>               return e.val;// table[i]就是要找的 直接返回
+>       }
+>       else if (eh < 0)// 是转发节点 forwardingNode(正在扩容)，去新table中寻找
+>           return (p = e.find(h, key)) != null ? p.val : null;
+>       while ((e = e.next) != null) {// 遍历
+>           if (e.hash == h &&
+>               ((ek = e.key) == key || (ek != null && key.equals(ek))))
+>               return e.val;
+>       }
+>   }
+>   return null;
 > }
 > ```
+
+
+
+
+
+#### put(K, V)
+
+使用乐观锁cas + synchronized实现并发插入/更新，如果有锁竞争才synchronized锁定`head` / `root`，大致流程：
+
+> 1. 如果还没有初始化：先调用`initTable()`方法来进行初始化；
 >
-> 
-
-put()
-
-> 使用cas和synchronized：
+> 2. 如果没有 hash 冲突：直接 CAS 插入；（即table[i]就一个node 或 table[i]还没有node）
 >
-> ```java
-> public V put(K key, V value) {
->  return putVal(key, value, false);
-> }
-> 
-> /** Implementation for put and putIfAbsent */
-> final V putVal(K key, V value, boolean onlyIfAbsent) {
->  if (key == null || value == null) throw new NullPointerException();
->  int hash = spread(key.hashCode());
->  int binCount = 0;
->  for (Node<K,V>[] tab = table;;) {
->      Node<K,V> f; int n, i, fh;
->      if (tab == null || (n = tab.length) == 0)
->          tab = initTable();
->      else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {
->          // put到空容器中 不需要锁 cas即可
->          if (casTabAt(tab, i, null,
->                       new Node<K,V>(hash, key, value, null)))
->              break;   // no lock when adding to empty bin
->      }
->      else if ((fh = f.hash) == MOVED)
->          // 如果正在调整大小，则帮助转移
->          tab = helpTransfer(tab, f);
->      else {
->          V oldVal = null;
->          // 否则就是添加新元素。需要synchronized 获取当前node的锁
->          synchronized (f) {
->              if (tabAt(tab, i) == f) {
->                  if (fh >= 0) {
->                      binCount = 1;
->                      for (Node<K,V> e = f;; ++binCount) {
->                          K ek;
->                          if (e.hash == hash &&
->                              ((ek = e.key) == key ||
->                               (ek != null && key.equals(ek)))) {
->                              oldVal = e.val;
->                              if (!onlyIfAbsent)
->                                  e.val = value;
->                              break;
->                          }
->                          Node<K,V> pred = e;
->                          if ((e = e.next) == null) {
->                              pred.next = new Node<K,V>(hash, key,
->                                                        value, null);
->                              break;
->                          }
->                      }
->                  }
->                  else if (f instanceof TreeBin) {
->                      Node<K,V> p;
->                      binCount = 2;
->                      if ((p = ((TreeBin<K,V>)f).putTreeVal(hash, key,
->                                                            value)) != null) {
->                          oldVal = p.val;
->                          if (!onlyIfAbsent)
->                              p.val = value;
->                      }
->                  }
->              }
->          }
->          if (binCount != 0) {
->              if (binCount >= TREEIFY_THRESHOLD)
->                  treeifyBin(tab, i);
->              if (oldVal != null)
->                  return oldVal;
->              break;
->          }
->      }
->  }
->  addCount(1L, binCount);
->  return null;
-> }
-> 
-> @SuppressWarnings("unchecked")
-> static final <K,V> Node<K,V> tabAt(Node<K,V>[] tab, int i) {
->  return (Node<K,V>)U.getObjectVolatile(tab, ((long)i << ASHIFT) + ABASE);
-> }
-> 
-> // 使用cas操作
-> static final <K,V> boolean casTabAt(Node<K,V>[] tab, int i,
->                                  Node<K,V> c, Node<K,V> v) {
->  return U.compareAndSwapObject(tab, ((long)i << ASHIFT) + ABASE, c, v);
-> }
-> ```
+> 3. 如果正在进行扩容：就协助扩容；
 >
-> 
+> 4. 如果存在 hash 冲突：
+>
+>    synchronized锁定table[i]处的节点 来保证线程安全，并根据链表当前的结构进行插入
+>
+>    - 链表：直接遍历到尾端插入；
+>    - 红黑树：按照红黑树结构插入；
+>
+> 5. 如果链表的长度>=8，就再次调用`treeifyBin()`，尝试转换成红黑树；
+>
+> 6. 最后调用`addCount()`方法统计`size`，并且检查是否需要扩容
+
+```java
+public V put(K key, V value) {
+    return putVal(key, value, false);
+}
+static final int spread(int h) {// 其实就是取hash值
+    return (h ^ (h >>> 16)) & HASH_BITS;// HASH_BITS = 0x7fffffff
+}
+/** Implementation for put and putIfAbsent */
+final V putVal(K key, V value, boolean onlyIfAbsent) {
+    if (key == null || value == null) throw new NullPointerException();
+    int hash = spread(key.hashCode());
+    int binCount = 0;
+    for (Node<K,V>[] tab = table;;) {
+        Node<K,V> f; int n, i, fh;
+        if (tab == null || (n = tab.length) == 0)// 1：还未初始化
+            tab = initTable();
+        else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {// 2：对应的位置没有node
+            if (casTabAt(tab, i, null, new Node<K,V>(hash, key, value, null)))
+                break;// no lock when adding to empty bin（添加到空容器中不加锁）
+	            // CAS成功才会break，否则接着for循环
+        }
+        else if ((fh = f.hash) == MOVED)// 3：正在扩容（table[i]这个节点是个forwardingNode）
+            tab = helpTransfer(tab, f);// 协助扩容
+        else {// 4：存在hash冲突
+            V oldVal = null;
+            synchronized (f) {// 锁定 table[i]链表的头结点
+                if (tabAt(tab, i) == f) {
+                    if (fh >= 0) {// hash值正常
+                        binCount = 1;// 记录链表有多少个node
+                        for (Node<K,V> e = f;; ++binCount) {
+                            K ek;
+                            if (e.hash == hash &&
+                                ((ek = e.key) == key || (ek != null && key.equals(ek)))) {
+                                oldVal = e.val;
+                                //onlyIfAbsent:只在不存在的时候执行 true:不覆盖旧value; false:覆盖旧value
+                                if (!onlyIfAbsent)
+                                    e.val = value;// 覆盖value
+                                break;// 完事
+                            }
+                            Node<K,V> pred = e;// 保留当前node的指针，e指向下一个node
+                            if ((e = e.next) == null) {// 没有下一个就加到tail
+                                pred.next = new Node<K,V>(hash, key, value, null);
+                                break;
+                            }
+                        }
+                    }
+                    // fh<0（红黑树节点的hash都是-2）
+                    else if (f instanceof TreeBin) {// 红黑树结构 
+                        Node<K,V> p;
+                        binCount = 2;// 最少有两个node
+                        if ((p = ((TreeBin<K,V>)f).putTreeVal(hash, key, value)) != null) {
+                            // put红黑树节点，可能是插入一个节点，可能是替换一个节点的val，这个方法返回对应的节点
+                            oldVal = p.val;
+                            if (!onlyIfAbsent) // 决定是否覆盖oldValue
+                                p.val = value;
+                        }
+                    }
+                }
+            }
+            // 最后计算数量
+            if (binCount != 0) {
+                if (binCount >= TREEIFY_THRESHOLD)
+                    treeifyBin(tab, i);// 节点数>=8 申请转化为红黑树
+                if (oldVal != null)
+                    return oldVal; // 返回非空oldValue
+                break;
+            }
+        }
+    }
+    addCount(1L, binCount);// 统计size
+    return null;
+}
+```
+
+
+
+#### initTable() 初始化table
+
+```java
+private final Node<K,V>[] initTable() {
+    Node<K,V>[] tab; int sc;
+    while ((tab = table) == null || tab.length == 0) {
+        if ((sc = sizeCtl) < 0)// 说明有其他线程正在扩容
+            Thread.yield(); // lost initialization race; just spin   自旋等待初始化完成。
+        else if (U.compareAndSwapInt(this, SIZECTL, sc, -1)) {// cas设置sc为-1，表示正在初始化
+            try {
+                if ((tab = table) == null || tab.length == 0) {
+                    int n = (sc > 0) ? sc : DEFAULT_CAPACITY;// sc为正数标识阈值
+                    @SuppressWarnings("unchecked")
+                    Node<K,V>[] nt = (Node<K,V>[])new Node<?,?>[n];
+                    table = tab = nt;
+                    sc = n - (n >>> 2);// 并设置阈值。size达到sc就扩容。
+                    // >>>2就是/4,  n-n/4就是n=n*0.75呗
+                }
+            } finally {
+                sizeCtl = sc;// 更新sizeCtl属性
+            }
+            break;
+        }
+    }
+    return tab;
+}
+```
+
+
+
+#### helpTransfer() 协助扩容
+
+```java
+final Node<K,V>[] helpTransfer(Node<K,V>[] tab, Node<K,V> f) {
+    Node<K,V>[] nextTab; int sc;
+    if (tab != null && (f instanceof ForwardingNode) && // f是正在转化的node
+        (nextTab = ((ForwardingNode<K,V>)f).nextTable) != null) {// 并且 newTable已经存在
+        int rs = resizeStamp(tab.length);
+        while (nextTab == nextTable && table == tab && // 验证newTable和oldTable
+               (sc = sizeCtl) < 0) {// 并且sc是正在扩容
+            if ((sc >>> RESIZE_STAMP_SHIFT) != rs || sc == rs + 1 ||
+                sc == rs + MAX_RESIZERS || transferIndex <= 0)
+                break;
+            if (U.compareAndSwapInt(this, SIZECTL, sc, sc + 1)) {
+                transfer(tab, nextTab);// 调用扩容方法
+                break;
+            }
+        }
+        return nextTab;
+    }
+    return table;
+}
+```
+
+
+
+#### transfer() 扩容
+
+##### 步骤
+
+> 1. 开辟新table空间：`nextTable`
+>
+> 2. 遍历table，计算当前线程的步长(拿到自己的子任务)  ----- 每个线程都会计算自己能拿到的任务，以此方式协作！
+>
+> 3. 执行自己的任务，从后往前遍历（table[15]->table[0]）
+>
+>    > 比如16扩容到32，就是从15遍历到0，不会有其他线程再参与扩容了(因为最小步长16)
+>
+>    对table[i]的 链表 / 红黑树 进行遍历
+>
+>    - 链表（两次for遍历）
+>
+>      > 1. 找到链表尾端(newindex都相同的)最长子链表(图1的678)，并设置下次遍历的终点`lastRun`为这个子链表的head(图1的6)
+>      >
+>      > 2. 再次遍历table[i]，for [head,  `lastRun`) （lastRun就比如图1的6）
+>      >
+>      >    > 使用**头插法**把node都插入到新low链表/新high链表的前边。
+>      >
+>      >    结果会是有一个新链表的顺序会倒置（不是第一次for拿出的子链表）（图1的结果：5123 和 4678）
+>
+>    - 红黑树
+>
+> 4. 把新链表放到新table对应的索引位
+
+##### 源码
+
+```java
+// Moves and/or copies the nodes in each bin to new table. 将所有node移动到新table中
+private final void transfer(Node<K,V>[] tab, Node<K,V>[] nextTab) {
+    // ---------------- 1：给当前线程分配任务
+    int n = tab.length, stride;// stride：步长，每个线程负责table中一步之内的所有链表
+    if ((stride = (NCPU > 1) ? (n >>> 3) / NCPU : n) < MIN_TRANSFER_STRIDE)
+        stride = MIN_TRANSFER_STRIDE; // subdivide range 细分范围  
+    	// 最少16，也就是从16扩容到32的时候只会有一个线程参与扩容
+    if (nextTab == null) {            // initiating
+        try {
+            @SuppressWarnings("unchecked")
+            Node<K,V>[] nt = (Node<K,V>[])new Node<?,?>[n << 1];// newTable容量为原来的两倍
+            nextTab = nt;
+        } catch (Throwable ex) {      // try to cope with OOME ..尝试处理OOM
+            sizeCtl = Integer.MAX_VALUE;
+            return;
+        }
+        nextTable = nextTab;
+        transferIndex = n;// 当前线程的扩容任务是从 n开始
+    }
+    // ---------------- 2：执行当前线程的扩容子任务（遍历当前线程负责的一步范围内所有的链表）
+    int nextn = nextTab.length;
+    ForwardingNode<K,V> fwd = new ForwardingNode<K,V>(nextTab);// 创建forward节点
+    boolean advance = true;
+    boolean finishing = false; // to ensure sweep before committing nextTab 确保在提交nextTab之前扫描
+    // i 指当前处理的槽位序号， bound 指需要处理的槽位边界，先处理槽位15的节点
+    for (int i = 0, bound = 0;;) {// 遍历当前线程负责的一步范围内所有的链表
+        Node<K,V> f; int fh;
+        // ---------------- 2.1：自旋设置transferIndex的值 并初始化i 和 bound
+        while (advance) {
+            int nextIndex, nextBound;
+            if (--i >= bound || finishing)
+                advance = false;
+            else if ((nextIndex = transferIndex) <= 0) {
+                i = -1;
+                advance = false;
+            }
+            // cas设置transferIndex属性的值
+            else if (U.compareAndSwapInt (this, TRANSFERINDEX, nextIndex,
+                      nextBound = (nextIndex > stride ? nextIndex - stride : 0))
+                    ) {
+                bound = nextBound;
+                i = nextIndex - 1;// 初始化 i 和 bound
+                advance = false;
+            }
+        }
+        // ----------------↓↓ todo ??
+        if (i < 0 || i >= n || i + n >= nextn) {// todo ??
+            int sc;
+            if (finishing) {// 如果已经复制完所有节点
+                nextTable = null;
+                table = nextTab;// table变量 指向新table
+                sizeCtl = (n << 1) - (n >>> 1);// sc= n*2 - n/2 相当于 sc=n*1.5，阈值变为oldCap的1.5倍
+                return;
+            }
+            if (U.compareAndSwapInt(this, SIZECTL, sc = sizeCtl, sc - 1)) {// cas替换sc的值，通知其他线程 多了一个线程参与扩容
+                if ((sc - 2) != resizeStamp(n) << RESIZE_STAMP_SHIFT)
+                    return;
+                finishing = advance = true;
+                i = n; // recheck before commit
+            }
+        }
+        // ----------------↑↑ todo ??
+        else if ((f = tabAt(tab, i)) == null)// 如果节点为null，通过cas将forward节点放到该位置
+            advance = casTabAt(tab, i, null, fwd);
+        else if ((fh = f.hash) == MOVED) // 如果该节点已经是forward节点
+            advance = true; // already processed
+        else { // ---------------- 2.2：执行任务，把table[i]这个链表 转移到nextTable
+            synchronized (f) {// 对节点加锁
+                if (tabAt(tab, i) == f) {
+                    Node<K,V> ln, hn;// newIndex两种可能：oldIndex 或 oldIndex+oldCap
+                    // ---------------- 2.2.0：链表
+                    if (fh >= 0) {
+                        //n:oldCap，unBit是否为0 表示这个节点是在low还是high
+                        int runBit = fh & n;
+                        Node<K,V> lastRun = f;// 记录最后需要处理的节点
+                        // ---------------- 2.2.1：遍历链表
+                        for (Node<K,V> p = f.next; p != null; p = p.next) {
+                            int b = p.hash & n;// mask之后是否为0
+                            if (b != runBit) {// 如果节点p和节点f 的newIndex不同 如图1，p是节点4时才会第一次进入这个if
+                                runBit = b;// 更新runBit
+                                lastRun = p;// 更新要处理的节点
+                            }
+                        }
+                        // 这次for结束后，lastRun及其后所有节点newIndex均一致，如'图1'中的678，6是lastRun
+                        if (runBit == 0) {// 将lastRun截下来放到新table中对应的槽
+                            ln = lastRun;
+                            hn = null;
+                        }
+                        else {
+                            hn = lastRun;
+                            ln = null;
+                        }
+                        // ---------------- 2.2.1：再次遍历链表，范围：[head, lastRun)
+                        for (Node<K,V> p = f; p != lastRun; p = p.next) {
+                            int ph = p.hash; K pk = p.key; V pv = p.val;
+                            // 正向遍历，头插法，所以另一个newIndex的链表(图1中的蓝色)节点会倒置
+                            if ((ph & n) == 0)
+                                ln = new Node<K,V>(ph, pk, pv, /*next*/ln);// 构造函数第四个参数是next，懂了吧。头插法
+                            else
+                                hn = new Node<K,V>(ph, pk, pv, hn);
+                        }
+                        // ---------------- 2.2.2：放到newTab中对应的index，完活
+                        setTabAt(nextTab, i, ln);
+                        setTabAt(nextTab, i + n, hn);
+                        setTabAt(tab, i, fwd);// 在table i 位置处插上ForwardingNode 表示该节点已经处理过了
+                        advance = true;
+                    }
+                    // ---------------- 2.2.0：红黑树 
+                    else if (f instanceof TreeBin) {
+                        TreeBin<K,V> t = (TreeBin<K,V>)f;
+                        TreeNode<K,V> lo = null, loTail = null;// newIndex为low的槽 对应的root和tail
+                        TreeNode<K,V> hi = null, hiTail = null;// newIndex为high的槽 对应的root和tail
+                        int lc = 0, hc = 0;// 记录新table中 low槽和high槽的节点数，后边会检查是否需要转为链表结构
+                        for (Node<K,V> e = t.first; e != null; e = e.next) {
+                            int h = e.hash;
+                            TreeNode<K,V> p = new TreeNode<K,V>
+                                (h, e.key, e.val, /*next*/null, /*parent*/null);
+                            if ((h & n) == 0) {// low槽
+                                if ((p.prev = loTail) == null)
+                                    lo = p;
+                                else
+                                    loTail.next = p;
+                                loTail = p;
+                                ++lc;
+                            }
+                            else {// high槽
+                                if ((p.prev = hiTail) == null)
+                                    hi = p;
+                                else
+                                    hiTail.next = p;
+                                hiTail = p;
+                                ++hc;
+                            }
+                        }
+                        // 如果扩容后节点数<6 转为链表
+                        ln = (lc <= UNTREEIFY_THRESHOLD) ? untreeify(lo) :
+                        (hc != 0) ? new TreeBin<K,V>(lo) : t;
+                        hn = (hc <= UNTREEIFY_THRESHOLD) ? untreeify(hi) :
+                        (lc != 0) ? new TreeBin<K,V>(hi) : t;
+                        // 放到新table对应的槽，完活
+                        setTabAt(nextTab, i, ln);
+                        setTabAt(nextTab, i + n, hn);
+                        setTabAt(tab, i, fwd);
+                        advance = true;
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+> 图1：
+>
+> <img alt="节点newIndex不同的链表，图在github" src="https://raw.githubusercontent.com/melopoz/pics/master/img/%E8%8A%82%E7%82%B9newIndex%E4%B8%8D%E5%90%8C%E7%9A%84%E9%93%BE%E8%A1%A8.png" style="zoom:50%;" />
+>
+> 这个链表最后会变成  `5->3->2->1` 和 `4->6->7->8`
+
+
+
+#### addCount()  统计size
+
+```java
+@sun.misc.Contended static final class CounterCell {
+    volatile long value;
+    CounterCell(long x) { value = x; }
+}
+
+final long sumCount() {
+    CounterCell[] as = counterCells; CounterCell a;
+    long sum = baseCount;
+    if (as != null) {
+        for (int i = 0; i < as.length; ++i) {
+            if ((a = as[i]) != null)
+                sum += a.value;
+        }
+    }
+    return sum;
+}
+
+@sun.misc.Contended static final class CounterCell {
+    volatile long value;
+    CounterCell(long x) { value = x; }
+}
+
+private final void addCount(long x, int check) {
+    CounterCell[] as; long b, s;
+    // 初始化时counterCells为空，在并发量很高时，如果存在两个线程同时执行CAS修改baseCount值，
+    // 则失败的线程会继续执行方法体中的逻辑，使用CounterCell记录元素个数的变化
+    if ((as = counterCells) != null ||
+        !U.compareAndSwapLong(this, BASECOUNT, b = baseCount, s = b + x)) {
+        // 使用CounterCell记录元素个数的变化
+        CounterCell a; long v; int m;
+        boolean uncontended = true;
+        // 如果CounterCell数组counterCells为空，调用fullAddCount()方法进行初始化，
+        // 并插入对应的记录数，通过CAS设置cellsBusy字段，只有设置成功的线程才能初始化CounterCell数组
+        if (as == null || (m = as.length - 1) < 0 ||
+            (a = as[ThreadLocalRandom.getProbe() & m]) == null ||
+            !(uncontended =
+              U.compareAndSwapLong(a, CELLVALUE, v = a.value, v + x))) {
+            fullAddCount(x, uncontended);
+            return;
+        }
+        if (check <= 1)
+            return;
+        s = sumCount();
+    }
+    if (check >= 0) {
+        Node<K,V>[] tab, nt; int n, sc;
+        while (s >= (long)(sc = sizeCtl) && (tab = table) != null &&
+               (n = tab.length) < MAXIMUM_CAPACITY) {
+            int rs = resizeStamp(n);
+            if (sc < 0) {
+                if ((sc >>> RESIZE_STAMP_SHIFT) != rs || sc == rs + 1 ||
+                    sc == rs + MAX_RESIZERS || (nt = nextTable) == null ||
+                    transferIndex <= 0)
+                    break;
+                if (U.compareAndSwapInt(this, SIZECTL, sc, sc + 1))
+                    transfer(tab, nt);
+            }
+            else if (U.compareAndSwapInt(this, SIZECTL, sc,
+                                         (rs << RESIZE_STAMP_SHIFT) + 2))
+                transfer(tab, null);
+            s = sumCount();
+        }
+    }
+}
+```
+
+todo addCount       T.T 
+
+图1来自  https://www.jianshu.com/p/0e435f39e796  ，正好看看dalao对addCount怎么说的，还有红黑树
+
+
+
+todo 红黑树 https://blog.csdn.net/v_july_v/article/details/6105630
 
 
 
 
 
-md 又是 todo
+## 总结
+
+### 1.7和1.8区别（1.8的优化）
+
+1. 1.8 的结构和HashMap大致相同（1.7的ConcurrentHashMap其实就和1.8的HashMap差不多了）；
+
+2. 1.8 取消segment分段锁，不用ReentrantLock了，而是使用很多乐观锁-自旋CAS，
+
+   乐观失败就用synchronized锁定table[i]的链表的head。锁粒度更细，并发性高；
+
+   > 锁粒度降低，synchronized并不比ReentrantLock差了。
+   >
+   > 本来ReentrantLock的Condition可以在粗粒度的场景中提高性能（我觉得算是变相降低锁粒度吧）。
+   >
+   > 锁粒度降下来之后，ReentrantLock就没必要了。
+   >
+   > > 而且synchronized可以基于jvm优化，使用关键字比使用api确实更加自然。
+   >
+   > > 数据量很大的话，使用基于 api 的 ReentrantLock 会比 synchronized 占用更多的内存
+
+3. 可以协助扩容，扩容的时候1.8用到了头插法，部分node顺序会倒置；
+
+4. 高效更新元素个数，类似LongAdder 。。。？todo
+
+
+
+### HashMap和ConcurrentHashMap的区别
+
+1. HashMap线程不安全，..；
+2. ConcurrentHashMap扩容的时候会先拿当前线程的子任务（步长 `stride`），HashMap没这么多事；
+3. ConcurrentHashMap扩容的时候有用到头插法，部分node的顺序会倒置，而HashMap用的尾插法；
+4. 1.7的ConcurrentHashMap的put和get操作都要两次hash

@@ -1,0 +1,526 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/favicon.png">
+  <link rel="icon" type="image/png" href="/blog/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Although things are always not as you wish, but effort will be lucy!">
+  <meta name="author" content="melopoz">
+  <meta name="keywords" content="">
+  <title>HDFS - 你不喜欢孤独 那就别停下来</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/blog/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.1.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"melopoz.github.io","root":"/blog/","version":"1.8.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"copy_btn":true,"image_zoom":{"enable":true},"lazyload":{"enable":true,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/blog/">&nbsp;<strong>Fluid</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/blog/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="HDFS">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-03-28 23:27" pubdate>
+        2021年3月28日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      870 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      9
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">HDFS</h1>
+            
+            <div class="markdown-body">
+              <p>目录树结构</p>
+<p>角色namenode datanode 角色即进程</p>
+<h3 id="角色"><a href="#角色" class="headerlink" title="角色"></a>角色</h3><h4 id="NameNode"><a href="#NameNode" class="headerlink" title="NameNode"></a>NameNode</h4><p>基于内存存储文件元数据、目录结构、文件block的映射</p>
+<p>需要持久化方案提供数据可靠性</p>
+<p>提供副本放置策略</p>
+<h4 id="DataNode"><a href="#DataNode" class="headerlink" title="DataNode"></a>DataNode</h4><p>基于本地磁盘存储block（块）（以文件形式）</p>
+<p>保存block的校验和数据 保证block的可靠性</p>
+<p>和NameNode保持心跳，汇报block的列表状态</p>
+<h3 id="数据恢复策略："><a href="#数据恢复策略：" class="headerlink" title="数据恢复策略："></a>数据恢复策略：</h3><ul>
+<li><p>日志文件(记录所有操作，恢复时重新执行一遍)</p>
+<blockquote>
+<p>恢复慢 数据全</p>
+</blockquote>
+</li>
+<li><p>镜像 快照 dump db 序列化</p>
+<blockquote>
+<p>恢复快 数据不全(因为只能间隔一段时间备份一下)</p>
+</blockquote>
+</li>
+</ul>
+<h4 id="HDFS的数据恢复策略："><a href="#HDFS的数据恢复策略：" class="headerlink" title="HDFS的数据恢复策略："></a>HDFS的数据恢复策略：</h4><ul>
+<li>EditsLog  日志</li>
+<li>FsImage  镜像、快照</li>
+</ul>
+<blockquote>
+<p>EditsLog和FsImage存储在本地磁盘</p>
+</blockquote>
+<p>HDFS采用最近时间点的FsImage + 增量的EditsLog</p>
+<blockquote>
+<p>任何修改文件系统元数据的操作，NameNode都会使用EditsLog记录到事务日志</p>
+<p>使用FsImage存储内存中所有元数据状态</p>
+</blockquote>
+<h3 id="Block的副本放置策略"><a href="#Block的副本放置策略" class="headerlink" title="Block的副本放置策略"></a>Block的副本放置策略</h3><p>默认为每个数据块放3个副本，按照部署在NameNode上的默认机架感知策略存放数据副本。</p>
+<ul>
+<li><p>第一个block副本放在上传文件的datanode，如果是集群外上传文件到hdfs，则随机挑选一个磁盘剩余空间大，cpu比较轻松的datanode；</p>
+</li>
+<li><p>第二个block副本放在和第一个副本 不同机架 中的另一个datanode（随机选择）；</p>
+</li>
+<li><p>第三个block副本放在和第二个副本 相同机架 中的节点；</p>
+<blockquote>
+<p>这样就只通过一个交换机(当前机架的交换机)，如果放在其他机架，就要通过更多交换机传输，效率会变低</p>
+</blockquote>
+</li>
+<li><p>第n个block副本放在 随机节点。</p>
+</li>
+</ul>
+<img src="https://raw.githubusercontent.com/melopoz/pics/master/img/hdfs-%E5%89%AF%E6%9C%AC%E4%BD%8D%E7%BD%AE.png" srcset="/blog/img/loading.gif" style="zoom:33%;" />
+
+
+
+<h3 id="HDFS写流程"><a href="#HDFS写流程" class="headerlink" title="HDFS写流程"></a>HDFS写流程</h3><img src="https://raw.githubusercontent.com/melopoz/pics/master/img/hdfs-%E5%86%99%E6%B5%81%E7%A8%8B.png" srcset="/blog/img/loading.gif" />
+
+<blockquote>
+<p>block 块  packet小包(64kb)  chunk大块(512kb)</p>
+<p>写入数据的时候DN以chunk为单位进行数据校验。</p>
+</blockquote>
+<p>想NN请求上传文件，NN返回是否可以上传，client对文件进行切分(比如一个block64M，200M的文件就会分成64 64 64 8)，client向NN请求第一个block应该存储到的DN服务器，NN返回第一个DN服务器，client请求第一个DN(RPC调用，建立pipeline)，client发送第一个packet到DN1，传输完成像DN1发送第二个packet，同时DN1向DN2发送第一个packet… …  以此类推。</p>
+<blockquote>
+<p> 这样就比client发送整个大包到DN1，传输完成DN1发送打包到DN2… 效率要高很多</p>
+</blockquote>
+<p>第一个block传输完成，client再次请求NN上传第二个block</p>
+<h3 id="HDFS读流程"><a href="#HDFS读流程" class="headerlink" title="HDFS读流程"></a>HDFS读流程</h3><ol>
+<li>跟NN通信查询元数据(block所在的DN的节点)，找到文件块所在的DN的服务器。</li>
+<li>挑选一台DN（就近原则，然后随机）服务器，请求建立socket流。</li>
+<li>DN开始发送数据（从磁盘里读取数据放入流，以packet为单位做校验）</li>
+<li>客户端以packet为单位接收，先在本地缓存，然后写入目标文件中，后面的block块就相当于append到前面的block块，最后合成最终需要的文件</li>
+</ol>
+<h4 id="读取某个指定的block"><a href="#读取某个指定的block" class="headerlink" title="读取某个指定的block"></a>读取某个指定的block</h4><p>下载一个文件：（获取文件的所有block元数据）</p>
+<ul>
+<li>client和NN交互文件元数据获取fileBlockLocation</li>
+<li>NN按距离策略排序返回</li>
+<li>client尝试下载block并校验数据完整性</li>
+</ul>
+<p>”下载一个文件“的子集：获取某些block</p>
+<blockquote>
+<p> HDFS支持client给出我文件的offset，自定义连接某个block所在的DN，自定义获取数据.</p>
+<p>这是支持计算层分治、并行计算的核心</p>
+</blockquote>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+                    
+                      <a class="hover-with-bg" href="/blog/categories/%E5%88%86%E5%B8%83%E5%BC%8F/Hadoop/">Hadoop</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2021/03/28/Elasticsearch/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">ElasticSearch</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2021/03/28/HTTP/">
+                        <span class="hidden-mobile">HTTP</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":200})
+    NProgress.start()
+    document.addEventListener('DOMContentLoaded', function() {
+      window.NProgress && window.NProgress.inc();
+    })
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.staticfile.org/jquery/3.5.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/debouncer.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/blog/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.12.0/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/blog/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/blog/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+
+</body>
+</html>

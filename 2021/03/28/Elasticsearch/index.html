@@ -1,0 +1,834 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/favicon.png">
+  <link rel="icon" type="image/png" href="/blog/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Although things are always not as you wish, but effort will be lucy!">
+  <meta name="author" content="melopoz">
+  <meta name="keywords" content="">
+  <title>ElasticSearch - 你不喜欢孤独 那就别停下来</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/blog/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.1.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"melopoz.github.io","root":"/blog/","version":"1.8.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"copy_btn":true,"image_zoom":{"enable":true},"lazyload":{"enable":true,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/blog/">&nbsp;<strong>Fluid</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/blog/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="ElasticSearch">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-03-28 23:27" pubdate>
+        2021年3月28日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.6k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      26
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">ElasticSearch</h1>
+            
+            <div class="markdown-body">
+              <p>ELK</p>
+<p>elasticsearch + Logstash + Kibana</p>
+<p>在加上kafka更好</p>
+<p>Elasticsearch基于Lucene</p>
+<p>下载elasticsearch并安装 port9200</p>
+<p>下载head (Node.js) port9100</p>
+<p>config中配置跨域</p>
+<pre><code class="hljs yaml"><span class="hljs-attr">http.cors.enable:</span> <span class="hljs-literal">true</span>
+<span class="hljs-attr">http.cors.allow-origin:</span> <span class="hljs-string">&quot;*&quot;</span></code></pre>
+
+
+
+
+
+<p>Kibana下载 要和Elasticsearch的版本一致  可以汉化</p>
+<p>使用了Lucene倒排索引</p>
+<p>分片就是倒排索引</p>
+<p>下载ik分词器</p>
+<p>在kibana中使用rest请求</p>
+<pre><code class="hljs json">GET _analyze
+&#123;
+  <span class="hljs-attr">&quot;analyzer&quot;</span>: <span class="hljs-string">&quot;ik_smart&quot;</span>,
+  <span class="hljs-attr">&quot;text&quot;</span>: <span class="hljs-string">&quot;java大数据行业&quot;</span>
+&#125;
+
+GET _analyze
+&#123;
+  <span class="hljs-attr">&quot;analyzer&quot;</span>: <span class="hljs-string">&quot;ik_max_word&quot;</span>,
+  <span class="hljs-attr">&quot;text&quot;</span>: <span class="hljs-string">&quot;java大数据行业&quot;</span>
+&#125;
+
+GET _analyze
+&#123;
+  <span class="hljs-attr">&quot;analyzer&quot;</span>: <span class="hljs-string">&quot;standard&quot;</span>,
+  <span class="hljs-attr">&quot;text&quot;</span>: <span class="hljs-string">&quot;↑这个是标准的分词器&quot;</span>
+&#125;
+
+GET _analyze
+&#123;
+  <span class="hljs-attr">&quot;analyzer&quot;</span>: <span class="hljs-string">&quot;keyword&quot;</span>,
+  <span class="hljs-attr">&quot;text&quot;</span>: <span class="hljs-string">&quot;这个不会拆分text&quot;</span>
+&#125;</code></pre>
+
+<p>字典中没有的词需要自己加入到字典中， 在ik中增加自己的配置，新增.dic文件</p>
+<p>字段如果是keyword类型，就不会被分词器拆分，如果是text才可以</p>
+<p>version 0-6 一个索引下有可以有多个type</p>
+<p>version 7     一个索引下只有一个type</p>
+<p>version 8      索引下直接使用documentId，没有type</p>
+<ul>
+<li>查看所有索引 GET /_cat/indices</li>
+<li>查看集群是否健康 GET /_cat/health</li>
+<li>查看集群节点 GET /_cat/nodes</li>
+</ul>
+<h3 id="CRUD"><a href="#CRUD" class="headerlink" title="CRUD"></a>CRUD</h3><ol>
+<li><p>创建一个库  创建规则</p>
+<pre><code class="hljs json">PUT /索引名
+&#123;
+  <span class="hljs-attr">&quot;mappings&quot;</span>: &#123;
+    <span class="hljs-attr">&quot;properties&quot;</span>: &#123;
+      <span class="hljs-attr">&quot;name&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;type&quot;</span>: <span class="hljs-string">&quot;text&quot;</span>
+      &#125;,
+      <span class="hljs-attr">&quot;height&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;type&quot;</span>: <span class="hljs-string">&quot;double&quot;</span>
+      &#125;,
+      <span class="hljs-attr">&quot;birthday&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;type&quot;</span>: <span class="hljs-string">&quot;date&quot;</span>
+      &#125;
+    &#125;
+  &#125;
+&#125;</code></pre>
+</li>
+<li><p>查看索引下所有数据</p>
+<pre><code class="hljs json">GET /team/_search?pretty
+<span class="hljs-comment">// _doc</span>
+<span class="hljs-comment">// _search</span>
+<span class="hljs-comment">// _mapping...</span>
+结果
+&#123;
+  <span class="hljs-attr">&quot;took&quot;</span> : <span class="hljs-number">0</span>,
+  <span class="hljs-attr">&quot;timed_out&quot;</span> : <span class="hljs-literal">false</span>,<span class="hljs-comment">// 超时</span>
+  <span class="hljs-attr">&quot;_shards&quot;</span> : &#123;<span class="hljs-comment">//分区信息</span>
+    <span class="hljs-attr">&quot;total&quot;</span> : <span class="hljs-number">1</span>,
+    <span class="hljs-attr">&quot;successful&quot;</span> : <span class="hljs-number">1</span>,
+    <span class="hljs-attr">&quot;skipped&quot;</span> : <span class="hljs-number">0</span>,
+    <span class="hljs-attr">&quot;failed&quot;</span> : <span class="hljs-number">0</span>
+  &#125;,
+  <span class="hljs-attr">&quot;hits&quot;</span> : &#123;
+    <span class="hljs-attr">&quot;total&quot;</span> : &#123;
+      <span class="hljs-attr">&quot;value&quot;</span> : <span class="hljs-number">3</span>,
+      <span class="hljs-attr">&quot;relation&quot;</span> : <span class="hljs-string">&quot;eq&quot;</span>
+    &#125;,
+    <span class="hljs-attr">&quot;max_score&quot;</span> : <span class="hljs-number">1.0</span>,
+    <span class="hljs-attr">&quot;hits&quot;</span> : [ <span class="hljs-comment">// 全部数据</span>
+      &#123;
+        <span class="hljs-attr">&quot;_index&quot;</span> : <span class="hljs-string">&quot;team&quot;</span>,<span class="hljs-comment">//索引</span>
+        <span class="hljs-attr">&quot;_type&quot;</span> : <span class="hljs-string">&quot;_doc&quot;</span>,
+        <span class="hljs-attr">&quot;_id&quot;</span> : <span class="hljs-string">&quot;1&quot;</span>,
+        <span class="hljs-attr">&quot;_score&quot;</span> : <span class="hljs-number">1.0</span>,<span class="hljs-comment">//分值</span>
+        <span class="hljs-attr">&quot;_source&quot;</span> : &#123;<span class="hljs-comment">//source数据</span>
+          <span class="hljs-attr">&quot;name&quot;</span> : <span class="hljs-string">&quot;Thunders&quot;</span>,
+          <span class="hljs-attr">&quot;area&quot;</span> : <span class="hljs-string">&quot;north-west&quot;</span>,
+          <span class="hljs-attr">&quot;address&quot;</span> : <span class="hljs-string">&quot;Oklahoma City&quot;</span>,
+          <span class="hljs-attr">&quot;Coach&quot;</span> : <span class="hljs-string">&quot;Mitchell Donovan&quot;</span>
+        &#125;
+      &#125;,
+      &#123;
+        <span class="hljs-attr">&quot;_index&quot;</span> : <span class="hljs-string">&quot;team&quot;</span>,
+        <span class="hljs-attr">&quot;_type&quot;</span> : <span class="hljs-string">&quot;_doc&quot;</span>,
+        <span class="hljs-attr">&quot;_id&quot;</span> : <span class="hljs-string">&quot;2&quot;</span>,
+        <span class="hljs-attr">&quot;_score&quot;</span> : <span class="hljs-number">1.0</span>,
+        <span class="hljs-attr">&quot;_source&quot;</span> : &#123;
+          <span class="hljs-attr">&quot;name&quot;</span> : <span class="hljs-string">&quot;Warriors&quot;</span>,
+          <span class="hljs-attr">&quot;area&quot;</span> : <span class="hljs-string">&quot;north-west&quot;</span>,
+          <span class="hljs-attr">&quot;address&quot;</span> : <span class="hljs-string">&quot;Golden State&quot;</span>,
+          <span class="hljs-attr">&quot;Coach&quot;</span> : <span class="hljs-string">&quot;Steve Kerr&quot;</span>
+        &#125;
+      &#125;,
+      &#123;
+        <span class="hljs-attr">&quot;_index&quot;</span> : <span class="hljs-string">&quot;team&quot;</span>,
+        <span class="hljs-attr">&quot;_type&quot;</span> : <span class="hljs-string">&quot;_doc&quot;</span>,
+        <span class="hljs-attr">&quot;_id&quot;</span> : <span class="hljs-string">&quot;3&quot;</span>,
+        <span class="hljs-attr">&quot;_score&quot;</span> : <span class="hljs-number">1.0</span>,
+        <span class="hljs-attr">&quot;_source&quot;</span> : &#123;
+          <span class="hljs-attr">&quot;name&quot;</span> : <span class="hljs-string">&quot;Clippers&quot;</span>,
+          <span class="hljs-attr">&quot;area&quot;</span> : <span class="hljs-string">&quot;north-west&quot;</span>,
+          <span class="hljs-attr">&quot;address&quot;</span> : <span class="hljs-string">&quot;Los Angeles&quot;</span>,
+          <span class="hljs-attr">&quot;Coach&quot;</span> : <span class="hljs-string">&quot;Doc Rivers&quot;</span>
+        &#125;
+      &#125;
+    ]
+  &#125;
+&#125;</code></pre>
+
+
+</li>
+<li><p>增加一条索引</p>
+<pre><code class="hljs json">PUT /索引名/type名/id
+&#123;
+  <span class="hljs-attr">&quot;name&quot;</span>: <span class="hljs-string">&quot;melopoz&quot;</span>,
+  <span class="hljs-attr">&quot;height&quot;</span>: <span class="hljs-string">&quot;190&quot;</span>
+&#125;</code></pre>
+</li>
+<li><p>修改一条索引  每次version会+1</p>
+<pre><code class="hljs json"><span class="hljs-comment">//如果缺少字段，更新之后就会丢失</span>
+PUT /索引/type/id
+&#123;
+  <span class="hljs-attr">&quot;doc&quot;</span>: &#123;
+    <span class="hljs-attr">&quot;feildName&quot;</span>: <span class="hljs-string">&quot;newValue&quot;</span>   
+  &#125;
+&#125;
+<span class="hljs-comment">//不会丢失字段 在id后加update。</span>
+POST /索引/type/id/_update
+&#123;
+  <span class="hljs-attr">&quot;doc&quot;</span>: &#123;
+    <span class="hljs-attr">&quot;feildName&quot;</span>: <span class="hljs-string">&quot;newValue&quot;</span>
+  &#125;
+&#125;</code></pre>
+</li>
+<li><p>删除  DELETE</p>
+</li>
+</ol>
+<h3 id="复杂查询"><a href="#复杂查询" class="headerlink" title="复杂查询"></a>复杂查询</h3><ul>
+<li>match 使用分词器解析</li>
+</ul>
+<pre><code class="hljs json">GET /../../..
+&#123;
+  <span class="hljs-attr">&quot;query&quot;</span>: &#123;
+    <span class="hljs-attr">&quot;match&quot;</span>: &#123;
+      <span class="hljs-attr">&quot;字段名&quot;</span>: <span class="hljs-string">&quot;值&quot;</span>,
+      ...
+    &#125;
+  &#125;,
+  <span class="hljs-comment">//字段过滤</span>
+  &quot;_source&quot;: [&quot;name&quot;, &quot;height&quot;], 
+  <span class="hljs-comment">//排序 多种写法</span>
+  &quot;sort&quot;: [
+    &#123;
+      <span class="hljs-attr">&quot;height&quot;</span>: <span class="hljs-string">&quot;asc&quot;</span>
+    &#125;,&#123;&#125;
+  ]
+  <span class="hljs-comment">//分页</span>
+  &quot;from&quot;: 0,
+  &quot;size&quot;: 20
+&#125;</code></pre>
+
+<ul>
+<li>boolean查询</li>
+</ul>
+<pre><code class="hljs json">GET /../../..
+&#123;
+  <span class="hljs-attr">&quot;query&quot;</span>: &#123;
+    <span class="hljs-attr">&quot;bool&quot;</span>: &#123;
+      <span class="hljs-attr">&quot;must&quot;</span>: [<span class="hljs-comment">//should(or) must(and) must_not(!=)</span>
+        &#123;
+          <span class="hljs-attr">&quot;match&quot;</span>: &#123;
+            <span class="hljs-attr">&quot;name&quot;</span>: <span class="hljs-string">&quot;melopoz&quot;</span>
+          &#125;
+        &#125;,&#123;
+          <span class="hljs-attr">&quot;match&quot;</span>: &#123;
+            <span class="hljs-attr">&quot;height&quot;</span>: <span class="hljs-number">190</span>
+          &#125;
+        &#125;
+      ],
+      <span class="hljs-attr">&quot;filter&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;range&quot;</span>: &#123;
+          <span class="hljs-attr">&quot;height&quot;</span>: &#123;
+            <span class="hljs-attr">&quot;gt&quot;</span>: <span class="hljs-number">185</span> <span class="hljs-comment">//gt gte lt lte</span>
+          &#125;
+        &#125;
+      &#125;
+    &#125;
+  &#125;
+&#125;</code></pre>
+
+<ul>
+<li>term 直接精确查询 若果存储的value首字母大写了，查询时的参数首字母也要小写。因为分词器分析出的都是小写。 standard</li>
+</ul>
+<pre><code class="hljs json">GET /../../..
+&#123;
+  <span class="hljs-attr">&quot;query&quot;</span>: &#123;
+    <span class="hljs-attr">&quot;term&quot;</span>: &#123;
+      <span class="hljs-attr">&quot;name&quot;</span>: <span class="hljs-string">&quot;melopoz&quot;</span> <span class="hljs-comment">//如果name字段的type为keyword，有name=melopoz2的数据，也不会被查询到</span>
+    &#125;
+  &#125;
+&#125;</code></pre>
+
+<ul>
+<li>高亮查询</li>
+</ul>
+<pre><code class="hljs awk">GET <span class="hljs-regexp">/../</span>../..
+&#123;
+  <span class="hljs-string">&quot;query&quot;</span>: &#123;
+    <span class="hljs-string">&quot;match&quot;</span>: &#123;
+      <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;melopoz&quot;</span>
+    &#125;
+  &#125;,
+  <span class="hljs-string">&quot;highlight&quot;</span>: &#123;
+    <span class="hljs-string">&quot;pre_tags&quot;</span>: <span class="hljs-string">&quot;&lt;hl class=&quot;</span>highlight_word<span class="hljs-string">&quot;&gt;&quot;</span>
+    <span class="hljs-string">&quot;post_tags&quot;</span>: <span class="hljs-string">&quot;&lt;/h1&gt;&quot;</span>
+    <span class="hljs-string">&quot;name&quot;</span>:&#123;&#125;
+  &#125;
+&#125;</code></pre>
+
+<h3 id="聚合索引"><a href="#聚合索引" class="headerlink" title="聚合索引"></a>聚合索引</h3><pre><code class="hljs awk"><span class="hljs-regexp">//</span>查询<span class="hljs-number">20</span>-<span class="hljs-number">30</span>,<span class="hljs-number">0</span>-<span class="hljs-number">40</span>,<span class="hljs-number">40</span>-<span class="hljs-number">50</span>这三个年龄段分别有多少人
+GET /..
+&#123;
+  <span class="hljs-string">&quot;size&quot;</span>: <span class="hljs-number">0</span>, <span class="hljs-regexp">//</span> size=<span class="hljs-number">0</span>则不显示数据只显示聚合结果，每个阶段的人数
+  <span class="hljs-string">&quot;user&quot;</span>: &#123;
+    <span class="hljs-string">&quot;age&quot;</span>: &#123;
+      <span class="hljs-string">&quot;range&quot;</span>: &#123;
+        <span class="hljs-string">&quot;field&quot;</span>: <span class="hljs-string">&quot;age&quot;</span>,
+        <span class="hljs-string">&quot;ranges&quot;</span>: [
+          &#123;
+            <span class="hljs-string">&quot;from&quot;</span>: <span class="hljs-number">20</span>,
+            <span class="hljs-string">&quot;to&quot;</span>: <span class="hljs-number">30</span>
+          &#125;,&#123;
+            <span class="hljs-string">&quot;from&quot;</span>: <span class="hljs-number">30</span>,
+            <span class="hljs-string">&quot;to&quot;</span>: <span class="hljs-number">40</span>
+          &#125;,&#123;
+            <span class="hljs-string">&quot;from&quot;</span>: <span class="hljs-number">40</span>,
+            <span class="hljs-string">&quot;to&quot;</span>: <span class="hljs-number">50</span>
+          &#125;
+        ]
+      &#125;
+    &#125;
+  &#125;
+&#125;</code></pre>
+
+<h3 id="tokenizer分词器"><a href="#tokenizer分词器" class="headerlink" title="tokenizer分词器"></a>tokenizer分词器</h3><ul>
+<li>keyword分词器</li>
+</ul>
+<pre><code class="hljs json">GET /kibana_sample_data_ecommerce/_analyze
+&#123;
+  <span class="hljs-attr">&quot;text&quot;</span>: [<span class="hljs-string">&quot;Happy Birthday&quot;</span>],
+  <span class="hljs-attr">&quot;tokenizer&quot;</span>: <span class="hljs-string">&quot;keyword&quot;</span>
+&#125;
+结果：
+&#123;
+  <span class="hljs-attr">&quot;tokens&quot;</span> : [
+    &#123;
+      <span class="hljs-attr">&quot;token&quot;</span> : <span class="hljs-string">&quot;Happy Birthday&quot;</span>,
+      <span class="hljs-attr">&quot;start_offset&quot;</span> : <span class="hljs-number">0</span>,
+      <span class="hljs-attr">&quot;end_offset&quot;</span> : <span class="hljs-number">14</span>,
+      <span class="hljs-attr">&quot;type&quot;</span> : <span class="hljs-string">&quot;word&quot;</span>,
+      <span class="hljs-attr">&quot;position&quot;</span> : <span class="hljs-number">0</span>
+    &#125;
+  ]
+&#125;</code></pre>
+
+<ul>
+<li>standard标准分词器</li>
+</ul>
+<pre><code class="hljs awk">GET <span class="hljs-regexp">/kibana_sample_data_ecommerce/</span>_analyze
+&#123;
+  <span class="hljs-string">&quot;text&quot;</span>: [<span class="hljs-string">&quot;Happy Birthday&quot;</span>],
+  <span class="hljs-string">&quot;tokenizer&quot;</span>: <span class="hljs-string">&quot;standard&quot;</span>, <span class="hljs-regexp">//</span>使用standard  标准分词器
+  <span class="hljs-string">&quot;filter&quot;</span>: [<span class="hljs-string">&quot;lowercase&quot;</span>] <span class="hljs-regexp">//</span>转换为小写
+&#125;
+结果：
+&#123;
+  <span class="hljs-string">&quot;tokens&quot;</span> : [
+    &#123;
+      <span class="hljs-string">&quot;token&quot;</span> : <span class="hljs-string">&quot;happy&quot;</span>,
+      <span class="hljs-string">&quot;start_offset&quot;</span> : <span class="hljs-number">0</span>,
+      <span class="hljs-string">&quot;end_offset&quot;</span> : <span class="hljs-number">5</span>,
+      <span class="hljs-string">&quot;type&quot;</span> : <span class="hljs-string">&quot;&lt;ALPHANUM&gt;&quot;</span>,
+      <span class="hljs-string">&quot;position&quot;</span> : <span class="hljs-number">0</span>
+    &#125;,
+    &#123;
+      <span class="hljs-string">&quot;token&quot;</span> : <span class="hljs-string">&quot;birthday&quot;</span>,
+      <span class="hljs-string">&quot;start_offset&quot;</span> : <span class="hljs-number">6</span>,
+      <span class="hljs-string">&quot;end_offset&quot;</span> : <span class="hljs-number">14</span>,
+      <span class="hljs-string">&quot;type&quot;</span> : <span class="hljs-string">&quot;&lt;ALPHANUM&gt;&quot;</span>,
+      <span class="hljs-string">&quot;position&quot;</span> : <span class="hljs-number">1</span>
+    &#125;
+  ]
+&#125;
+</code></pre>
+
+
+
+<h3 id="Spring-Data-Elasticsearch"><a href="#Spring-Data-Elasticsearch" class="headerlink" title="Spring Data Elasticsearch"></a>Spring Data Elasticsearch</h3><p>​    可以使用RestClient(RestHighLevelClient)、Jest、SpringDataElasticsearch</p>
+<h4 id="RestHighLevelClient"><a href="#RestHighLevelClient" class="headerlink" title="RestHighLevelClient"></a>RestHighLevelClient</h4><p>_My Project.spring-elasticsearch</p>
+<h4 id="Jest"><a href="#Jest" class="headerlink" title="Jest"></a>Jest</h4><p>引入依赖 （就不需要再引入elasticsearch的依赖了）</p>
+<pre><code class="hljs xml"><span class="hljs-comment">&lt;!-- https://mvnrepository.com/artifact/io.searchbox/jest --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.searchbox<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>jest<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>6.3.1<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span></code></pre>
+
+<p>直接注入bean，不需要自己配置bean</p>
+<pre><code class="hljs java"><span class="hljs-meta">@Autowired</span>
+JestClient jestClient;</code></pre>
+
+<p>添加索引</p>
+<pre><code class="hljs java"><span class="hljs-keyword">import</span> io.searchbox.core.Index;</code></pre>
+
+<pre><code class="hljs java">Player player = <span class="hljs-keyword">new</span> Player(...);
+Index index = <span class="hljs-keyword">new</span> Index.Builder(player).index(<span class="hljs-string">&quot;索引&quot;</span>).type(<span class="hljs-string">&quot;类型&quot;</span>).build();
+<span class="hljs-keyword">try</span>&#123;
+	jestClient.execute(index);
+&#125;<span class="hljs-keyword">catch</span> (IOException e)&#123;
+	e.printStackTrace();
+&#125;</code></pre>
+
+<p>…</p>
+<h4 id="SpringDataElasticsearch"><a href="#SpringDataElasticsearch" class="headerlink" title="SpringDataElasticsearch"></a>SpringDataElasticsearch</h4><p>依赖</p>
+<pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-data-elasticsearch<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+<span class="hljs-comment">&lt;!--需要使用json--&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.google.code.gson<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>gson<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>2.8.5<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span></code></pre>
+
+<p>实体类</p>
+<pre><code class="hljs java"><span class="hljs-meta">@Document(indexName=&quot;nba&quot;, type=&quot;player&quot;)</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Player</span></span>&#123;
+...
+&#125;</code></pre>
+
+<p>repository接口</p>
+<pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">PlayerRepo</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">ElasticsearchRepository</span>&lt;<span class="hljs-title">Player</span>, <span class="hljs-title">Integer</span>&gt;</span>&#123;
+&#125;</code></pre>
+
+<p>注入bean即可使用</p>
+<pre><code class="hljs java"><span class="hljs-meta">@Autowired</span>
+PlayerRepo playerRepo;</code></pre>
+
+<p>添加索引</p>
+<pre><code class="hljs java">playerRepo.index(<span class="hljs-keyword">new</span> Player(...));</code></pre>
+
+<p>使用接口的方法即可</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/categories/%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E/">搜索引擎</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E/">搜索引擎</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2021/03/28/CDN/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CDN(Content Delivery Network，内容分发网络)</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2021/03/28/HDFS/">
+                        <span class="hidden-mobile">HDFS</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":200})
+    NProgress.start()
+    document.addEventListener('DOMContentLoaded', function() {
+      window.NProgress && window.NProgress.inc();
+    })
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.staticfile.org/jquery/3.5.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/debouncer.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/blog/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.12.0/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/blog/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/blog/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+
+</body>
+</html>

@@ -172,8 +172,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2021-03-29 17:48" pubdate>
-        2021年3月29日 下午
+      <time datetime="2021-03-30 02:25" pubdate>
+        2021年3月30日 凌晨
       </time>
     </span>
   
@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      7.2k 字
+      10.2k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      87
+      124
        分钟
     </span>
   
@@ -229,8 +229,6 @@
             <div class="markdown-body">
               <p>配置文件示例</p>
 <p><a target="_blank" rel="noopener" href="http://download.redis.io/redis-stable/redis.conf">http://download.redis.io/redis-stable/redis.conf</a></p>
-<p>参考</p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/kismetv/p/9137897.html">https://www.cnblogs.com/kismetv/p/9137897.html</a></p>
 <hr>
 <h3 id="本地缓存和分布式缓存"><a href="#本地缓存和分布式缓存" class="headerlink" title="本地缓存和分布式缓存"></a>本地缓存和分布式缓存</h3><blockquote>
 <p>本地缓存，比如java中的map，guava实现，轻量、快速，但是如果有多个实例，就需要每个实例都保存一份缓存，不具有一致性。</p>
@@ -290,7 +288,7 @@ io-threads <span class="hljs-number">4</span> <span class="hljs-comment">#配置
 </ol>
 </blockquote>
 <blockquote>
-<p>todo！ 看看redis源码吧   <a target="_blank" rel="noopener" href="https://github.com/redis/redis.git">https://github.com/redis/redis.git</a>       <a href="mailto:&#103;&#105;&#116;&#x40;&#103;&#105;&#116;&#x68;&#x75;&#x62;&#x2e;&#99;&#111;&#x6d;">&#103;&#105;&#116;&#x40;&#103;&#105;&#116;&#x68;&#x75;&#x62;&#x2e;&#99;&#111;&#x6d;</a>:redis/redis.git</p>
+<p>todo！ 看看redis源码吧   <a target="_blank" rel="noopener" href="https://github.com/redis/redis.git">https://github.com/redis/redis.git</a>       <a href="mailto:&#x67;&#105;&#x74;&#64;&#x67;&#105;&#x74;&#104;&#117;&#98;&#46;&#99;&#x6f;&#109;">&#x67;&#105;&#x74;&#64;&#x67;&#105;&#x74;&#104;&#117;&#98;&#46;&#99;&#x6f;&#109;</a>:redis/redis.git</p>
 </blockquote>
 <p>可以看看这篇文章：<a target="_blank" rel="noopener" href="https://ruby-china.org/topics/38957%EF%BC%89">https://ruby-china.org/topics/38957%EF%BC%89</a></p>
 <hr>
@@ -719,96 +717,352 @@ zunionstore rank:last_week 7 rank:20150323 rank:20150324 rank:20150325  weights 
 </blockquote>
 <h4 id="限流"><a href="#限流" class="headerlink" title="限流"></a>限流</h4><p>直接自增自减  Semaphore</p>
 <hr>
-<h2 id="集群策略"><a href="#集群策略" class="headerlink" title="集群策略"></a>集群策略</h2><h3 id="主从复制"><a href="#主从复制" class="headerlink" title="主从复制"></a>主从复制</h3><p>master可以读、写；</p>
-<p>slave只提供读服务，并接受master同步过来的数据。</p>
-<h5 id="工作机制"><a href="#工作机制" class="headerlink" title="工作机制"></a>工作机制</h5><blockquote>
+<h2 id="集群策略"><a href="#集群策略" class="headerlink" title="集群策略"></a>集群策略</h2><h3 id="主从复制"><a href="#主从复制" class="headerlink" title="主从复制"></a>主从复制</h3><p>master可以读、写；   slave只提供读服务，并接受master同步过来的数据。</p>
+<blockquote>
 <p>slave启动之后发送sync请求到master，master在后台保存快照和保存快照期间的命令，发送给slave。</p>
 </blockquote>
-<h5 id="主从配置"><a href="#主从配置" class="headerlink" title="主从配置"></a>主从配置</h5><p>master无需配置，修改slave节点的配置：</p>
+<p>master无需配置，只需修改slave节点的配置：</p>
 <pre><code class="hljs properties"><span class="hljs-attr">slaveof</span> <span class="hljs-string">[masterIP] [masterPort]</span>
 <span class="hljs-attr">masterauth</span> <span class="hljs-string">[masterPassword]</span></code></pre>
 
 <p>连接成功后可以使用<code>info replication</code>查看其他节点的信息</p>
-<h5 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h5><p>如果master宕机，不能自动将slave转换成master</p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/L-Test/p/11626124.html">https://www.cnblogs.com/L-Test/p/11626124.html</a></p>
-<h3 id="哨兵模式"><a href="#哨兵模式" class="headerlink" title="哨兵模式"></a>哨兵模式</h3><p>哨兵模式<strong>sentinel</strong>，比较特殊。哨兵是一个独立的进程，独立运行，他监控多个redis实例。</p>
-<h5 id="工作机制-1"><a href="#工作机制-1" class="headerlink" title="工作机制"></a>工作机制</h5><p>哨兵的功能：</p>
+<p>如果master宕机，不能自动将slave转换成master，还得手动修改。客户端配置的redis地址可不一定方便修改。</p>
+<h3 id="哨兵模式"><a href="#哨兵模式" class="headerlink" title="哨兵模式"></a>哨兵模式</h3><p>哨兵进程<code>sentinel</code>是一个独立的进程，负责监控多个redis实例</p>
+<blockquote>
 <ul>
-<li>监控master和slave是否正常运行；</li>
-<li>master出现故障就将slave转化为master；</li>
-<li>多个哨兵互相监控；</li>
-<li>多个哨兵同时监控一个redis</li>
+<li>sentinel监控master和slave是否正常运行</li>
+<li>master出现故障就将slave转化为master</li>
+<li>多个sentinel互相监控</li>
+<li>只有一个master</li>
+<li>客户端需要连接sentinel集群获取master实例</li>
 </ul>
-<h5 id="哨兵和redis之间的通信"><a href="#哨兵和redis之间的通信" class="headerlink" title="哨兵和redis之间的通信"></a>哨兵和redis之间的通信</h5><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/q649381130/article/details/79931791">https://blog.csdn.net/q649381130/article/details/79931791</a></p>
-<h5 id="故障切换过程"><a href="#故障切换过程" class="headerlink" title="故障切换过程"></a>故障切换过程</h5><p>如果被ping的节点超时未回复，哨兵认为其<strong>主观下线</strong>，如果是master下线，哨兵会询问其他哨兵是否也认为该master<strong>主观下线</strong>，如果达到（配置文件中的）quorum个投票，哨兵会认为该master<strong>客观下线</strong>，并选举领头哨兵节点发起故障恢复。</p>
-<h6 id="选举领头哨兵-raft算法"><a href="#选举领头哨兵-raft算法" class="headerlink" title="选举领头哨兵 raft算法"></a>选举领头哨兵 raft算法</h6><blockquote>
-<p>发现master下线的A节点像其他哨兵发送消息要求选自己为领头哨兵</p>
-<p>如果目标节点没有选过其他人（没有接收到其他哨兵的相同要求），就选A为领头哨兵</p>
-<p>若超过一半的哨兵同意选A为领头，则A当选</p>
-<p>如果多个哨兵同时参与了领头，可能一轮投票无人当选，A就会等待随机事件后再次发起请求</p>
 </blockquote>
-<p>选出新master之后，会发送消息到其他slave使其接受新master，最后更新数据。已停止的旧master会降为slave，恢复服务之后继续运行。</p>
-<h6 id="领头哨兵挑选新master的规则"><a href="#领头哨兵挑选新master的规则" class="headerlink" title="领头哨兵挑选新master的规则"></a>领头哨兵挑选新master的规则</h6><blockquote>
-<p>优先级最高（slave-priority配置）</p>
-<p>复制偏移量最大</p>
-<p>id最小</p>
-</blockquote>
-<h5 id="哨兵配置-sentinel-conf"><a href="#哨兵配置-sentinel-conf" class="headerlink" title="哨兵配置  sentinel.conf"></a>哨兵配置  sentinel.conf</h5><pre><code class="hljs properties"><span class="hljs-comment"># 设置主机名称 地址 端口 选举所需票数</span>
+<p>哨兵配置  sentinel.conf</p>
+<pre><code class="hljs properties"><span class="hljs-comment"># 设置主机名称 地址 端口 选举所需票数</span>
 <span class="hljs-attr">sentinel</span> <span class="hljs-string">monitor [master-name] [ip] [port] [quorum]</span>
 <span class="hljs-comment"># demo</span>
 <span class="hljs-attr">sentinel</span> <span class="hljs-string">monitor mymaster 192.168.0.107 6379 1</span></code></pre>
 
-<h5 id="启动哨兵节点"><a href="#启动哨兵节点" class="headerlink" title="启动哨兵节点"></a>启动哨兵节点</h5><pre><code class="hljs sh">bin/redis-server etc/sentinel.conf --sentinel &amp;</code></pre>
+<p>启动哨兵节点</p>
+<pre><code class="hljs sh">bin/redis-server etc/sentinel.conf --sentinel &amp;</code></pre>
 
-<h5 id="查看指定哨兵节点信息"><a href="#查看指定哨兵节点信息" class="headerlink" title="查看指定哨兵节点信息"></a>查看指定哨兵节点信息</h5><pre><code class="hljs sh"><span class="hljs-comment">#可以在任何一台服务器上查看指定哨兵节点信息：</span>
+<p>查看指定哨兵节点信息</p>
+<pre><code class="hljs sh"><span class="hljs-comment">#可以在任何一台服务器上查看指定哨兵节点信息：</span>
 bin/redis-cli -h 192.168.0.110 -p 26379 info Sentinel</code></pre>
 
-
-
-<h3 id="Cluster集群"><a href="#Cluster集群" class="headerlink" title="Cluster集群"></a>Cluster集群</h3><blockquote>
-<p>官方推荐集群至少要3台以上master，即 3 master 3 slave。</p>
+<p>故障切换过程</p>
+<blockquote>
+<p>如果被ping的节点超时未回复，哨兵则认为其<strong>主观下线</strong>，如果是master下线，哨兵会询问其他哨兵是否也认为该master<strong>主观下线</strong>，如果达到（配置文件中的）<code>quorum</code>个投票，哨兵会认为该master<strong>客观下线</strong>，并选举出领头哨兵节点，领头哨兵发起故障恢复。</p>
+</blockquote>
+<p>选举领头哨兵 raft算法</p>
+<blockquote>
+<p>发现master下线的A节点向其他哨兵发送消息要求选自己为领头哨兵</p>
+<p>如果目标节点没有选过其他人（没有接收到其他哨兵的相同要求），就选A为领头哨兵</p>
+<p>若<strong>超过一半的哨兵同意</strong>选A为领头，则A当选</p>
+<p>如果多个哨兵同时参与了领头，可能一轮投票无人当选，A就会等待随机事件后再次发起请求</p>
+<blockquote>
+<p>选出新master之后，会发送消息到其他slave使其接受新master，最后更新数据。</p>
+<p>已停止的旧master会降为slave，恢复服务之后继续运行。</p>
+</blockquote>
+</blockquote>
+<p>领头哨兵挑选新master的规则</p>
+<blockquote>
+<p>优先级最高（slave-priority配置）；复制偏移量最大；id最小</p>
+</blockquote>
+<h3 id="Cluster集群-☆"><a href="#Cluster集群-☆" class="headerlink" title="Cluster集群 ☆"></a>Cluster集群 ☆</h3><p>为了保证高可用，使用主从模式。master宕机就启用slave。如果一个节点的主从都宕机，则集群不可用。</p>
+<blockquote>
+<p>多个master(最少3个)，  多个slaver</p>
 </blockquote>
 <p>配置 redis.conf</p>
 <pre><code class="hljs properties"><span class="hljs-comment">#开启cluster模式</span>
 <span class="hljs-meta">cluster-enable</span> <span class="hljs-string">yes</span>
 <span class="hljs-comment">#集群模式下的集群配置文件</span>
 <span class="hljs-meta">cluster-config-file</span> <span class="hljs-string">nodes-6379.conf</span>
-<span class="hljs-comment">#集群内节点之间最长响应时间</span>
-<span class="hljs-meta">cluster-node-timeout</span> <span class="hljs-string">15000</span></code></pre>
+<span class="hljs-comment">#集群内节点之间最长响应时间  默认15s 关系到集群节点通信占用的带宽</span>
+<span class="hljs-meta">cluster-node-timeout</span> <span class="hljs-string">15000</span>
+<span class="hljs-comment"># 还会在加一个端口号用来集群之间节点的通讯  6379+10000  16379</span></code></pre>
 
+<p>启动集群 (需要Ruby版本 &gt; 2.2)</p>
 <blockquote>
-<p>启动6个redis-server，可以借助ruby，或者自己写群起脚本</p>
+<p><code>redis-trib.rb create --replicas 1 [ip]:6380 [...] [ip]:6381 [ip]:6385 </code></p>
 </blockquote>
-<h4 id="工作机制-2"><a href="#工作机制-2" class="headerlink" title="工作机制"></a>工作机制</h4><p>对key进行【crc16算法】【% 16384】的操作，通过计算结果找到对应插槽所对应的节点，然后直接跳转到这个节点进行存取操作。</p>
-<p>为了保证高可用，使用主从模式。master宕机，启用slave。如果一个节点的主从都宕机，则集群不可用。</p>
+<p>查看集群中的节点</p>
+<pre><code class="hljs sh">[root@buke107 src]\<span class="hljs-comment"># redis-cli -c -h 192.168.0.107 -p 6381 # 连接任一节点</span>
+192.168.0.107:6381&gt; cluster nodes <span class="hljs-comment"># 查看集群节点</span>
+<span class="hljs-comment"># nodeId | ip:port | nodeType | masterId | 0？ | ？ | 连接数 | 节点对应的槽位slots(master节点才有)</span>
+868456121fa4e6c8e7abe235a88b51d354a944b5 192.168.0.107:6382 master - 0 1523609792598 3 connected 10923-16383
+d6d01fd8f1e5b9f8fc0c748e08248a358da3638d 192.168.0.107:6385 slave 868456121fa4e6c8e7abe235a88b51d354a944b5 0 1523609795616 6 connected
+5cd3ed3a84ead41a765abd3781b98950d452c958 192.168.0.107:6380 master - 0 1523609794610 1 connected 0-5460
+b8e047aeacb9398c3f58f96d0602efbbea2078e2 192.168.0.107:6383 slave 5cd3ed3a84ead41a765abd3781b98950d452c958 0 1523609797629 1 connected
+68cf66359318b26df16ebf95ba0c00d9f6b2c63e 192.168.0.107:6384 slave 90b4b326d579f9b5e181e3df95578bceba29b204 0 1523609796622 5 connected
+90b4b326d579f9b5e181e3df95578bceba29b204 192.168.0.107:6381 myself,master - 0 0 2 connected 5461-10922
+<span class="hljs-comment"># 节点类型还会展示的信息  myself:当前节点   fail:节点下线</span></code></pre>
+
+<p>关于cluster的其他操作:   <a target="_blank" rel="noopener" href="https://www.cnblogs.com/kevingrace/p/7910692.html">https://www.cnblogs.com/kevingrace/p/7910692.html</a></p>
 <blockquote>
-<p>为什么slots数量使用16384 ？</p>
+<p><code>添加主/从节点</code>、<code>重新分配slot</code>、<code>查看集群状态信息</code>、<code>改变slave的master</code>、<code>删除主/从节点</code></p>
+<p><code>复制迁移</code>(登录到slave并更换其follow的master)、<code>cluster集群节点升级</code>(升级redis版本)</p>
+<p><code>缓存清理</code>(在集群中删除指定的key需要链接到对应的节点…)，节点太多就用脚本吧</p>
 <blockquote>
-<p>正常的心跳包携带一个节点的全部配置信息，其中就包含slots信息，16384bit = 2048byte  2k了，如果用65536bit的话，就需要8k</p>
-<p>集群是每秒ping-pong，一旦集群的节点数量多了就会占用大量带宽</p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/rjzheng/p/11430592.html">https://www.cnblogs.com/rjzheng/p/11430592.html</a>  这个dalao的文章有redis源码 心跳包消息结构</p>
+<p>查看cluster信息找到所有master</p>
+<p>遍历master（连接该master，执行del key）直到del成功，结束遍历</p>
+<p><code>再搜吧...</code></p>
 </blockquote>
 </blockquote>
-<h4 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h4><ul>
-<li><p>所有redis节点彼此互联（PING-PONG机制），使用二进制协议优化传输速度和带宽</p>
+<h4 id="工作机制-原理"><a href="#工作机制-原理" class="headerlink" title="工作机制 原理"></a>工作机制 原理</h4><p>先了解一下分布式数据分布方案。</p>
 <blockquote>
+<p>分布式 数据分布方案(寻址算法)：</p>
+<ul>
+<li><p>节点取余</p>
+<p>根据数据(或数据的某一特征)计算hash并取余节点数量得到数据所在位置，比如Java的HashMap(强行举例…)。</p>
+<blockquote>
+<p>缺点：当节点数量变化(扩容/缩容)时，数据节点映射关系需要重新计算，会导致大量数据的迁移(HashMap优化：翻倍扩容，可以使数据迁移从80%降到50%)</p>
 </blockquote>
 </li>
-<li><p>集群中超过半数的节点检测失效才认为节点fail</p>
+<li><p>一致性哈希</p>
+<p>指定范围内（比如0-2^32^）所有数字首尾相连形成一个哈希环，并为每个节点分配一个该范围内的值，寻址时计算key的hash值，然后在环上找到第一个<code>token &gt;= hash(key)</code>的节点。</p>
 <blockquote>
-<p>master选举机制？ todo </p>
+<p>优点：节点数量变化时，只影响（相邻的）一个节点。</p>
+<p>缺点：很可能会分布不均匀（负载不均衡）</p>
 </blockquote>
 </li>
-<li><p>redic-cil与节点直连，不需要中间代理层，任意连接集群中一个可用节点即可。</p>
+<li><p>虚拟槽分区（<strong>cluster采用</strong>）</p>
+<p>用hash函数把数据分散到<strong>固定范围</strong>内的整数集合中，每个整数定义为槽<code>slot</code>。</p>
+<p>slot数量远大于节点数，每个节点负责一部分slot，这样更方便数据的拆分和集群扩容（增加节点）</p>
+<p>（相当于也融合了虚拟节点的概念吧）</p>
 <blockquote>
-<p>如果客户端请求的key不在当前节点，会返回<code>xxx</code>消息，客户端再去连接该节点执行命令。</p>
+<p>与一致性哈希的不同：</p>
+<blockquote>
+<p>一致性哈希直接根据数据的hash值找对应的节点；</p>
+<p>虚拟槽分区是先根据数据的hash找到节点，再去该节点进行操作。</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>优点：</p>
+<ul>
+<li>节点负载均衡</li>
+<li>解耦数据和节点的关系，方便数据的拆分和集群扩容；</li>
+<li>节点自身维护节点和slot的映射关系，无需客户端运算；</li>
+</ul>
+</blockquote>
+<p>带图的描述：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/myseries/p/10959050.html">https://www.cnblogs.com/myseries/p/10959050.html</a></p>
+</li>
+</ul>
+<p>数据分布存储的集群模式<strong>都</strong>会有的缺点：</p>
+<ul>
+<li>key批量操作受限。mset、mget等操作，key可能存在于多个节点上，所以不可用(报错)；(<a href="#%E9%9B%86%E7%BE%A4%E5%B0%8F%E6%8A%80%E5%B7%A7">集群小技巧</a>可以解决)</li>
+<li>key事务操作受限。伪事务，本来也不用…；</li>
+<li>不支持多数据库。（本来也鸡肋）单机redis可支持16个数据库，集群模式下只能使用一个数据库空间，即db0。</li>
+</ul>
+<p>还有一些不算缺点，算是不足之处的</p>
+<ul>
+<li>key作为数据的最小粒度，可能value还是比较大，集群也无法将一个大的键值对象（如hash、list等）映射到不同的节点。</li>
+</ul>
+</blockquote>
+<p>redis cluster 的数据分布方案采用的是<code>虚拟槽分区(16384个slot)</code>方案（+虚拟节点）</p>
+<p>所以 redis cluster 的节点处理请求会先计算key对应的slot</p>
+<ul>
+<li>如果对应的节点是自身，直接执行命令并返回结果；</li>
+<li>否则返回<code>MOVED重定向错误</code>通知客户端访问正确的节点（<code>MOVED</code>带有key所在slot信息 和 对应节点的地址信息）。</li>
+</ul>
+<p>客户端收到<code>MOVED</code>再去对应的节点请求执行。</p>
+<blockquote>
+<p>连接集群的客户端需要处理<code>MOVED</code>命令，所以和连接redis单机的客户端还是不同的。</p>
+</blockquote>
+<h5 id="集群内节点通信"><a href="#集群内节点通信" class="headerlink" title="集群内节点通信"></a>集群内节点通信</h5><blockquote>
+<p>Redis Cluster 采用P2P的<code>Gossip</code>(流言/八卦)协议，原理就是：节点彼此不断交换信息，一段时间后所有节点都会知道集群所有节点的信息。</p>
+</blockquote>
+<p>集群内节点的通信的消息头都是使用的<code>clusterMsg</code>这个结构（下边有源码），包含id、myslots、消息类型、节点标识等等。</p>
+<h6 id="Gossip消息类型"><a href="#Gossip消息类型" class="headerlink" title="Gossip消息类型"></a>Gossip消息类型</h6><ul>
+<li>meet：<code>通知新节点加入</code>（“加入我们吧”），meet通信完成后，接收方会周期进行ping-pong；</li>
+<li>ping：每秒发送给多个其他节点，用于<code>检测节点是否在线并进行信息交换</code>，封装了<code>自身和部分其他节点的状态数据</code>；</li>
+<li>pong：回应<code>meet</code>和<code>ping</code>，封装了<code>自己的状态数据</code>。也可用来向集群广播自己的状态信息来<code>通知整个集群更新&quot;我&quot;的状态</code>。</li>
+<li>fail：（”xx下线了”）判断集群内另一个节点下线后，就广播fail消息，接收方把该节点的状态置为下线。</li>
+</ul>
+<blockquote>
+<p>Gossip特点：</p>
+<p>扩展性：节点可任意增减，状态信息最终都会和其他节点同步；</p>
+<p>最终一致性：只保证最终一致性</p>
+<p>容错性：每个节点都有数据，宕机一部分也没事</p>
+<p>健壮性：去中心化，每个节点都有持有数据</p>
+</blockquote>
+<h6 id="Redis-Cluster-消息-数据结构"><a href="#Redis-Cluster-消息-数据结构" class="headerlink" title="Redis Cluster 消息 数据结构"></a>Redis Cluster 消息 数据结构</h6><p>消息头：clusterMsgData + <a href="#redis%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF16384%E4%B8%AA%E6%A7%BD">redis为什么是16384个槽</a> 里边的源码</p>
+<p>消息体：meet、ping、pong等类型的消息采用MsgDataGossip数组作为消息体。</p>
+<h6 id="发送消息的规则"><a href="#发送消息的规则" class="headerlink" title="发送消息的规则"></a>发送消息的规则</h6><ul>
+<li>每秒随机选取5个节点，找出最久没有通信的节点发送ping消息  ——1个</li>
+<li>每100毫秒(1秒10次)都会扫描本地节点列表，如果发现节点最近一次接受pong消息的时间大于<code>cluster-node-timeout / 2</code>则立刻发送ping消息</li>
+</ul>
+<p>所以每个节点每秒需要发送ping消息的数量 = <code>1 + 10 * num (node.pong_received &gt; cluster_node_timeout / 2)</code></p>
+<blockquote>
+<p><code>node</code>：本地节点列表的每个节点</p>
+<p><code>node.pong_received</code>：上次收到<code>该node</code>的<code>pong</code>消息已经过去多久</p>
+<p><code>cluster_node_timeout</code>：配置节点超时时间，默认 <code>15s</code> </p>
+<blockquote>
+<p>当我们的带宽资源紧张时，可以适当调大这个参数，如从默认15秒改为30秒来降低集群通信的带宽占用率。</p>
+<p>调得太大了也不行，会影响消息交换的频率，从而影响<code>故障转移</code>、<code>槽信息更新</code>、<code>新节点发现的速度</code>。</p>
+<p>需要根据业务容忍度和资源消耗进行平衡，节点数越多集群的总消息量就越大。<a href="#redis%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF16384%E4%B8%AA%E6%A7%BD">redis为什么是16384个槽</a></p>
+</blockquote>
+</blockquote>
+<p>ps: 集群中的每个节点都会单独开辟一个TCP通道用于节点之间彼此通信，通信端口号 = 基础端口 + 10000，比如16379</p>
+<h4 id="集群扩容"><a href="#集群扩容" class="headerlink" title="集群扩容"></a>集群扩容</h4><p>rehash重新分片，每增加一个节点只会影响到一个老节点，就是从老节点上分一些slot到新节点。</p>
+<p><code>redis-trib.rb</code>，这个脚本 就129行代码，可以看看。。<a target="_blank" rel="noopener" href="https://github.com/redis/redis/blob/unstable/src/redis-trib.rb">https://github.com/redis/redis/blob/unstable/src/redis-trib.rb</a> todo</p>
+<h4 id="集群高可用-amp-故障转移-amp-新master选举"><a href="#集群高可用-amp-故障转移-amp-新master选举" class="headerlink" title="集群高可用 &amp; 故障转移 &amp; 新master选举"></a>集群高可用 &amp; 故障转移 &amp; 新master选举</h4><p>Cluster保证集群高可用和Sentinel类似。</p>
+<p>某节点认为<code>master1</code>宕机，就会广播<code>fail</code>消息，此时<code>master1</code>是主观宕机状态，如果集群内<code>超过半数节点</code>都认为<code>master1</code>主观宕机，就会标记<code>master1</code>为客观宕机。</p>
+<p>然后就要开始进行故障转移：</p>
+<p>集群中<code>正常的master</code>进行投票，从<code>master1</code>的<code>slave</code>中选出一个，当某个slave获得了<code>半数以上的选票</code>，升为master。</p>
+<p>新master会<code>停止复制master1</code>节点，并将<code>master1负责的所有slot</code>分配给自己，然后广播<code>pong</code>消息。</p>
+<h4 id="集群小技巧-amp-优化点"><a href="#集群小技巧-amp-优化点" class="headerlink" title="集群小技巧 &amp; 优化点"></a>集群小技巧 &amp; 优化点</h4><ul>
+<li><p>hash_tag：一举两得  （注意不要过度使用，<a href="#%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C">数据倾斜</a>）</p>
+<ul>
+<li>可以利用{}给不同的key命名，以达到不同的key对应相同的槽的效果，这样还可以在集群中会用mget，mset等命令，（否则报错）</li>
+<li>Redis IO 优化：Pipeline</li>
+</ul>
+<blockquote>
+<p>redis计算槽的时候如果key的内容有<code>&#123;...&#125;</code>，会使用<code>&#123;&#125;</code>里边的内容，这里<code>...</code>称为<code>hash_tag</code>，可以让不同的key映射到相同的slot。</p>
+<pre><code class="hljs c"><span class="hljs-function">def <span class="hljs-title">key_hash_slot</span><span class="hljs-params">(key)</span>:</span>
+<span class="hljs-function">    <span class="hljs-keyword">int</span> keylen </span>= key.length();
+    <span class="hljs-keyword">for</span> (s = <span class="hljs-number">0</span>; s &lt; keylen; s++):
+        <span class="hljs-keyword">if</span> (key[s] == <span class="hljs-string">&#x27;&#123;&#x27;</span>):
+            <span class="hljs-keyword">break</span>;
+        <span class="hljs-keyword">if</span> (s == keylen) <span class="hljs-keyword">return</span> crc16(key,keylen) &amp; <span class="hljs-number">16383</span>;
+        <span class="hljs-keyword">for</span> (e = s+<span class="hljs-number">1</span>; e &lt; keylen; e++):
+            <span class="hljs-keyword">if</span> (key[e] == <span class="hljs-string">&#x27;&#125;&#x27;</span>) <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">if</span> (e == keylen || e == s+<span class="hljs-number">1</span>) <span class="hljs-keyword">return</span> crc16(key,keylen) &amp; <span class="hljs-number">16383</span>;
+    <span class="hljs-comment">/* 使用&#123;和&#125;之间的有效部分计算槽 */</span>
+    <span class="hljs-keyword">return</span> crc16(key+s+<span class="hljs-number">1</span>,e-s<span class="hljs-number">-1</span>) &amp; <span class="hljs-number">16383</span>;</code></pre>
+
+<p>由于Pipeline只能向一个节点批量发送执行命令，相同的hash_tag对应相同的slot，而相同slot必然会对应到唯一的节点</p>
+<p>这样一来….不就可以用pipeline了嘛</p>
 </blockquote>
 </li>
 </ul>
-<h2 id="集群中key的分布"><a href="#集群中key的分布" class="headerlink" title="集群中key的分布"></a>集群中key的分布</h2><p>如果分布不均匀怎么办</p>
-<p>一致性hash todo</p>
-<p>消息队列尾部热点问题；<br>redis <a target="_blank" rel="noopener" href="https://www.cnblogs.com/rjzheng/p/11430592.html">https://www.cnblogs.com/rjzheng/p/11430592.html</a><br>redis &amp; mq  <a target="_blank" rel="noopener" href="https://www.zhihu.com/question/43557507">https://www.zhihu.com/question/43557507</a><br>redis <a target="_blank" rel="noopener" href="https://zyfcodes.blog.csdn.net/article/details/90384502">https://zyfcodes.blog.csdn.net/article/details/90384502</a><br>redis 一致性hash  <a target="_blank" rel="noopener" href="https://www.cnblogs.com/myseries/p/10959050.html">https://www.cnblogs.com/myseries/p/10959050.html</a></p>
-<h1 id="Lua-脚本-原子执行"><a href="#Lua-脚本-原子执行" class="headerlink" title="Lua 脚本 原子执行"></a>Lua 脚本 原子执行</h1><p>Lua 脚本在 Redis 中是原子执行的，Redis 在执行<code>EVAL</code>命令的时候，一直到执行完毕并返回结果之前，会阻塞所有其他客户端的命令，so Lua脚本中要写逻辑特别复杂的脚本， 必须保证 Lua 脚本的效率。</p>
+<h4 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h4><h5 id="数据倾斜"><a href="#数据倾斜" class="headerlink" title="数据倾斜"></a>数据倾斜</h5><ul>
+<li>节点和槽的分配不均【不常见】 ，可以使用redis-trib.rb rebalance命令进行平衡；</li>
+<li>不同槽对应键数量差异过大。注意不能过度使用hashtag；</li>
+<li>可能包含big key，一般不能有太大的key ，需要找到大集合后根据业务场景进行拆分</li>
+</ul>
+<h5 id="请求倾斜"><a href="#请求倾斜" class="headerlink" title="请求倾斜"></a>请求倾斜</h5><blockquote>
+<p>集群内特定节点请求量 / 流量过大 导致节点之间负载不均</p>
+</blockquote>
+<p>对于热点key: 避免bigkey ,不要使用hash_tag，本地缓存+MQ</p>
+<h5 id="redis为什么是16384个槽"><a href="#redis为什么是16384个槽" class="headerlink" title="redis为什么是16384个槽"></a>redis为什么是16384个槽</h5><blockquote>
+<ol>
+<li><p>正常的心跳包携带一个节点的全部配置信息，其中就包含<code>myslots</code>信息，16384bit = 2048byte  2k了，如果用65536bit的话，就需要8k</p>
+</li>
+<li><p>集群是每秒ping-pong，一旦集群的节点数量多了就会占用大量带宽</p>
+<blockquote>
+<p>集群节点越多，心跳包的消息体内携带的数据越多。如果节点过1000个，也会导致网络拥堵。</p>
+<p>因此，redis作者不建议redis cluster节点数量超过1000个。而对于节点数在1000以内的redis cluster集群，16384个槽位够用了。</p>
+</blockquote>
+</li>
+<li><p>槽位越小，节点少的情况下，压缩比高</p>
+<blockquote>
+<p>Redis Cluster master的配置信息中，它所负责的哈希槽是通过一张bitmap的形式来保存的。</p>
+<p>在传输过程中，会对bitmap进行压缩，如果bitmap的填充率slots / N很高的话(N表示集群节点总数)，bitmap的压缩率就会变低。</p>
+<p>如果节点数很少，而哈希槽数量很多的话，bitmap的压缩率就很低。</p>
+</blockquote>
+</li>
+</ol>
+<p>再<code>考虑到负载均衡和扩展，槽位也不能太少</code>，折中考虑，作者决定取16384个槽</p>
+<p>消息头的源码：</p>
+<pre><code class="hljs c"><span class="hljs-comment">// https://github.com/redis/redis/blob/unstable/src/cluster.h</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> CLUSTER_SLOTS 16384  <span class="hljs-comment">// 这里声明常量</span></span>
+<span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span>
+    <span class="hljs-keyword">char</span> sig[<span class="hljs-number">4</span>];        <span class="hljs-comment">/* Signature &quot;RCmb&quot; (Redis Cluster message bus). 消息总线*/</span>
+    <span class="hljs-keyword">uint32_t</span> totlen;    <span class="hljs-comment">/* Total length of this message 消息总长度*/</span>
+    <span class="hljs-keyword">uint16_t</span> ver;       <span class="hljs-comment">/* Protocol version, currently set to 1. 协议版本号*/</span>
+    <span class="hljs-keyword">uint16_t</span> port;      <span class="hljs-comment">/* TCP base port number. */</span>
+    <span class="hljs-keyword">uint16_t</span> type;      <span class="hljs-comment">/* Message type 消息类型：meet、ping、pong*/</span>
+    <span class="hljs-keyword">uint16_t</span> count;     <span class="hljs-comment">/* Only used for some kind of messages. 某些信息会用...*/</span>
+    <span class="hljs-keyword">uint64_t</span> currentEpoch;  <span class="hljs-comment">/* The epoch accordingly to the sending node. */</span>
+    <span class="hljs-keyword">uint64_t</span> configEpoch;   <span class="hljs-comment">/* The config epoch if it&#x27;s a master, or the last</span>
+<span class="hljs-comment">                               epoch advertised by its master if it is a</span>
+<span class="hljs-comment">                               slave. */</span>
+    <span class="hljs-keyword">uint64_t</span> offset;    <span class="hljs-comment">/* Master replication offset if node is a master or 主节点的已复制偏移量 或</span>
+<span class="hljs-comment">                           processed replication offset if node is a slave. 从节点已处理的复制偏移量 */</span>
+    <span class="hljs-keyword">char</span> sender[CLUSTER_NAMELEN]; <span class="hljs-comment">/* Name of the sender node 发送者name*/</span>
+    <span class="hljs-comment">// 这里这里这里！！！</span>
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">char</span> myslots[CLUSTER_SLOTS/<span class="hljs-number">8</span>]; <span class="hljs-comment">// 发送节点负责的slot，这个数组大小是16384/8=2048 byte，2kb</span>
+    <span class="hljs-keyword">char</span> slaveof[CLUSTER_NAMELEN];
+    <span class="hljs-keyword">char</span> myip[NET_IP_STR_LEN];    <span class="hljs-comment">/* Sender IP, if not all zeroed. 不全为0就是发送方的ip*/</span>
+    <span class="hljs-keyword">char</span> notused1[<span class="hljs-number">34</span>];  <span class="hljs-comment">/* 34 bytes reserved for future usage. 保留字节*/</span>
+    <span class="hljs-keyword">uint16_t</span> cport;      <span class="hljs-comment">/* Sender TCP cluster bus port 发送方tcp总线端口*/</span>
+    <span class="hljs-keyword">uint16_t</span> flags;      <span class="hljs-comment">/* Sender node flags 发送方的flags 这里这里这里！！！*/</span>
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">char</span> state; <span class="hljs-comment">/* Cluster state from the POV of the sender */</span>
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">char</span> mflags[<span class="hljs-number">3</span>]; <span class="hljs-comment">/* Message flags: CLUSTERMSG_FLAG[012]_... */</span>
+    <span class="hljs-class"><span class="hljs-keyword">union</span> <span class="hljs-title">clusterMsgData</span> <span class="hljs-title">data</span>;</span>
+&#125; clusterMsg;</code></pre>
+
+<p>消息体的源码：</p>
+<pre><code class="hljs plain">。。算了哥  下次一定          todo</code></pre>
+
+<pre><code class="hljs c"><span class="hljs-comment">// https://github.com/redis/redis/blob/unstable/src/cluster.h </span>
+<span class="hljs-comment">// 特么太多了</span>
+clusterMsgDataGossip
+clusterMsgData 消息体
+</code></pre>
+</blockquote>
+<h1 id="redis源码"><a href="#redis源码" class="headerlink" title="redis源码"></a>redis源码</h1><table>
+<thead>
+<tr>
+<th>src文件名</th>
+<th>干啥的</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ae.c 、 ae.h 、 ae_epoll.c 、 ae_evport.c 、 ae_kqueue.c 、 ae_select.c</td>
+<td>事件处理器，以及各个具体实现。</td>
+</tr>
+<tr>
+<td>redis.h</td>
+<td>Redis 的主要头文件，记录了 Redis 中的大部分数据结构， 包括服务器状态和客户端状态。</td>
+</tr>
+<tr>
+<td>zmalloc.c 、 zmalloc.h</td>
+<td>内存管理程序。</td>
+</tr>
+<tr>
+<td>sds.c 、 sds.h</td>
+<td>SDS 数据结构的实现，SDS 为 Redis 的默认字符串表示。</td>
+</tr>
+<tr>
+<td>adlist.c 、 adlist.h</td>
+<td>双端链表数据结构的实现。</td>
+</tr>
+<tr>
+<td>dict.c 、 dict.h</td>
+<td>字典数据结构的实现</td>
+</tr>
+<tr>
+<td>bio.c 、 bio.h</td>
+<td>Redis 的后台 I/O 程序，用于将 I/O 操作放到子线程里面执行， 减少 I/O 操作对主线程的阻塞。</td>
+</tr>
+<tr>
+<td>rdb.c 、 rdb.h</td>
+<td>RDB 持久化功能的实现。</td>
+</tr>
+<tr>
+<td>aof.c</td>
+<td>AOF 功能的实现。</td>
+</tr>
+<tr>
+<td>cluster.c 、 cluster.h</td>
+<td>Redis Cluster 的集群实现。</td>
+</tr>
+<tr>
+<td>sentinel.c</td>
+<td>Redis Sentinel 的实现。</td>
+</tr>
+<tr>
+<td>crc16.c 、 crc64.c 、 crc64.h</td>
+<td>计算 CRC 校验和。 crc16算法</td>
+</tr>
+<tr>
+<td>redis-trib.rb</td>
+<td>Redis 集群的管理程序。Ruby脚本</td>
+</tr>
+</tbody></table>
+<h1 id="Lua-脚本-原子执行"><a href="#Lua-脚本-原子执行" class="headerlink" title="Lua 脚本 原子执行"></a>Lua 脚本 原子执行</h1><p>Lua 脚本在 Redis 中是原子执行的，Redis 在执行<code>EVAL</code>命令的时候，一直到执行完毕并返回结果之前，会阻塞所有其他客户端的命令，所以Lua脚本中要写逻辑特别复杂的脚本， 必须保证 Lua 脚本的效率。</p>
 <h4 id="SCRIPT-LOAD"><a href="#SCRIPT-LOAD" class="headerlink" title="SCRIPT LOAD"></a>SCRIPT LOAD</h4><p>加载脚本到缓存，以复用</p>
 <pre><code class="hljs jboss-cli"><span class="hljs-string">...</span><span class="hljs-function">:6379</span>&gt; SCRIPT LOAD <span class="hljs-string">&quot;return &#x27;abc&#x27;&quot;</span>
 “1b936e3fe509bcbc9<span class="hljs-keyword">cd</span>0664897bbe8fd0cac101b”
@@ -822,7 +1076,7 @@ bin/redis-cli -h 192.168.0.110 -p 26379 info Sentinel</code></pre>
 
 <h4 id="SCRIPT-KILL"><a href="#SCRIPT-KILL" class="headerlink" title="SCRIPT KILL"></a>SCRIPT KILL</h4><p>终止正在执行的脚本，如果脚本中已经执行了一部分写命令，则 kill 命令无效</p>
 <p>若不对数据进行持久化， 可通过 shutdown nosave 来终止脚本…</p>
-<h4 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h4><ul>
+<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
 <li>Lua 脚本执行异常也不会回滚， 所以脚本逻辑要有较高的健壮性</li>
 <li>Lua 脚本执行是原子性的，会阻塞其他客户端的命令，所有效率要高</li>
 <li>在集群中使用 Lua 脚本的话要确保脚本中用到的 key 都在相同机器(相同的插槽slot)中，可用 Redis Hash Tags 技术</li>
@@ -855,16 +1109,25 @@ bin/redis-cli -h 192.168.0.110 -p 26379 info Sentinel</code></pre>
 
 
 
+<h1 id="一些小坑"><a href="#一些小坑" class="headerlink" title="一些小坑"></a>一些小坑</h1><pre><code class="hljs java"><span class="hljs-comment">// 错误用法 .. 第三个参数不是timeout...</span>
+stringRedisTemplate.opsForValue().set(<span class="hljs-string">&quot;hashkey:key1&quot;</span>,<span class="hljs-string">&quot;value&quot;</span>,<span class="hljs-number">60</span>*<span class="hljs-number">60</span>*<span class="hljs-number">1000</span>);
 
+<span class="hljs-comment">// api源码</span>
+<span class="hljs-meta">@Override</span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">set</span><span class="hljs-params">(K key, V value, <span class="hljs-keyword">long</span> offset)</span> </span>&#123;
+    <span class="hljs-keyword">byte</span>[] rawKey = rawKey(key);
+    <span class="hljs-keyword">byte</span>[] rawValue = rawValue(value);
+    execute(connection -&gt; &#123;
+        connection.setRange(rawKey, rawValue, offset);<span class="hljs-comment">// 用指定的字符串覆盖给定key所储存的字符串值，覆盖的位置从偏移量offset开始</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;
+    &#125;, <span class="hljs-keyword">true</span>);
+&#125;
 
+<span class="hljs-comment">// 正确用法：（key, value, offset, timeout）</span>
+stringRedisTemplate.opsForValue().set(<span class="hljs-string">&quot;hashkey:key1&quot;</span>,<span class="hljs-string">&quot;value&quot;</span>,<span class="hljs-number">60</span>*<span class="hljs-number">60</span>*<span class="hljs-number">1000</span>,TimeUnit.MILLISECONDS);</code></pre>
 
+<img alt="redisTemplate.opsForValue().set(k, v, offset)" src="https://raw.githubusercontent.com/melopoz/pics/master/img/20210330005146.png" srcset="/blog/img/loading.gif" style="zoom:50%;" />
 
-
-
-
-
-<p>这个链接关于redis好全面。。</p>
-<p><a target="_blank" rel="noopener" href="https://zyfcodes.blog.csdn.net/article/details/90384502">https://zyfcodes.blog.csdn.net/article/details/90384502</a></p>
 
             </div>
             <hr>
@@ -884,15 +1147,13 @@ bin/redis-cli -h 192.168.0.110 -p 26379 info Sentinel</code></pre>
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
-                      <a class="hover-with-bg" href="/blog/tags/DB/">DB</a>
+                      <a class="hover-with-bg" href="/blog/tags/%E4%BD%8D%E5%9B%BE/">位图</a>
                     
                       <a class="hover-with-bg" href="/blog/tags/%E7%BC%93%E5%AD%98/">缓存</a>
                     
                       <a class="hover-with-bg" href="/blog/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">分布式锁</a>
                     
-                      <a class="hover-with-bg" href="/blog/tags/Cluster%E9%9B%86%E7%BE%A4/">Cluster集群</a>
-                    
-                      <a class="hover-with-bg" href="/blog/tags/redis%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/">redis常见问题</a>
+                      <a class="hover-with-bg" href="/blog/tags/%E4%B8%80%E8%87%B4%E6%80%A7hash-%E8%99%9A%E6%8B%9F%E6%A7%BDslot/">一致性hash+虚拟槽slot</a>
                     
                       <a class="hover-with-bg" href="/blog/tags/%E9%80%89%E4%B8%BE%E7%AD%96%E7%95%A5/">选举策略</a>
                     
@@ -917,8 +1178,8 @@ bin/redis-cli -h 192.168.0.110 -p 26379 info Sentinel</code></pre>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/blog/2021/03/29/Java_HashMap&amp;ConcurrentHashMap/">
-                        <span class="hidden-mobile">Java_HashMap 不止是HashMap</span>
+                      <a href="/blog/2021/03/29/CDN/">
+                        <span class="hidden-mobile">CDN(Content Delivery Network，内容分发网络)</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

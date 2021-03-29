@@ -172,8 +172,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2021-03-29 17:48" pubdate>
-        2021年3月29日 下午
+      <time datetime="2021-03-30 02:25" pubdate>
+        2021年3月30日 凌晨
       </time>
     </span>
   
@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      10k 字
+      9.9k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      144
+      142
        分钟
     </span>
   
@@ -387,13 +387,7 @@
 newTab[e.hash &amp; (newCap - <span class="hljs-number">1</span>)] = e;</code></pre>
 
 <blockquote>
-<p>ps：曾经，dalao问我有什么比取余效率更高的，我寻思还能比&amp;运算效率高的？可能就是想听我说<code>与运算 &amp;</code>吧 。</p>
-<blockquote>
-<p>所以严谨一点，不能把<code>&amp;</code>说成取余了，这俩本来也不一样！<code>%</code> 取余是个数学运算，<code>&amp;</code> 与 是位运算。</p>
-<p>位运算<code>hash &amp; (length-1)</code>肯定比数学运算取余<code>hash % (length-1)</code>效率要高啊。</p>
-<p>哦，dalao还问redis怎么让那些key分布更均匀一些？也就是数据倾斜的场景该咋搞！</p>
-<p>学学hashmap，让hash值的高位也参与运算？当然还得有好的hash函数、虚拟节点（自动负载均衡）</p>
-</blockquote>
+<p><code>%</code> 取余是个数学运算， 而<code>&amp;</code> 与运算是位运算，效率更高。</p>
 </blockquote>
 <p>相关的优化还有一个，就是<code>resize()</code>扩容时的 <strong>oldCap作mask 重hash优化</strong>，key的<code>newIndex</code>只可能是<code>oldIndex</code>或<code>oldIndex+oldCap</code>，决定因素就是oldCap这个位<code>1 还是 0</code>。见下方[扩容 resize()](#扩容 resize())</p>
 <h4 id="put-K-V-方法"><a href="#put-K-V-方法" class="headerlink" title="put(K, V)方法"></a>put(K, V)方法</h4><p>流程：</p>
@@ -1405,21 +1399,15 @@ newTab[e.hash &amp; (newCap - <span class="hljs-number">1</span>)] = e;</code></
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/blog/2021/03/29/redis/">
+                      <a href="/blog/2021/03/29/Java_AQS%E6%BA%90%E7%A0%81/">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Redis</span>
+                        <span class="hidden-mobile">AQS-JUC中锁的抽象模板</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
                   </article>
                   <article class="post-next col-6">
                     
-                    
-                      <a href="/blog/2021/03/29/CDN/">
-                        <span class="hidden-mobile">CDN(Content Delivery Network，内容分发网络)</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
                     
                   </article>
                 </div>

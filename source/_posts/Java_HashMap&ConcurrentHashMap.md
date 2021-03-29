@@ -221,15 +221,7 @@ public native int hashCode();// int 32位
 newTab[e.hash & (newCap - 1)] = e;
 ```
 
-> ps：曾经，dalao问我有什么比取余效率更高的，我寻思还能比&运算效率高的？可能就是想听我说`与运算 &`吧 。
->
-> > 所以严谨一点，不能把`&`说成取余了，这俩本来也不一样！`%` 取余是个数学运算，`&` 与 是位运算。
-> >
-> > 位运算`hash & (length-1)`肯定比数学运算取余`hash % (length-1)`效率要高啊。
-> >
-> > 哦，dalao还问redis怎么让那些key分布更均匀一些？也就是数据倾斜的场景该咋搞！
-> >
-> > 学学hashmap，让hash值的高位也参与运算？当然还得有好的hash函数、虚拟节点（自动负载均衡）
+> `%` 取余是个数学运算， 而`&` 与运算是位运算，效率更高。
 
 相关的优化还有一个，就是`resize()`扩容时的 **oldCap作mask 重hash优化**，key的`newIndex`只可能是`oldIndex`或`oldIndex+oldCap`，决定因素就是oldCap这个位`1 还是 0`。见下方[扩容 resize()](#扩容 resize())
 

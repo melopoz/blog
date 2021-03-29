@@ -1,11 +1,10 @@
 ---
 title: Redis
-tags: 
-  - DB
+tags:
+  - 位图
   - 缓存
   - 分布式锁
-  - Cluster集群
-  - redis常见问题
+  - 一致性hash+虚拟槽slot
   - 选举策略
 categories: 
   - [NoSQL]
@@ -17,10 +16,6 @@ categories:
 配置文件示例
 
 http://download.redis.io/redis-stable/redis.conf
-
-参考
-
-https://www.cnblogs.com/kismetv/p/9137897.html
 
 ---
 
@@ -746,17 +741,11 @@ https://oss.redislabs.com/redisbloom/  这里有一个实现
 
 ### 主从复制
 
-master可以读、写；
-
-slave只提供读服务，并接受master同步过来的数据。
-
-##### 工作机制
+master可以读、写；   slave只提供读服务，并接受master同步过来的数据。
 
 > slave启动之后发送sync请求到master，master在后台保存快照和保存快照期间的命令，发送给slave。
 
-##### 主从配置
-
-master无需配置，修改slave节点的配置：
+master无需配置，只需修改slave节点的配置：
 
 ```properties
 slaveof [masterIP] [masterPort]
@@ -765,54 +754,21 @@ masterauth [masterPassword]
 
 连接成功后可以使用``info replication``查看其他节点的信息
 
-##### 缺点
+如果master宕机，不能自动将slave转换成master，还得手动修改。客户端配置的redis地址可不一定方便修改。
 
-如果master宕机，不能自动将slave转换成master
 
-https://www.cnblogs.com/L-Test/p/11626124.html
 
 ### 哨兵模式
 
-哨兵模式**sentinel**，比较特殊。哨兵是一个独立的进程，独立运行，他监控多个redis实例。
+哨兵进程`sentinel`是一个独立的进程，负责监控多个redis实例
 
-##### 工作机制
+> - sentinel监控master和slave是否正常运行
+> - master出现故障就将slave转化为master
+> - 多个sentinel互相监控
+> - 只有一个master
+> - 客户端需要连接sentinel集群获取master实例
 
-哨兵的功能：
-
-- 监控master和slave是否正常运行；
-- master出现故障就将slave转化为master；
-- 多个哨兵互相监控；
-- 多个哨兵同时监控一个redis
-
-##### 哨兵和redis之间的通信
-
-https://blog.csdn.net/q649381130/article/details/79931791
-
-##### 故障切换过程
-
-如果被ping的节点超时未回复，哨兵认为其**主观下线**，如果是master下线，哨兵会询问其他哨兵是否也认为该master**主观下线**，如果达到（配置文件中的）quorum个投票，哨兵会认为该master**客观下线**，并选举领头哨兵节点发起故障恢复。
-
-###### 选举领头哨兵 raft算法
-
-> 发现master下线的A节点像其他哨兵发送消息要求选自己为领头哨兵
->
-> 如果目标节点没有选过其他人（没有接收到其他哨兵的相同要求），就选A为领头哨兵
->
-> 若超过一半的哨兵同意选A为领头，则A当选
->
-> 如果多个哨兵同时参与了领头，可能一轮投票无人当选，A就会等待随机事件后再次发起请求
-
-选出新master之后，会发送消息到其他slave使其接受新master，最后更新数据。已停止的旧master会降为slave，恢复服务之后继续运行。
-
-###### 领头哨兵挑选新master的规则
-
-> 优先级最高（slave-priority配置）
->
-> 复制偏移量最大
->
-> id最小
-
-##### 哨兵配置  sentinel.conf
+哨兵配置  sentinel.conf
 
 ```properties
 # 设置主机名称 地址 端口 选举所需票数
@@ -821,24 +777,49 @@ sentinel monitor [master-name] [ip] [port] [quorum]
 sentinel monitor mymaster 192.168.0.107 6379 1
 ```
 
-##### 启动哨兵节点
+启动哨兵节点
 
 ```sh
 bin/redis-server etc/sentinel.conf --sentinel &
 ```
 
-##### 查看指定哨兵节点信息
+查看指定哨兵节点信息
 
 ```sh
 #可以在任何一台服务器上查看指定哨兵节点信息：
 bin/redis-cli -h 192.168.0.110 -p 26379 info Sentinel
 ```
 
+故障切换过程
+
+> 如果被ping的节点超时未回复，哨兵则认为其**主观下线**，如果是master下线，哨兵会询问其他哨兵是否也认为该master**主观下线**，如果达到（配置文件中的）`quorum`个投票，哨兵会认为该master**客观下线**，并选举出领头哨兵节点，领头哨兵发起故障恢复。
+
+选举领头哨兵 raft算法
+
+> 发现master下线的A节点向其他哨兵发送消息要求选自己为领头哨兵
+>
+> 如果目标节点没有选过其他人（没有接收到其他哨兵的相同要求），就选A为领头哨兵
+>
+> 若**超过一半的哨兵同意**选A为领头，则A当选
+>
+> 如果多个哨兵同时参与了领头，可能一轮投票无人当选，A就会等待随机事件后再次发起请求
+>
+> > 选出新master之后，会发送消息到其他slave使其接受新master，最后更新数据。
+> >
+> > 已停止的旧master会降为slave，恢复服务之后继续运行。
+
+领头哨兵挑选新master的规则
+
+> 优先级最高（slave-priority配置）；复制偏移量最大；id最小
+>
 
 
-### Cluster集群
 
-> 官方推荐集群至少要3台以上master，即 3 master 3 slave。
+### Cluster集群 ☆
+
+为了保证高可用，使用主从模式。master宕机就启用slave。如果一个节点的主从都宕机，则集群不可用。
+
+> 多个master(最少3个)，  多个slaver
 
 配置 redis.conf
 
@@ -847,63 +828,329 @@ bin/redis-cli -h 192.168.0.110 -p 26379 info Sentinel
 cluster-enable yes
 #集群模式下的集群配置文件
 cluster-config-file nodes-6379.conf
-#集群内节点之间最长响应时间
+#集群内节点之间最长响应时间  默认15s 关系到集群节点通信占用的带宽
 cluster-node-timeout 15000
+# 还会在加一个端口号用来集群之间节点的通讯  6379+10000  16379
 ```
 
-> 启动6个redis-server，可以借助ruby，或者自己写群起脚本
+启动集群 (需要Ruby版本 > 2.2)
 
+> `redis-trib.rb create --replicas 1 [ip]:6380 [...] [ip]:6381 [ip]:6385 `
 
+查看集群中的节点
 
-#### 工作机制
+```sh
+[root@buke107 src]\# redis-cli -c -h 192.168.0.107 -p 6381 # 连接任一节点
+192.168.0.107:6381> cluster nodes # 查看集群节点
+# nodeId | ip:port | nodeType | masterId | 0？ | ？ | 连接数 | 节点对应的槽位slots(master节点才有)
+868456121fa4e6c8e7abe235a88b51d354a944b5 192.168.0.107:6382 master - 0 1523609792598 3 connected 10923-16383
+d6d01fd8f1e5b9f8fc0c748e08248a358da3638d 192.168.0.107:6385 slave 868456121fa4e6c8e7abe235a88b51d354a944b5 0 1523609795616 6 connected
+5cd3ed3a84ead41a765abd3781b98950d452c958 192.168.0.107:6380 master - 0 1523609794610 1 connected 0-5460
+b8e047aeacb9398c3f58f96d0602efbbea2078e2 192.168.0.107:6383 slave 5cd3ed3a84ead41a765abd3781b98950d452c958 0 1523609797629 1 connected
+68cf66359318b26df16ebf95ba0c00d9f6b2c63e 192.168.0.107:6384 slave 90b4b326d579f9b5e181e3df95578bceba29b204 0 1523609796622 5 connected
+90b4b326d579f9b5e181e3df95578bceba29b204 192.168.0.107:6381 myself,master - 0 0 2 connected 5461-10922
+# 节点类型还会展示的信息  myself:当前节点   fail:节点下线
+```
 
-对key进行【crc16算法】【% 16384】的操作，通过计算结果找到对应插槽所对应的节点，然后直接跳转到这个节点进行存取操作。
+关于cluster的其他操作:   https://www.cnblogs.com/kevingrace/p/7910692.html
 
-为了保证高可用，使用主从模式。master宕机，启用slave。如果一个节点的主从都宕机，则集群不可用。
-
-> 为什么slots数量使用16384 ？
+> `添加主/从节点`、`重新分配slot`、`查看集群状态信息`、`改变slave的master`、`删除主/从节点`
 >
-> > 正常的心跳包携带一个节点的全部配置信息，其中就包含slots信息，16384bit = 2048byte  2k了，如果用65536bit的话，就需要8k
+> `复制迁移`(登录到slave并更换其follow的master)、`cluster集群节点升级`(升级redis版本)
+>
+> `缓存清理`(在集群中删除指定的key需要链接到对应的节点...)，节点太多就用脚本吧
+>
+> > 查看cluster信息找到所有master
 > >
-> > 集群是每秒ping-pong，一旦集群的节点数量多了就会占用大量带宽
+> > 遍历master（连接该master，执行del key）直到del成功，结束遍历
 > >
-> > https://www.cnblogs.com/rjzheng/p/11430592.html  这个dalao的文章有redis源码 心跳包消息结构
+> > `再搜吧...`
 
 
 
-#### 特点
+#### 工作机制 原理
 
-- 所有redis节点彼此互联（PING-PONG机制），使用二进制协议优化传输速度和带宽
+先了解一下分布式数据分布方案。
 
-  > 
+> 分布式 数据分布方案(寻址算法)：
+>
+> - 节点取余
+>
+>   根据数据(或数据的某一特征)计算hash并取余节点数量得到数据所在位置，比如Java的HashMap(强行举例...)。
+>
+>   > 缺点：当节点数量变化(扩容/缩容)时，数据节点映射关系需要重新计算，会导致大量数据的迁移(HashMap优化：翻倍扩容，可以使数据迁移从80%降到50%)
+>
+> - 一致性哈希
+>
+>   指定范围内（比如0-2^32^）所有数字首尾相连形成一个哈希环，并为每个节点分配一个该范围内的值，寻址时计算key的hash值，然后在环上找到第一个`token >= hash(key)`的节点。
+>
+>   > 优点：节点数量变化时，只影响（相邻的）一个节点。
+>   >
+>   > 缺点：很可能会分布不均匀（负载不均衡）
+>
+> - 虚拟槽分区（**cluster采用**）
+>
+>   用hash函数把数据分散到**固定范围**内的整数集合中，每个整数定义为槽`slot`。
+>
+>   slot数量远大于节点数，每个节点负责一部分slot，这样更方便数据的拆分和集群扩容（增加节点）
+>
+>   （相当于也融合了虚拟节点的概念吧）
+>
+>   > 与一致性哈希的不同：
+>   >
+>   > > 一致性哈希直接根据数据的hash值找对应的节点；
+>   > >
+>   > > 虚拟槽分区是先根据数据的hash找到节点，再去该节点进行操作。
+>
+>   > 优点：
+>   >
+>   > - 节点负载均衡
+>   > - 解耦数据和节点的关系，方便数据的拆分和集群扩容；
+>   > - 节点自身维护节点和slot的映射关系，无需客户端运算；
+>
+>   带图的描述：https://www.cnblogs.com/myseries/p/10959050.html
+>
+> 数据分布存储的集群模式**都**会有的缺点：
+>
+> - key批量操作受限。mset、mget等操作，key可能存在于多个节点上，所以不可用(报错)；([集群小技巧](#集群小技巧)可以解决)
+> - key事务操作受限。伪事务，本来也不用...；
+> - 不支持多数据库。（本来也鸡肋）单机redis可支持16个数据库，集群模式下只能使用一个数据库空间，即db0。
+>
+> 还有一些不算缺点，算是不足之处的
+>
+> - key作为数据的最小粒度，可能value还是比较大，集群也无法将一个大的键值对象（如hash、list等）映射到不同的节点。
 
-- 集群中超过半数的节点检测失效才认为节点fail
+redis cluster 的数据分布方案采用的是`虚拟槽分区(16384个slot)`方案（+虚拟节点）
 
-  > master选举机制？ todo 
+所以 redis cluster 的节点处理请求会先计算key对应的slot
 
-- redic-cil与节点直连，不需要中间代理层，任意连接集群中一个可用节点即可。
+- 如果对应的节点是自身，直接执行命令并返回结果；
+- 否则返回`MOVED重定向错误`通知客户端访问正确的节点（`MOVED`带有key所在slot信息 和 对应节点的地址信息）。
 
-  > 如果客户端请求的key不在当前节点，会返回`xxx`消息，客户端再去连接该节点执行命令。
+客户端收到`MOVED`再去对应的节点请求执行。
+
+> 连接集群的客户端需要处理`MOVED`命令，所以和连接redis单机的客户端还是不同的。
 
 
 
-## 集群中key的分布
+##### 集群内节点通信
 
-如果分布不均匀怎么办
+> Redis Cluster 采用P2P的`Gossip`(流言/八卦)协议，原理就是：节点彼此不断交换信息，一段时间后所有节点都会知道集群所有节点的信息。
 
-一致性hash todo
+集群内节点的通信的消息头都是使用的`clusterMsg`这个结构（下边有源码），包含id、myslots、消息类型、节点标识等等。
 
-消息队列尾部热点问题；
-redis https://www.cnblogs.com/rjzheng/p/11430592.html
-redis & mq  https://www.zhihu.com/question/43557507
-redis https://zyfcodes.blog.csdn.net/article/details/90384502
-redis 一致性hash  https://www.cnblogs.com/myseries/p/10959050.html
+
+
+###### Gossip消息类型
+
+- meet：`通知新节点加入`（“加入我们吧”），meet通信完成后，接收方会周期进行ping-pong；
+- ping：每秒发送给多个其他节点，用于`检测节点是否在线并进行信息交换`，封装了`自身和部分其他节点的状态数据`；
+- pong：回应`meet`和`ping`，封装了`自己的状态数据`。也可用来向集群广播自己的状态信息来`通知整个集群更新"我"的状态`。
+- fail：（"xx下线了"）判断集群内另一个节点下线后，就广播fail消息，接收方把该节点的状态置为下线。
+
+> Gossip特点：
+>
+> 扩展性：节点可任意增减，状态信息最终都会和其他节点同步；
+>
+> 最终一致性：只保证最终一致性
+>
+> 容错性：每个节点都有数据，宕机一部分也没事
+>
+> 健壮性：去中心化，每个节点都有持有数据
+
+
+
+###### Redis Cluster 消息 数据结构
+
+消息头：clusterMsgData + [redis为什么是16384个槽](#redis为什么是16384个槽) 里边的源码
+
+消息体：meet、ping、pong等类型的消息采用MsgDataGossip数组作为消息体。
+
+
+
+###### 发送消息的规则
+
+- 每秒随机选取5个节点，找出最久没有通信的节点发送ping消息  ——1个
+- 每100毫秒(1秒10次)都会扫描本地节点列表，如果发现节点最近一次接受pong消息的时间大于`cluster-node-timeout / 2`则立刻发送ping消息
+
+所以每个节点每秒需要发送ping消息的数量 = `1 + 10 * num (node.pong_received > cluster_node_timeout / 2)`
+
+> `node`：本地节点列表的每个节点
+>
+> `node.pong_received`：上次收到`该node`的`pong`消息已经过去多久
+>
+> `cluster_node_timeout`：配置节点超时时间，默认 `15s` 
+>
+> > 当我们的带宽资源紧张时，可以适当调大这个参数，如从默认15秒改为30秒来降低集群通信的带宽占用率。
+> >
+> > 调得太大了也不行，会影响消息交换的频率，从而影响`故障转移`、`槽信息更新`、`新节点发现的速度`。
+> >
+> > 需要根据业务容忍度和资源消耗进行平衡，节点数越多集群的总消息量就越大。[redis为什么是16384个槽](#redis为什么是16384个槽)
+
+ps: 集群中的每个节点都会单独开辟一个TCP通道用于节点之间彼此通信，通信端口号 = 基础端口 + 10000，比如16379
+
+
+
+#### 集群扩容
+
+rehash重新分片，每增加一个节点只会影响到一个老节点，就是从老节点上分一些slot到新节点。
+
+`redis-trib.rb`，这个脚本 就129行代码，可以看看。。https://github.com/redis/redis/blob/unstable/src/redis-trib.rb todo
+
+
+
+#### 集群高可用 & 故障转移 & 新master选举
+
+Cluster保证集群高可用和Sentinel类似。
+
+某节点认为`master1`宕机，就会广播`fail`消息，此时`master1`是主观宕机状态，如果集群内`超过半数节点`都认为`master1`主观宕机，就会标记`master1`为客观宕机。
+
+然后就要开始进行故障转移：
+
+集群中`正常的master`进行投票，从`master1`的`slave`中选出一个，当某个slave获得了`半数以上的选票`，升为master。
+
+新master会`停止复制master1`节点，并将`master1负责的所有slot`分配给自己，然后广播`pong`消息。
+
+
+
+#### 集群小技巧 & 优化点
+
+- hash_tag：一举两得  （注意不要过度使用，[数据倾斜](#数据倾斜)）
+
+  - 可以利用{}给不同的key命名，以达到不同的key对应相同的槽的效果，这样还可以在集群中会用mget，mset等命令，（否则报错）
+  - Redis IO 优化：Pipeline
+
+  > redis计算槽的时候如果key的内容有`{...}`，会使用`{}`里边的内容，这里`...`称为`hash_tag`，可以让不同的key映射到相同的slot。
+  >
+  > ```c
+  > def key_hash_slot(key):
+  >     int keylen = key.length();
+  >     for (s = 0; s < keylen; s++):
+  >         if (key[s] == '{'):
+  >             break;
+  >         if (s == keylen) return crc16(key,keylen) & 16383;
+  >         for (e = s+1; e < keylen; e++):
+  >             if (key[e] == '}') break;
+  >             if (e == keylen || e == s+1) return crc16(key,keylen) & 16383;
+  >     /* 使用{和}之间的有效部分计算槽 */
+  >     return crc16(key+s+1,e-s-1) & 16383;
+  > ```
+  >
+  > 由于Pipeline只能向一个节点批量发送执行命令，相同的hash_tag对应相同的slot，而相同slot必然会对应到唯一的节点
+  >
+  > 这样一来....不就可以用pipeline了嘛
+
+
+
+#### 常见问题
+
+##### 数据倾斜
+
+- 节点和槽的分配不均【不常见】 ，可以使用redis-trib.rb rebalance命令进行平衡；
+- 不同槽对应键数量差异过大。注意不能过度使用hashtag；
+- 可能包含big key，一般不能有太大的key ，需要找到大集合后根据业务场景进行拆分
+
+
+
+##### 请求倾斜
+
+> 集群内特定节点请求量 / 流量过大 导致节点之间负载不均
+
+对于热点key: 避免bigkey ,不要使用hash_tag，本地缓存+MQ
+
+
+
+##### redis为什么是16384个槽
+
+> 1. 正常的心跳包携带一个节点的全部配置信息，其中就包含`myslots`信息，16384bit = 2048byte  2k了，如果用65536bit的话，就需要8k
+>
+> 2. 集群是每秒ping-pong，一旦集群的节点数量多了就会占用大量带宽
+>
+>    > 集群节点越多，心跳包的消息体内携带的数据越多。如果节点过1000个，也会导致网络拥堵。
+>    >
+>    > 因此，redis作者不建议redis cluster节点数量超过1000个。而对于节点数在1000以内的redis cluster集群，16384个槽位够用了。
+>
+> 3. 槽位越小，节点少的情况下，压缩比高
+>
+>    > Redis Cluster master的配置信息中，它所负责的哈希槽是通过一张bitmap的形式来保存的。
+>    >
+>    > 在传输过程中，会对bitmap进行压缩，如果bitmap的填充率slots / N很高的话(N表示集群节点总数)，bitmap的压缩率就会变低。
+>    >
+>    > 如果节点数很少，而哈希槽数量很多的话，bitmap的压缩率就很低。
+>
+> 再`考虑到负载均衡和扩展，槽位也不能太少`，折中考虑，作者决定取16384个槽
+>
+> 消息头的源码：
+>
+> ```c
+> // https://github.com/redis/redis/blob/unstable/src/cluster.h
+> #define CLUSTER_SLOTS 16384  // 这里声明常量
+> typedef struct {
+>     char sig[4];        /* Signature "RCmb" (Redis Cluster message bus). 消息总线*/
+>     uint32_t totlen;    /* Total length of this message 消息总长度*/
+>     uint16_t ver;       /* Protocol version, currently set to 1. 协议版本号*/
+>     uint16_t port;      /* TCP base port number. */
+>     uint16_t type;      /* Message type 消息类型：meet、ping、pong*/
+>     uint16_t count;     /* Only used for some kind of messages. 某些信息会用...*/
+>     uint64_t currentEpoch;  /* The epoch accordingly to the sending node. */
+>     uint64_t configEpoch;   /* The config epoch if it's a master, or the last
+>                                epoch advertised by its master if it is a
+>                                slave. */
+>     uint64_t offset;    /* Master replication offset if node is a master or 主节点的已复制偏移量 或
+>                            processed replication offset if node is a slave. 从节点已处理的复制偏移量 */
+>     char sender[CLUSTER_NAMELEN]; /* Name of the sender node 发送者name*/
+>     // 这里这里这里！！！
+>     unsigned char myslots[CLUSTER_SLOTS/8]; // 发送节点负责的slot，这个数组大小是16384/8=2048 byte，2kb
+>     char slaveof[CLUSTER_NAMELEN];
+>     char myip[NET_IP_STR_LEN];    /* Sender IP, if not all zeroed. 不全为0就是发送方的ip*/
+>     char notused1[34];  /* 34 bytes reserved for future usage. 保留字节*/
+>     uint16_t cport;      /* Sender TCP cluster bus port 发送方tcp总线端口*/
+>     uint16_t flags;      /* Sender node flags 发送方的flags 这里这里这里！！！*/
+>     unsigned char state; /* Cluster state from the POV of the sender */
+>     unsigned char mflags[3]; /* Message flags: CLUSTERMSG_FLAG[012]_... */
+>     union clusterMsgData data;
+> } clusterMsg;
+> ```
+>
+> 消息体的源码：
+>
+> ```
+> 。。算了哥  下次一定          todo
+> ```
+>
+> ```c
+> // https://github.com/redis/redis/blob/unstable/src/cluster.h 
+> // 特么太多了
+> clusterMsgDataGossip
+> clusterMsgData 消息体
+> 
+> ```
+
+
+
+# redis源码
+
+| src文件名                                                    | 干啥的                                                       |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| ae.c 、 ae.h 、 ae_epoll.c 、 ae_evport.c 、 ae_kqueue.c 、 ae_select.c | 事件处理器，以及各个具体实现。                               |
+| redis.h                                                      | Redis 的主要头文件，记录了 Redis 中的大部分数据结构， 包括服务器状态和客户端状态。 |
+| zmalloc.c 、 zmalloc.h                                       | 内存管理程序。                                               |
+| sds.c 、 sds.h                                               | SDS 数据结构的实现，SDS 为 Redis 的默认字符串表示。          |
+| adlist.c 、 adlist.h                                         | 双端链表数据结构的实现。                                     |
+| dict.c 、 dict.h                                             | 字典数据结构的实现                                           |
+| bio.c 、 bio.h                                               | Redis 的后台 I/O 程序，用于将 I/O 操作放到子线程里面执行， 减少 I/O 操作对主线程的阻塞。 |
+| rdb.c 、 rdb.h                                               | RDB 持久化功能的实现。                                       |
+| aof.c                                                        | AOF 功能的实现。                                             |
+| cluster.c 、 cluster.h                                       | Redis Cluster 的集群实现。                                   |
+| sentinel.c                                                   | Redis Sentinel 的实现。                                      |
+| crc16.c 、 crc64.c 、 crc64.h                                | 计算 CRC 校验和。 crc16算法                                  |
+| redis-trib.rb                                                | Redis 集群的管理程序。Ruby脚本                               |
 
 
 
 # Lua 脚本 原子执行
 
-Lua 脚本在 Redis 中是原子执行的，Redis 在执行`EVAL`命令的时候，一直到执行完毕并返回结果之前，会阻塞所有其他客户端的命令，so Lua脚本中要写逻辑特别复杂的脚本， 必须保证 Lua 脚本的效率。
+Lua 脚本在 Redis 中是原子执行的，Redis 在执行`EVAL`命令的时候，一直到执行完毕并返回结果之前，会阻塞所有其他客户端的命令，所以Lua脚本中要写逻辑特别复杂的脚本， 必须保证 Lua 脚本的效率。
 
 
 
@@ -938,7 +1185,7 @@ Lua 脚本在 Redis 中是原子执行的，Redis 在执行`EVAL`命令的时候
 
 
 
-#### 注意
+#### 注意事项
 
 - Lua 脚本执行异常也不会回滚， 所以脚本逻辑要有较高的健壮性
 - Lua 脚本执行是原子性的，会阻塞其他客户端的命令，所有效率要高
@@ -982,14 +1229,26 @@ public static boolean releaseLock(String key ,String lockValue){
 
 
 
+# 一些小坑
 
+```java
+// 错误用法 .. 第三个参数不是timeout...
+stringRedisTemplate.opsForValue().set("hashkey:key1","value",60*60*1000);
 
+// api源码
+@Override
+public void set(K key, V value, long offset) {
+    byte[] rawKey = rawKey(key);
+    byte[] rawValue = rawValue(value);
+    execute(connection -> {
+        connection.setRange(rawKey, rawValue, offset);// 用指定的字符串覆盖给定key所储存的字符串值，覆盖的位置从偏移量offset开始
+        return null;
+    }, true);
+}
 
+// 正确用法：（key, value, offset, timeout）
+stringRedisTemplate.opsForValue().set("hashkey:key1","value",60*60*1000,TimeUnit.MILLISECONDS);
+```
 
+<img alt="redisTemplate.opsForValue().set(k, v, offset)" src="https://raw.githubusercontent.com/melopoz/pics/master/img/20210330005146.png" style="zoom:50%;" />
 
-
-
-
-这个链接关于redis好全面。。
-
-https://zyfcodes.blog.csdn.net/article/details/90384502

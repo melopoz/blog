@@ -1,14 +1,11 @@
 ---
-
-
-
 title: Java_HashMap 不止是HashMap
 tags: 
+  - java1.8优化
+  - hash散列的优化
   - JUC
   - 并发
   - 同步
-  - java1.8优化
-  - hash散列的优化
 categories:
   - [Java]
 ---
@@ -57,7 +54,7 @@ categories:
 
 <img alt="HashMap数据结构，图在github" src="https://raw.githubusercontent.com/melopoz/pics/master/img/HashMap%E7%BB%93%E6%9E%84.png" style="zoom:50%;" />
 
-#### hash数组：`Node<K, V>[] table；`
+#### hash数组：`Node<K, V>[] table`
 
 哈希桶数组，每个元素都是一个键值对：`Node<K,V> implements Map.Entry`。并维护下一个节点的引用`next`。
 
@@ -111,7 +108,7 @@ static class Node<K,V> implements Map.Entry<K,V> {
 
 扩容(resize)就 *2，**也是1.8HashMap的一个优化**。更多见下文[**确定node在table中的索引位置**](#确定node在table中的索引位置)
 
-因为这种根据hash在table中找位置都是用位运算`hash值 & (length-1)`，所以这个掩码的1越多，结果就越均匀。
+因为这种根据hash在table中找位置都是用位运算`hash值 & (length-1)`，所以这个掩码的1越多，hash值的有效位就越多，结果就越均匀。
 
 > 对比HashTable扩容是`* 2 - 1`，初始容量是个素数`11`，但是HashTable扩容后的数字并不理想，扩容后的length二进制标识就三个1:
 >
@@ -125,13 +122,13 @@ static class Node<K,V> implements Map.Entry<K,V> {
 >
 > 本来mask取素数应该是为了取余(flag&mask)的时候，mask有更多的1，相当于让flag有更多有效位，结果1.7的实现并不理想。
 
-HashMap中length必须是2的n次方，`16`binaryStr: `0001 0000`，减1就直接把唯一一个高电平位的右边全置为1：`16-1`binaryStr：`0000 1111`，这样node在table中的分配就更均匀了。
+HashMap中length必须是2的n次方，`16`binaryStr: `0001 0000`，减1就直接把唯一一个高电平位`1`置为`0`，再把其右边全置为`1`：`16-1`binaryStr：`0000 1111`，这样hash值的有效位最多，node在table中的分配就更均匀了。
 
 
 
 #### 结构变化次数：modCount
 
-记录hashMap内部结构发生变化的次数，主要用于迭代时的快速失败（fail-fast）。
+记录hashMap内部结构发生变化的次数，主要用于迭代时的快速失败（**fail-fast**）。
 
 > put新Entry算，put已存在的key(覆盖)不算。
 
@@ -224,15 +221,17 @@ public native int hashCode();// int 32位
 newTab[e.hash & (newCap - 1)] = e;
 ```
 
-> > ps：曾经，dalao问我有什么比取余效率更高的，应该就是想听我说`&运算`吧 。
+> ps：曾经，dalao问我有什么比取余效率更高的，我寻思还能比&运算效率高的？可能就是想听我说`与运算 &`吧 。
+>
+> > 所以严谨一点，不能把`&`说成取余了，这俩本来也不一样！`%` 取余是个数学运算，`&` 与 是位运算。
 > >
-> > 所以不要把`&`说成取余了，它毕竟是个数学的词，对方完全可以认为你说的是`%`。
+> > 位运算`hash & (length-1)`肯定比数学运算取余`hash % (length-1)`效率要高啊。
 > >
-> > 位运算`hash & (length-1)`肯定比数学运算-取余`hash % (length-1)`效率要高啊。
+> > 哦，dalao还问redis怎么让那些key分布更均匀一些？也就是数据倾斜的场景该咋搞！
 > >
-> > 哦，dalao还问redis怎么让那些key分布更均匀一些，应该想听让高位也参与运算吧，当然还得有好的hash函数。
+> > 学学hashmap，让hash值的高位也参与运算？当然还得有好的hash函数、虚拟节点（自动负载均衡）
 
-相关的优化还有一个，就是`resize()`扩容时的 **oldCap作mask 重hash优化**，key的`newIndex`只可能是`oldIndex`或`oldIndex+oldCap`，决定因素就是oldCap这个位`1 还是 0`。见下方[扩容 resize()](扩容 resize())
+相关的优化还有一个，就是`resize()`扩容时的 **oldCap作mask 重hash优化**，key的`newIndex`只可能是`oldIndex`或`oldIndex+oldCap`，决定因素就是oldCap这个位`1 还是 0`。见下方[扩容 resize()](#扩容 resize())
 
 
 
@@ -725,7 +724,7 @@ static final sun.misc.Unsafe U;
 
 
 
-### 内部类
+#### 内部类
 
 ##### ForwardingNode 转发节点
 
@@ -835,10 +834,6 @@ static final <K,V> void setTabAt(Node<K,V>[] tab, int i, Node<K,V> v) {
 
 
 ### 功能 & 实现
-
-> 先看看大致步骤吧，不然文字很难描述的那么多分支，直线往下看会有点找不着北。
-
-
 
 
 

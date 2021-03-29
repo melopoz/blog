@@ -1,0 +1,588 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/favicon.png">
+  <link rel="icon" type="image/png" href="/blog/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Although things are always not as you wish, but effort will be lucy!">
+  <meta name="author" content="melopoz">
+  <meta name="keywords" content="">
+  <title>HTTPS - 你不喜欢孤独 那就别停下来</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/blog/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.1.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"melopoz.github.io","root":"/blog/","version":"1.8.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"copy_btn":true,"image_zoom":{"enable":true},"lazyload":{"enable":true,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/blog/">&nbsp;<strong>Fluid</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/blog/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="HTTPS">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-03-29 17:48" pubdate>
+        2021年3月29日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.6k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      18
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">HTTPS</h1>
+            
+            <div class="markdown-body">
+              <h1 id="HTTP"><a href="#HTTP" class="headerlink" title="HTTP"></a>HTTP</h1><h3 id="TCP三次握手"><a href="#TCP三次握手" class="headerlink" title="TCP三次握手"></a>TCP三次握手</h3><ol>
+<li>client 发送 SYN(seq=x) 到 server;   <code>client进入SYN_SEND状态</code></li>
+<li>server 收到并回应 SYN(seq=y), ACK(seq=x+1);   <code>server进入SYN_RECV状态</code></li>
+<li>client 收到 server 的SYN报文, 回应一个 ACK(seq=y+1) <code>client发送完进入ESTABLISHED状态, server收到也进入ESTABLISHED状态</code></li>
+</ol>
+<blockquote>
+<p>seq number (x, y) 均为随机数, 抓包看到的一般为相对的数字, 即 0 和 1</p>
+</blockquote>
+<h3 id="TCP四次挥手"><a href="#TCP四次挥手" class="headerlink" title="TCP四次挥手"></a>TCP四次挥手</h3><ol>
+<li>client 发送 FIN(seq=x) 到 server;   <code>client只是不再发送数据, 但还可以接受数据</code>   <code>client进入FIN_WAIT_1状态</code></li>
+<li>server 回应 ACK(seq=x+1);   <code>server可能还需要发送数据到client, 所以不能一起发送FIN</code>   <code>server进入CLOSE_WAIT,client进入FIN_WAIT_2状态</code></li>
+<li>server 没有要发送的数据之后, 向 client 发送 FIN(seq=y);   <code>server进入LAST_ACK状态</code></li>
+<li>client 回应 ACK(seq=y+1)   <code>client发送完成进图established状态, server收到后进入CLOSED状态</code>   <code>client在等待固定时间(两个最大生命周期)后, 若没有接受到服务的ACK包, 则进入CLOSED状态</code></li>
+</ol>
+<h1 id="确保安全通信的三个原则"><a href="#确保安全通信的三个原则" class="headerlink" title="确保安全通信的三个原则"></a>确保安全通信的三个原则</h1><ol>
+<li><p>数据内容加密</p>
+</li>
+<li><p>通信双方身份校验</p>
+<blockquote>
+<p>确保你是在给 （给你发消息的人）发消息</p>
+</blockquote>
+</li>
+<li><p>数据内容完整</p>
+<blockquote>
+<p>确保对方能够完整地读完我的消息</p>
+</blockquote>
+</li>
+</ol>
+<p>http是明文, 不安全 所以需要加密来保证数据安全</p>
+<h3 id="对称加密-和-非对称加密"><a href="#对称加密-和-非对称加密" class="headerlink" title="对称加密 和 非对称加密"></a>对称加密 和 非对称加密</h3><p>对称加密:</p>
+<blockquote>
+<p>使用同一个密钥进行加密和解密, 速度快, 但是必须在通信时告诉对方使用什么密钥, 一旦密钥被截获, 相当于仍然是明文.</p>
+</blockquote>
+<p>非对称加密:</p>
+<blockquote>
+<p>公钥随便发，通信双方各自保管私钥。使用私钥加密则必须用公钥解密，使用公钥加密则必须使用私钥解密。</p>
+</blockquote>
+<h1 id="HTTPS设计思路"><a href="#HTTPS设计思路" class="headerlink" title="HTTPS设计思路"></a>HTTPS设计思路</h1><ol>
+<li>server为客户端生成一个公钥并发送给client；</li>
+<li>client选择一个加密算法，用公钥把这个算法加密后发送给server；</li>
+<li>server收到后用私钥解密得到加密算法，以后都用这个算法进行数据包的decode。</li>
+</ol>
+<h3 id="缺陷"><a href="#缺陷" class="headerlink" title="缺陷"></a>缺陷</h3><p>中间人可以对client伪装成server， 对server伪装成client， 仍然可以截获真数据包。</p>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>既然在通信中发送公钥危险，那就别直接发送公钥了呗。把这个公钥交给可信任的第三方机构。</p>
+<ol>
+<li><p>由CA向 server 颁发证书，来证明服务器是安全的；</p>
+</li>
+<li><p>server 将证书（包含 server 的公钥）发送给 client；</p>
+</li>
+<li><p>client 收到加密后的公钥之后，用CA的公钥把server发来的公钥解密得到 通信中使用的公钥。</p>
+<blockquote>
+<p>操作系统或者浏览器本身就带有 CA 的公钥，server 发送给 client 的证书是由 CA 用私钥加密过的。</p>
+</blockquote>
+</li>
+</ol>
+<p>这样一来，中间人也就只能作为client请求server，但不能伪装成server回应client。</p>
+<h3 id="SSL-TLS"><a href="#SSL-TLS" class="headerlink" title="SSL/TLS"></a>SSL/TLS</h3><p>也就是上述结局方案了。具体步骤为：</p>
+<ol>
+<li><p>client 发送请求到 server， 生成并携带随机数 random1 和 支持的加密算法； <code>Client Hello</code></p>
+</li>
+<li><p>server 取出random1和client支持的加密算法，从中取出一个算法，生成 random2；<code>Server Hello</code></p>
+<p>server 将自己的数字证书（含有server的公钥）发送给 client，让 client 对自己进行身份校验； <code>Certificate</code></p>
+<p>..”server 的工作完成了“   <code>Server Hello Done</code></p>
+</li>
+<li><p>client 校验证书是否合法，生成 random3，用服务器的公钥加密 random3 得到 premaster，并发送给 server；<code>Client Key Exchange</code> <code>Change Cipher Spec</code> <code>Encrypted Handshake Message </code> </p>
+</li>
+<li><p>server 收到加密的 random3（premaster）之后，用私钥解密，得到 random3 ， 用这三个随机数生成一个秘钥，这个秘钥将作为接下来 对通信数据进行对称加密 的秘钥；</p>
+<p><code>New Session Ticket</code>  <code>Change Cipher Spec</code>  <code>Encryted Handshake Message</code> 接下来要使用对称加密了；</p>
+<blockquote>
+<p>session ticket ： 一个状态保存机制， 下次请求https的时候，携带这个ticket， 节省握手时间、资源消耗</p>
+</blockquote>
+</li>
+<li><p>发送 加密后的 <code>Applation Data</code>   通信数据</p>
+</li>
+</ol>
+<blockquote>
+<p>清楚明了，无敌：<a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2014/02/ssl_tls.html">http://www.ruanyifeng.com/blog/2014/02/ssl_tls.html</a></p>
+</blockquote>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>HTTPS = TLS 五次握手 + HTTP 三次握手</p>
+<blockquote>
+<p>举个例子。。。        TLS 110-120ms       TCP 50-60ms </p>
+</blockquote>
+<ol>
+<li>因为TLS很耗性能耗时间， 所以使用非对称加密 把   对称加密中使用的秘钥a   加密，然后都用这个秘钥a进行对称加密。</li>
+<li>服务器的公钥私钥只用来加密和解密“对话秘钥（sessionkey）”（对 ApplicationData 进行对称加密的秘钥），无其他作用。</li>
+<li>一般还会使用 session ticket 或 session id 技术来提高性能。</li>
+</ol>
+<hr>
+<blockquote>
+<p>CA证书  只是证明 服务器的合法性</p>
+<p>客户端安装了抓包工具的根证书，就会信任（伪装成server的）抓包工具， 这时抓包工具就可以伪装成服务器与客户端进行通信了。</p>
+<p>而抓包工具与真服务器进行通信是不需要证明的， 因为在这个通信中（抓包工具）就是客户端。</p>
+</blockquote>
+<h1 id="自签名，-搭建HTTPS服务"><a href="#自签名，-搭建HTTPS服务" class="headerlink" title="自签名， 搭建HTTPS服务"></a>自签名， 搭建HTTPS服务</h1><h4 id="需要做的事："><a href="#需要做的事：" class="headerlink" title="需要做的事："></a>需要做的事：</h4><blockquote>
+<ul>
+<li>一个提供 https 服务的服务器需要有经过 CA 认证的数字证书和自己的公钥私钥（公钥放在证书里）</li>
+<li>CA 认证是需要收费的，所以我们需要自建一个 CA 机构</li>
+<li>自建的 CA 机构需要有标识自己身份的根证书（包含公钥），以及用来对服务器证书进行签名(加密)的私钥</li>
+<li>一个 https 站点，收到客户端访问时下发自己的数字证书</li>
+<li>客户端需要持有 CA 的根证书，所以我们需要手动导入自建 CA 的证书</li>
+</ul>
+</blockquote>
+<hr>
+<p>自己通过 keytool 生成一个证书，</p>
+<ol>
+<li><p>生成服务端私钥 generate private key（.key)</p>
+<pre><code class="hljs pgsql"># Key considerations <span class="hljs-keyword">for</span> algorithm &quot;RSA&quot; ≥ <span class="hljs-number">2048</span>-<span class="hljs-type">bit</span>
+openssl genrsa -<span class="hljs-keyword">out</span> <span class="hljs-keyword">server</span>.key <span class="hljs-number">2048</span>
+
+# Key considerations <span class="hljs-keyword">for</span> algorithm &quot;ECDSA&quot; ≥ secp384r1
+# List ECDSA the supported curves (openssl ecparam -list_curves)
+openssl ecparam -genkey -<span class="hljs-type">name</span> secp384r1 -<span class="hljs-keyword">out</span> <span class="hljs-keyword">server</span>.key</code></pre>
+</li>
+<li><p>生成服务端自签名证书</p>
+<p><code>openssl req -new -x509 -sha256 -key server.key -out -server.crt -days 3560</code></p>
+</li>
+<li><p>填写信息：</p>
+<pre><code class="hljs less"><span class="hljs-selector-tag">Country</span> <span class="hljs-selector-tag">Name</span> (<span class="hljs-number">2</span> letter code) <span class="hljs-selector-attr">[AU]</span>:<span class="hljs-selector-tag">CN</span>
+<span class="hljs-selector-tag">State</span> <span class="hljs-selector-tag">or</span> <span class="hljs-selector-tag">Province</span> <span class="hljs-selector-tag">Name</span> (full name) <span class="hljs-selector-attr">[Some-State]</span>:<span class="hljs-selector-tag">Guangdong</span>
+<span class="hljs-selector-tag">Locality</span> <span class="hljs-selector-tag">Name</span> (eg, city) <span class="hljs-selector-attr">[]</span>:<span class="hljs-selector-tag">FoShan</span>
+<span class="hljs-selector-tag">Organization</span> <span class="hljs-selector-tag">Name</span> (eg, company) <span class="hljs-selector-attr">[Internet Widgits Pty Ltd]</span>:<span class="hljs-selector-tag">TestCA</span>
+<span class="hljs-selector-tag">Organizational</span> <span class="hljs-selector-tag">Unit</span> <span class="hljs-selector-tag">Name</span> (eg, section) <span class="hljs-selector-attr">[]</span>:
+<span class="hljs-selector-tag">Common</span> <span class="hljs-selector-tag">Name</span> (e.g. server FQDN or YOUR name) <span class="hljs-selector-attr">[]</span>:<span class="hljs-selector-tag">xxx</span><span class="hljs-selector-class">.com</span> #域名
+<span class="hljs-selector-tag">Email</span> <span class="hljs-selector-tag">Address</span> <span class="hljs-selector-attr">[]</span>:</code></pre>
+
+
+
+
+
+
+
+
+
+</li>
+</ol>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/Hui4401/p/14128112.html">https://www.cnblogs.com/Hui4401/p/14128112.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/u010983881/article/details/83588326">https://blog.csdn.net/u010983881/article/details/83588326</a></p>
+<p><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844903522333376525">https://juejin.cn/post/6844903522333376525</a>    RSA非对称加密算法</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/%E5%AE%89%E5%85%A8/">安全</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/%E5%8A%A0%E5%AF%86/">加密</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86/">非对称加密</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2021/03/29/HTTP/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">HTTP</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2021/03/29/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">
+                        <span class="hidden-mobile">I/O多路复用</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":200})
+    NProgress.start()
+    document.addEventListener('DOMContentLoaded', function() {
+      window.NProgress && window.NProgress.inc();
+    })
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.staticfile.org/jquery/3.5.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/debouncer.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/blog/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.12.0/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/blog/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/blog/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+
+</body>
+</html>

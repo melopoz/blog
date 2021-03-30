@@ -181,341 +181,6 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/30/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">I/O多路复用</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/03/30/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">
-          
-          
-            
-          
-          简单说 IO：读取/写入 若干字节 从/到 单个文件描述符
-
-阻塞 / 非阻塞
-
-阻塞：如果文件描述符不处于就绪状态则阻塞直到其就绪
-
-非阻塞：如果文件描述符不处于就绪状态则返回一个错误码，比如 EAGAIN
-
-
-
-同步 / 异步
-
-同步和异步 是指 函数返回之时， 能不能保证任务完成。
-比如调用了read()直接返回了一个Future对象，你需要再调Future的函数来获取read()的结果。
-
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-30 23:38" pubdate>
-              2021-03-30
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/OS/">OS</a>
-            
-              <a href="/blog/categories/IO/">IO</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/IO/">IO</a>
-            
-              <a href="/blog/tags/select/">select</a>
-            
-              <a href="/blog/tags/epoll/">epoll</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/03/30/IP%E5%9C%B0%E5%9D%80/">关于IP地址</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/03/30/IP%E5%9C%B0%E5%9D%80/">
-          
-          
-            
-          
-          ipv4地址
-比如：192.168.1.1
-转换成二进制
-0000 0000.0000 0000.0000 0000.0000 0000
-​     8   *   4
-
-
-
-ipv4地址类别
-二进制格式
-范围
-
-
-
-
-A类
-0xxx xxxx(1+7位网络号).0000 0000.0000 0000.0000 0000(8*3位主机号)
-1.0.0.0—126.0.0.0
-10.X.X.X是私有
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-30 23:38" pubdate>
-              2021-03-30
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a>
-            
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/03/30/JVM_%E5%8F%82%E6%95%B0/">JVM的一些参数</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/03/30/JVM_%E5%8F%82%E6%95%B0/">
-          
-          
-            
-          
-          查看jvm参数(参数默认值): java -XX:+PrintFlagsFinal -version
-查看java进程的参数的配置: jinfo -flags [pid] `
-查看java进程的指定参数的配置: jinfo -flags [option] [pid]
-
-jinfo -flags NewRatio 15222
-
-SoftRefLRUPolicyMSPerMB
-关系到 软引用 再GC发
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-30 23:38" pubdate>
-              2021-03-30
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/Java/">Java</a>
-            
-              <a href="/blog/categories/Java/JVM/">JVM</a>
-            
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/03/30/JVM_%E5%AE%89%E5%85%A8%E9%80%80%E5%87%BA/">JVM安全退出</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/03/30/JVM_%E5%AE%89%E5%85%A8%E9%80%80%E5%87%BA/">
-          
-          
-            
-          
-          Shutdown HookSystem.getRuntime().addShutdownHook(Thread thread);
-public class JVMShutdownHook &#123;
-    public static void main(String[] args) throws InterruptedException &#123;
-        //hook
-      
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-30 23:38" pubdate>
-              2021-03-30
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/Java/">Java</a>
-            
-              <a href="/blog/categories/Java/JVM/">JVM</a>
-            
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/03/30/JVMjava8%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/">java8内存结构</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/03/30/JVMjava8%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/">
-          
-          
-            
-          
-          
-
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-30 23:38" pubdate>
-              2021-03-30
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/Java/">Java</a>
-            
-              <a href="/blog/categories/JVM/">JVM</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/JVM/">JVM</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/03/30/Java_AQS%E6%BA%90%E7%A0%81/">AQS-JUC中锁的抽象模板</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/03/30/Java_AQS%E6%BA%90%E7%A0%81/">
-          
-          
-            
-          
-          todo 
-https://www.cnblogs.com/waterystone/p/4920797.html
-AQS源码分析维护一个 volatile int 变量 state 代表加锁状态
-维护一个 队列代表请求锁资源的线程，head持有锁，后边的节点（线程）等待锁
-提供一套模板，实现类必须实现以下方法来实现自己加锁解锁的逻辑：
-
-boolean tryAcquire(int)：独占式 尝试
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-30 23:38" pubdate>
-              2021-03-30
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/Java/">Java</a>
-            
-              <a href="/blog/categories/Java/JUC/">JUC</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/JUC/">JUC</a>
-            
-              <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">并发</a>
-            
-              <a href="/blog/tags/%E5%90%8C%E6%AD%A5/">同步</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
         <a href="/blog/2021/03/30/Java_IO/">Java中的IO</a>
       </h1>
 
@@ -540,8 +205,8 @@ buffers比如ByteBuffe
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-30 23:38" pubdate>
-              2021-03-30
+            <time datetime="2021-03-31 00:09" pubdate>
+              2021-03-31
             </time>
           </div>
         
@@ -584,8 +249,8 @@ fail-fast在使用迭代器遍历一个集合的时候，例如foreach(实现还
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-30 23:38" pubdate>
-              2021-03-30
+            <time datetime="2021-03-31 00:09" pubdate>
+              2021-03-31
             </time>
           </div>
         
@@ -635,8 +300,8 @@ https://blog.csdn.net/wolfcode_cn/article/details/83058235
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-30 23:38" pubdate>
-              2021-03-30
+            <time datetime="2021-03-31 00:09" pubdate>
+              2021-03-31
             </time>
           </div>
         
@@ -686,8 +351,8 @@ https://blog.csdn.net/wolfcode_cn/article/details/83058235
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-30 23:38" pubdate>
-              2021-03-30
+            <time datetime="2021-03-31 00:09" pubdate>
+              2021-03-31
             </time>
           </div>
         
@@ -708,6 +373,343 @@ https://blog.csdn.net/wolfcode_cn/article/details/83058235
             <i class="iconfont icon-tags"></i>
             
               <a href="/blog/tags/synchronized/">synchronized</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/30/Kafka/">Kafka</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/30/Kafka/">
+          
+          
+            
+          
+          混乱。。。
+kafka百度网盘,git_note有pdf
+https://blog.csdn.net/qq_37502106/article/details/80271800
+https://blog.csdn.net/chenwiehuang/article/details/100172204
+javademo
+https://blog.csdn.net/Dongguabai/article/d
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-31 00:09" pubdate>
+              2021-03-31
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/MQ/">MQ</a>
+            
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/30/MySQL_function/">Mysql function应用</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/30/MySQL_function/">
+          
+          
+            
+          
+          自连接应用类似排名这种逻辑，可以用自连接来做。比如   某学生在班级中某科目的分数排名   ，自连接的时候用count()看比自己分高的同学的数量即可得到。要注意   distinct 去重。
+
+应用：leetcode 185. 部门工资前三高的所有员工
+
+select d.Name Department, e.Name Employee, e.Salary Salary
+from Employe
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-31 00:09" pubdate>
+              2021-03-31
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/DB/">DB</a>
+            
+              <a href="/blog/categories/DB/MySQL/">MySQL</a>
+            
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/30/MySQL_%E7%B4%A2%E5%BC%95&%E4%BA%8B%E5%8A%A1&mvcc&%E9%94%81/">Mysql</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/30/MySQL_%E7%B4%A2%E5%BC%95&%E4%BA%8B%E5%8A%A1&mvcc&%E9%94%81/">
+          
+          
+            
+          
+          joinmysql优化器会让小表驱动大表，因为底层也是两次遍历比较，原理相当于两层for循环，如果使用BTree，查找一条数据的时间复杂度=log(n)，所以两种for嵌套的时间复杂度比较如下：
+
+大表.rows * log(小表.rows)      肯定&gt;    小表.rows * log(大表.rows)
+
+B+Tree 的最大深度 log(n)，n:节点数，而且是B+Tree，每次查
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-31 00:09" pubdate>
+              2021-03-31
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/DB/">DB</a>
+            
+              <a href="/blog/categories/DB/MySQL/">MySQL</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E7%B4%A2%E5%BC%95/">索引</a>
+            
+              <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/">事务</a>
+            
+              <a href="/blog/tags/mvcc/">mvcc</a>
+            
+              <a href="/blog/tags/buffer-pool/">buffer pool</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/30/Nginx/">Nginx</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/30/Nginx/">
+          
+          
+            
+          
+          官方中文文档：https://www.nginx.cn/doc
+功能：免费开源的 高性能的HTTP服务器、反向代理、IMAP/POP3代理服务器。
+特点：稳定，轻量级，配置简单，资源消耗低，功能丰富！
+相同功能还有Apache的Httpd，架构比较笨重，性能不如nginx，主要不会玩。
+配置服务器名称（域名）
+nginx通过请求的请求头中的Host获取要访问的server,
+
+可用精确名称、通配符
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-31 00:09" pubdate>
+              2021-03-31
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/HTTP%E6%9C%8D%E5%8A%A1%E5%99%A8/">HTTP服务器</a>
+            
+              <a href="/blog/tags/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86/">反向代理</a>
+            
+              <a href="/blog/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">负载均衡</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/30/OS/">OS</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/30/OS/">
+          
+          
+            
+          
+          操作系统四大特征：并发两个事件在同一段时间内发生，即宏观上同时运行；并行是两个事件在统一时刻发生，多(核)CPU可支持并行
+共享（资源复用）多个并发执行的进程共同使用同一系统资源，比如内存
+
+互斥共享：同一时刻只有一个进程可以访问，需要同步机制来实现互斥。互斥的资源成为临界资源。e.g.:摄像头
+同时访问：允许多个进程在同一段时间内访问同一资源，即宏观上的同时。（微观上还是交替进行）e.g.:磁盘
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-31 00:09" pubdate>
+              2021-03-31
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/OS/">OS</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/select/">select</a>
+            
+              <a href="/blog/tags/epoll/">epoll</a>
+            
+              <a href="/blog/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
+            
+              <a href="/blog/tags/%E9%9B%B6%E6%8B%B7%E8%B4%9D/">零拷贝</a>
+            
+              <a href="/blog/tags/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">IO多路复用</a>
+            
+              <a href="/blog/tags/poll/">poll</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/30/RPC/">RPC:Remote Procedure Call</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/30/RPC/">
+          
+          
+            
+          
+          RPC和HTTP区别在OSI中所处的层就不同，HTTP是在TCP的基础上，RPC是自己实现的传输层协议。
+OSI分层
+
+应用层（应用层+表示层+会话层）
+传输层
+网络层
+链路层
+物理层
+
+HTTP是应用层的协议，自己是此案
+性能对两者来说并不是重点,因为RPC也有使用HTTP协议的,比如JSON-RPC,使用场景是两者的最大区别:RPC场景是公司内部互相调用.最大的好处是包装合理的RPC你会觉得他
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-31 00:09" pubdate>
+              2021-03-31
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a>
+            
+              <a href="/blog/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/OSI/">OSI</a>
+            
+              <a href="/blog/tags/RPC/">RPC</a>
             
           </div>
         

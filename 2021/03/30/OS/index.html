@@ -17,7 +17,7 @@
   <meta name="description" content="Although things are always not as you wish, but effort will be lucy!">
   <meta name="author" content="melopoz">
   <meta name="keywords" content="">
-  <title>OS - 你不喜欢孤独 那就别停下来</title>
+  <title>OS - Be your own god.</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
 
@@ -172,8 +172,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2021-03-30 15:00" pubdate>
-        2021年3月30日 下午
+      <time datetime="2021-03-30 18:20" pubdate>
+        2021年3月30日 晚上
       </time>
     </span>
   
@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      2.6k 字
+      3.1k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      27
+      33
        分钟
     </span>
   
@@ -227,7 +227,7 @@
             <h1 style="display: none">OS</h1>
             
             <div class="markdown-body">
-              <h1 id="操作系统四大特征："><a href="#操作系统四大特征：" class="headerlink" title="操作系统四大特征："></a>操作系统四大特征：</h1><h3 id="并发"><a href="#并发" class="headerlink" title="并发"></a>并发</h3><p>两个事件在<strong>同一段时间内</strong>发生，即宏观上同时运行；并行是两个事件在统一时刻发生，多(核)CPU可支持并行</p>
+              <h1 id="操作系统四大特征："><a href="#操作系统四大特征：" class="headerlink" title="操作系统四大特征："></a>操作系统四大特征：</h1><h3 id="并发"><a href="#并发" class="headerlink" title="并发"></a>并发</h3><p>两个事件在<strong>同一段时间内</strong>发生，即宏观上同时运行；<strong>并行</strong>是两个事件在统一时刻发生，多(核)CPU可支持并行</p>
 <h3 id="共享（资源复用）"><a href="#共享（资源复用）" class="headerlink" title="共享（资源复用）"></a>共享（资源复用）</h3><p>多个并发执行的进程共同使用同一系统资源，比如内存</p>
 <blockquote>
 <p>互斥共享：同一时刻只有一个进程可以访问，需要同步机制来实现互斥。互斥的资源成为<strong>临界资源</strong>。e.g.:摄像头</p>
@@ -238,39 +238,70 @@
 <p><strong>时分复用</strong>（把时间段分片）；<strong>空分复用</strong>（把较宽的信道分成多个较窄的信道）</p>
 <p>空分复用 e.g.：需要100M内存的程序只用30M的内存，因为程序总是趋向于使用最近使用过的数据和指令，所以内存中只存放一部分，用完内存中这部分或必须要用内存中没有的数据，则把其他部分换进来</p>
 </blockquote>
+<blockquote>
 <p>相关：虚拟内存，内存映射…</p>
-<h3 id="异步"><a href="#异步" class="headerlink" title="异步"></a>异步</h3><p>因为任务多，资源少的情况，所以进程通常都是走走停停的方式进行。</p>
-<h1 id="进程管理"><a href="#进程管理" class="headerlink" title="进程管理"></a>进程管理</h1><blockquote>
-<p>进程：程序的执行过程，是暂时的。 （也可以说包含正在运行的程序实体和其占据的所有系统资源, CPU,内存,网络）</p>
 </blockquote>
-<p>多任务系统中用于管理CPU的时间片分配</p>
-<p>进程又可以有多个线程，需要操作系统来执行上下文切换，让多个进程/线程使用同一个CPU资源</p>
-<h1 id="CPU"><a href="#CPU" class="headerlink" title="CPU"></a>CPU</h1><p><strong>Register</strong> ：寄存器，是CPU对接收到的信息直接处理的地方</p>
+<h3 id="异步"><a href="#异步" class="headerlink" title="异步"></a>异步</h3><p>因为任务多，资源少的情况，所以进程通常都是走走停停的方式进行。</p>
+<h1 id="CPU"><a href="#CPU" class="headerlink" title="CPU"></a>CPU</h1><blockquote>
+<p><strong>Register</strong> ：寄存器，是CPU对接收到的信息直接处理的地方</p>
 <p><strong>word</strong>：字，MIPS指令集术语，一个32bit的二进制串，组成一个word，一个register可load一个word，一个instruction可以是一个word</p>
 <p><strong>Instruction</strong>：指令，32位的cpu通常就是指这个instruction的长度为32bit</p>
-<h1 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h1><p>内存本来是存放正在运行的程序，但是因为内存大小等原因，只能把必须的、使用频繁的部分放入内存，内存满了就在内存中删除非必须的，加载必须的数据。</p>
-<blockquote>
-<p>RAM（Random Access Memory）：随机读写存储，主内存</p>
-<p>ROM（Read Only Memory）：只读内存，比如主板上用来存放BIOS程序。</p>
 </blockquote>
-<p>首先，CPU是通过地址从<code>RAM/ROM/外设</code>中获取数据（程序、数据）以执行/运算；CPU能识别多大范围内的地址，取决于CPU的</p>
-<h3 id="寻址空间"><a href="#寻址空间" class="headerlink" title="寻址空间"></a>寻址空间</h3><p>32位CPU， 理论上 寻址空间 2^32, 4GB（32bit，可以表示2^32^种可能嘛(不是4GByte)）</p>
+<h2 id="寻址空间"><a href="#寻址空间" class="headerlink" title="寻址空间"></a>寻址空间</h2><p>32位CPU， 理论上 寻址空间 2^32, 4GB（32bit，可以表示2^32^种可能嘛(不是4GByte)）</p>
 <p>64位CPU， 理论上 寻址空间 2^64, 16EB = 160亿GB（只是理论上支持，但是大多64位PC也只能到32GB）</p>
 <p>但实际寻址空间还取决于<strong>总线宽度</strong>，而且一般没有那么大内存，64位机器常用的也就<code>2^42~2^47</code>（<code>4T~</code>）吧</p>
-<p>如果执行的程序都放进内存，可能会导致内存不够用，</p>
-<blockquote>
-<p>而且程序总是趋向于使用最近使用过的数据和指令</p>
+<h1 id="内核态-用户态"><a href="#内核态-用户态" class="headerlink" title="内核态 / 用户态"></a>内核态 / 用户态</h1><p>内核态：操作系统管理程序运行时的状态。运行在内核态的程序可以访问计算机的任何资源，比如协调CPU，分配内存资源；</p>
+<p>用户态：应用程序运行时的状态。用户态的程序只能访问当前CPU上执行的程序所在的地址空间。</p>
+<p>区分内核态和用户态是为了<strong>安全，控制权限，保护操作系统程序</strong>。</p>
+<p>OS在内核态会在合适的情况（比如执行完某IO命令）把CPU使用权还给应用程序，即转换回用户态。但是从用户态转换到内核态，只能通过<a href="#%E4%B8%AD%E6%96%AD%E6%9C%BA%E5%88%B6">中断机制</a>来实现。</p>
+<h1 id="进程管理"><a href="#进程管理" class="headerlink" title="进程管理"></a>进程管理</h1><blockquote>
+<p>进程：程序的执行过程，是暂时的。 （也可以说包含正在运行的程序实体和其占据的所有系统资源, CPU,内存,网络）</p>
+<p>进程又可以有多个线程，需要操作系统来执行上下文切换，让多个进程/线程使用同一个CPU资源</p>
 </blockquote>
-<p>所以使用了<strong>虚拟内存</strong>技术，<strong>让程序看起来内存空间足够大并且可用地址是连续的</strong></p>
-<h3 id="虚拟内存（线性地址）（虚拟地址空间）"><a href="#虚拟内存（线性地址）（虚拟地址空间）" class="headerlink" title="虚拟内存（线性地址）（虚拟地址空间）"></a>虚拟内存（线性地址）（虚拟地址空间）</h3><blockquote>
-<p>最大的地址空间和实际系统有多少物理内存无关，也因此称为虚拟地址空间，内核把物理空间再抽象出一层，供应用程序使用</p>
-<p>Linux是通过段页机制来讲虚拟地址和物理地址进行映射。</p>
+<h3 id="内核空间-用户空间"><a href="#内核空间-用户空间" class="headerlink" title="内核空间 / 用户空间"></a>内核空间 / 用户空间</h3><p>[内核态 / 用户态](#内核态 / 用户态)</p>
+<h3 id="中断机制"><a href="#中断机制" class="headerlink" title="中断机制"></a>中断机制</h3><p>中断可以分为</p>
+<ul>
+<li>内中断：中断信号来源于CPU内部，如地址越界、除数为0；</li>
+<li>外中断：如IO完成、时钟中断（线程切换）、控制台中断（Ctrl+C）</li>
+</ul>
+<p>触发中断的条件：程序需要请求操作系统帮忙比如IO、IO操作完成、程序异常（需要异常处理程序工作）</p>
+<h3 id="进程切换"><a href="#进程切换" class="headerlink" title="进程切换"></a>进程切换</h3><p>多任务系统中用于管理CPU的时间片分配，OS<strong>内核</strong>必须有能力挂起正在 CPU 上运行的进程，并恢复以前挂起的某个进程的执行。</p>
+<h3 id="进程阻塞"><a href="#进程阻塞" class="headerlink" title="进程阻塞"></a>进程阻塞</h3><p>正在执行的进程，<code>请求系统资源失败</code>、<code>等待某种操作的完成</code>、<code>新数据尚未到达</code>或<code>无新任务可以执行</code>等，则由系统自动执行阻塞原语(<code>Block</code>)，使自己由运行状态变为阻塞状态。</p>
+<p>是进程自身的一种主动行为，只有处于运行态的进程（获得CPU），才可能将其转为阻塞状态。<code>当进程进入阻塞状态，会释放CPU资源</code></p>
+<h3 id="缓存IO"><a href="#缓存IO" class="headerlink" title="缓存IO"></a>缓存IO</h3><blockquote>
+<p>缓存 IO 又被称作标准 IO，大多数文件系统的默认 IO 操作都是缓存 IO</p>
 </blockquote>
-<p>虚拟内存抽象了物理内存的使用，上层（应用）调用的时候使用虚拟地址，让CPU转换成实际的物理地址再去访问内存。</p>
+<p>在 Linux 的缓存 IO 机制中，OS会将 IO 的数据缓存在文件系统的页缓存<code>page cache</code>(在内存中)中，也就是说：</p>
 <blockquote>
-<p>MMU（内存管理单元）：CPU中用来管理虚拟存储器、物理存储器的控制线路，同时也<strong>负责虚拟地址映射为物理地址</strong>，以及提供硬件机制的内存访问授权</p>
+<p>数据会先被拷贝到<code>操作系统内核的缓冲区</code>中（disk -&gt; memory）</p>
+<p>然后才会从<code>操作系统内核的缓冲区</code>拷贝到<code>应用程序的地址空间</code>（用户态，虚拟地址对应的物理地址）</p>
+</blockquote>
+<p>也就是需要 两次拷贝，这些数据拷贝操作所带来的 CPU 以及内存开销非常大，</p>
+<p>所以很多应用程序会利用<a href="#%E9%9B%B6%E6%8B%B7%E8%B4%9D">零拷贝</a>技术来避免这种多次拷贝操作的发生以提高性能。</p>
 <blockquote>
-<p>CPU通过TLB（Translation Lookaside Buffer，转换检测缓冲区）提升虚拟地址到物理地址的转换速度</p>
+<p>补充：（个人理解是这样）</p>
+<p>page cache：页缓存，用来存储文件数据中的业务数据部分。重点是cache（缓存）</p>
+<p>buffer cache：针对磁盘块的缓存，存储任意一个扇区的数据。重点是buffer（缓冲），比如MySQL的插入缓冲，读写的时候 放到buffer中，然后由OS决定何时刷到磁盘。</p>
+<blockquote>
+<p>也就是说在没有文件系统的情况下（准确的表达是，无论有否文件系统的存在，设备驱动程序读取的数据（也即直接对磁盘进行操作的数据）都是缓存到buffer cache中的），直接对磁盘进行操作的数据会缓存到buffer cache中，例如，文件系统的元数据都会缓存到buffer cache中</p>
+</blockquote>
+</blockquote>
+<h1 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h1><p>内存 本来存放的是正在运行的程序相关的数据，但是因为物理内存大小限制，只能把必须的、使用频繁的部分放入内存，内存满了就在内存中删除非必须的，加载必须的数据。</p>
+<blockquote>
+<p>RAM（<strong>Random Access</strong> Memory）：随机读写存储，主内存</p>
+<p>ROM（<strong>Read Only</strong> Memory）：只读内存，比如主板上用来存放BIOS程序。</p>
+</blockquote>
+<p>首先，CPU是通过地址从<code>RAM/ROM/外设</code>中获取数据（程序、数据）以执行/运算；CPU能识别多大范围内的地址，取决于CPU的<a href="#%E5%AF%BB%E5%9D%80%E7%A9%BA%E9%97%B4">寻址空间</a></p>
+<p>如果执行的程序都放进内存，可能会导致内存不够用，所以使用了<a href="#%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98">虚拟内存</a>技术，<strong>让程序看起来内存空间足够大并且可用地址是连续的</strong></p>
+<h3 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h3><p>又叫 <code>线性地址</code>、<code>虚拟地址空间</code></p>
+<p>OS使用<code>虚拟内存</code>抽象了物理内存的使用，上层（应用）调用的时候使用虚拟地址，让CPU转换成实际的物理地址再去访问内存。</p>
+<blockquote>
+<p>最大的地址空间和实际系统有多少物理内存无关，也因此称为<strong>虚拟</strong>地址空间。Linux是通过<strong>段页机制</strong>来将虚拟地址和物理地址进行映射。</p>
+</blockquote>
+<blockquote>
+<p><strong>MMU</strong>（内存管理单元）：CPU中用来管理虚拟存储器、物理存储器的控制线路，同时也<strong>负责虚拟地址映射为物理地址</strong>，以及提供硬件机制的内存访问授权</p>
+<blockquote>
+<p>CPU通过<strong>TLB</strong>（Translation Lookaside Buffer，转换检测缓冲区）提升虚拟地址到物理地址的转换速度</p>
 </blockquote>
 </blockquote>
 <h3 id="Linux内核空间"><a href="#Linux内核空间" class="headerlink" title="Linux内核空间"></a>Linux内核空间</h3><p>Linux会给程序分配4G（2^32）的虚拟地址空间，这4G又分为3G用户空间和1G内核空间（只能在内核态访问）（Windows为2:2），</p>
@@ -278,29 +309,18 @@
 <p>使用命令<code>cat /proc/cpuinfo</code> 可以查看到 <code>address sizes   : 36 bits physical, 48 bits virtual</code> （在win10的Ubuntu子系统中）</p>
 <p>2^32^物理地址空间，2^48^虚拟地址空间</p>
 </blockquote>
-<h1 id="IO设备管理"><a href="#IO设备管理" class="headerlink" title="IO设备管理"></a>IO设备管理</h1><p>对IO设备（磁盘）的高层次抽象。</p>
-<p>操作系统向I/O设备发送命令，比如访问设备、读写数据、读写设备配置，还要捕捉中断，处理设备的错误，并提供设备功能的抽象。</p>
-<h1 id="文件管理"><a href="#文件管理" class="headerlink" title="文件管理"></a>文件管理</h1><p>将硬盘的扇区组织成文件系统，实现文件读写操作</p>
-<p>比如 win使用NTFS、FAT32、FAT16；macOS使用APFS（apple file system）；linux使用EXT2 等等</p>
-<h1 id="内核态-用户态"><a href="#内核态-用户态" class="headerlink" title="内核态 / 用户态"></a>内核态 / 用户态</h1><p>内核态：操作系统管理程序运行时的状态。运行在内核态的程序可以访问计算机的任何资源，比如协调CPU，分配内存资源；</p>
-<p>用户态：应用程序运行时的状态。用户态的程序只能访问当前CPU上执行的程序所在的地址空间。</p>
-<p>区分内核态和用户态是为了<strong>安全，控制权限，保护操作系统程序</strong>。</p>
-<p>OS在内核态会在合适的情况（比如执行完某IO命令）把CPU使用权还给应用程序，即转换回用户态。但是从用户态转换到内核态，只能通过<strong>中断</strong>来实现。</p>
-<h3 id="中断机制"><a href="#中断机制" class="headerlink" title="中断机制"></a>中断机制</h3><p>中断包括很多，比如 程序需要请求操作系统帮忙比如IO、IO操作完成、程序异常（需要异常处理程序工作）。。</p>
-<p>中断可以分为</p>
-<ul>
-<li>内中断：中断信号来源于CPU内部，如地址越界、除数为0；</li>
-<li>外中断：如IO完成、时钟中断（线程切换）、控制台中断（Ctrl+C）</li>
-</ul>
-<h1 id="内存映射-mmap（Memory-Map）"><a href="#内存映射-mmap（Memory-Map）" class="headerlink" title="内存映射 mmap（Memory Map）"></a>内存映射 mmap（Memory Map）</h1><blockquote>
-<p>底层的一个函数 mmap()</p>
+<h2 id="内存映射-mmap（Memory-Map）"><a href="#内存映射-mmap（Memory-Map）" class="headerlink" title="内存映射 mmap（Memory Map）"></a>内存映射 mmap（Memory Map）</h2><blockquote>
+<p>底层的一个函数 <code>mmap()</code></p>
 </blockquote>
-<p>用mmap映射一个设备，意味着<strong>使用户空间的一段地址关联到设备内存上</strong>，这使得只要程序在分配的地址范围内进行读取或者写入，实际上就是对设备的访问。这种数据传输是直接的，不需要用到内核空间作为数据转移的中间站。</p>
-<p>remap_page_range()函数的功能是构造用于映射一段物理地址的新页表，<strong>实现了内核空间与用户空间的映射</strong>。在内核<strong>驱动程序的初始化阶段</strong>，通过<strong>ioremap()将物理地址映射到内核虚拟空间</strong>；在驱动程序的<strong>mmap系统调用中</strong>，使用remap_page_range()将该<strong>块ROM映射到用户虚拟空间</strong>。这样内核空间和用户空间都能访问这段被映射后的虚拟地址。</p>
+<p>用mmap映射一个设备，意味着<strong>使用户空间的一段地址（线性地址）联到设备内存上</strong>，这使得只要程序在分配的地址范围内进行读取或者写入，实际上就是对设备的访问。这种数据传输是直接的，不需要用用到<a href="#%E7%BC%93%E5%AD%98IO">缓存IO</a>。</p>
+<p><code>remap_page_range()</code>函数的功能是<code>构造用于映射一段物理地址的新页表</code>，<strong>实现了内核空间与用户空间的映射</strong>。</p>
+<p>在内核<strong>驱动程序的初始化阶段</strong>，通过<code>ioremap()</code><strong>将物理地址映射到内核虚拟空间</strong>；</p>
+<p>在驱动程序的<code>mmap()</code>系统调用中，使用<code>remap_page_range()</code>将<strong>该块ROM映射到用户虚拟空间</strong>。这样内核空间和用户空间都能访问这段被映射后的虚拟地址。</p>
 <ul>
-<li>read()是系统调用，步骤1）从硬盘拷贝到内核缓冲区(内核空间)，2）从内核空间拷贝到用户空间；</li>
+<li>read()是系统调用，步骤：1）从硬盘拷贝到内核缓冲区(内核空间)，2）从内核空间拷贝到用户空间；</li>
 <li>有了虚拟内存空间，则**mmap()**返回一个虚拟空间的指针<code>ptr</code>，指向进程逻辑空间中的一个地址，若要操作其中数据，必须由MMU将逻辑地址转换为物理地址<code>（如果没能找到对应的物理地址，会引发缺页中断，响应中断的函数会在swap中寻找对应的数据页，如果找不到，就会使用mmap()建立映射关系，将硬盘文件读取到物理内存中）</code>。</li>
 </ul>
+<p>todo  <a target="_blank" rel="noopener" href="https://www.jianshu.com/p/096e1b58c678">https://www.jianshu.com/p/096e1b58c678</a></p>
 <h3 id="零拷贝"><a href="#零拷贝" class="headerlink" title="零拷贝"></a>零拷贝</h3><p>从代码层面上看，从硬盘上将文件读入内存，都要经过文件系统进行数据拷贝，并且数据拷贝操作是由文件系统和硬件驱动实现的，理论上来说，拷贝数据的效率是一样的。但</p>
 <blockquote>
 <p>是通过内存映射的方法访问硬盘上的文件，效率要比read和write系统调用高，这是为什么呢？</p>
@@ -318,7 +338,11 @@
 <p>如果这块内存需要被使用，再通过缺页异常，把磁盘中那部分数据刷回内存</p>
 </blockquote>
 <p>Linux内核就是维护了一张表来记录每一页存储在物理内存还是交换空间(磁盘)。</p>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/73453720">https://zhuanlan.zhihu.com/p/73453720</a></p>
+<h1 id="IO设备管理"><a href="#IO设备管理" class="headerlink" title="IO设备管理"></a>IO设备管理</h1><p>对IO设备（磁盘）的高层次抽象。</p>
+<p>操作系统向I/O设备发送命令，比如访问设备、读写数据、读写设备配置，还要捕捉中断，处理设备的错误，并提供设备功能的抽象。</p>
+<h1 id="文件管理"><a href="#文件管理" class="headerlink" title="文件管理"></a>文件管理</h1><p>将硬盘的扇区组织成文件系统，实现文件读写操作</p>
+<p>比如 win使用NTFS、FAT32、FAT16；macOS使用APFS（apple file system）；linux使用EXT2 等等</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/73453720">https://zhuanlan.zhihu.com/p/73453720</a></p>
 <p><a target="_blank" rel="noopener" href="https://xie.infoq.cn/article/19ac8a31e0f4c3869846b5530">https://xie.infoq.cn/article/19ac8a31e0f4c3869846b5530</a></p>
 <p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/67059173">https://zhuanlan.zhihu.com/p/67059173</a></p>
 <p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/116896185">https://zhuanlan.zhihu.com/p/116896185</a></p>
@@ -341,7 +365,17 @@
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
+                      <a class="hover-with-bg" href="/blog/tags/select/">select</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/epoll/">epoll</a>
+                    
                       <a class="hover-with-bg" href="/blog/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/%E9%9B%B6%E6%8B%B7%E8%B4%9D/">零拷贝</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">IO多路复用</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/poll/">poll</a>
                     
                   </div>
                 

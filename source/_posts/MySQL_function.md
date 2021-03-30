@@ -2,6 +2,8 @@
 title: Mysql function应用
 categories:
   - [DB,MySQL]
+date: 2021/01/01 20:46:25
+updated: 2021/01/01 20:46:25
 ---
 
 

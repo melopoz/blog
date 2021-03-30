@@ -1,0 +1,579 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/favicon.png">
+  <link rel="icon" type="image/png" href="/blog/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Although things are always not as you wish, but effort will be lucy!">
+  <meta name="author" content="melopoz">
+  <meta name="keywords" content="">
+  <title>I/O多路复用 - 你不喜欢孤独 那就别停下来</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/blog/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.1.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"melopoz.github.io","root":"/blog/","version":"1.8.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"copy_btn":true,"image_zoom":{"enable":true},"lazyload":{"enable":true,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/blog/">&nbsp;<strong>Fluid</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/blog/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="I/O多路复用">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-03-30 15:00" pubdate>
+        2021年3月30日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.7k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      20
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">I/O多路复用</h1>
+            
+            <div class="markdown-body">
+              <p>简单说 IO：读取/写入 若干字节 从/到 <strong>单个文件描述符</strong></p>
+<ul>
+<li><p>阻塞 / 非阻塞</p>
+<ul>
+<li><p>阻塞：如果文件描述符不处于就绪状态则<strong>阻塞直到其就绪</strong></p>
+</li>
+<li><p>非阻塞：如果文件描述符不处于就绪状态则<strong>返回一个错误码</strong>，比如 <code>EAGAIN</code></p>
+</li>
+</ul>
+</li>
+<li><p>同步 / 异步</p>
+<blockquote>
+<p>同步和异步 是指 函数返回之时， 能不能保证任务完成。</p>
+<p>比如调用了read()直接返回了一个Future对象，你需要再调Future的函数来获取read()的结果。</p>
+</blockquote>
+<ul>
+<li>同步 IO 操作将导致请求的进程一直被阻塞，直到 IO 操作完成。从这个层次来，阻塞 IO、非阻塞 IO 操作、IO 多路复用都是同步 IO</li>
+<li>异步 IO 操作不会导致请求的进程被阻塞。当发出 IO 操作请求，直接返回，等待 IO 操作完成后，再通知调用进程。</li>
+</ul>
+</li>
+<li><p>I/O多路复用</p>
+<p>比如Linux的select/poll/epoll，macOS的kqueue</p>
+<p>I/O多路复用是通过一种机制，可以<strong>监视多个fd</strong>，一旦某个fd就绪（读就绪/写就绪），能够通知程序进行相应的读写操作。</p>
+<blockquote>
+<p>通知 也就是线程间的通信了，像future那种也就是通过共享变量喽</p>
+</blockquote>
+</li>
+</ul>
+<h4 id="几种IO多路复用"><a href="#几种IO多路复用" class="headerlink" title="几种IO多路复用"></a>几种IO多路复用</h4><p>阻塞IO 处理一个IO就阻塞，所以一个线程只能处理一个fd，如果想要同时处理多个就得开多个线程， 效率不高消耗还大。</p>
+<p>非阻塞IO 就得轮询所有你关注的fd，查看他们是否准备好了</p>
+<ul>
+<li><p>忙轮询</p>
+<p>无一例外从头到尾闷头轮询，如果长时间没有fd就绪，就相当于一直空轮询了</p>
+</li>
+<li><p>无差别轮询</p>
+<p>让一个代理去轮询，如果没有就绪的事件，就阻塞当前线程，直到关注的fd中有就绪事件，在linux中这个代理就是 select/poll</p>
+<pre><code class="hljs c"><span class="hljs-keyword">while</span> <span class="hljs-literal">true</span> &#123;
+    select(streams[]) <span class="hljs-comment">// 这里如果没有就绪的时间就阻塞</span>
+    <span class="hljs-keyword">for</span> i in streams[] &#123;
+        <span class="hljs-keyword">if</span> i has data
+            read until unavailable<span class="hljs-comment">//这里处理fd的时候还要注意 是不是已经处理过了 如果read()可能会一直阻塞下去，因为可能已经被其他人处理</span>
+    &#125;
+&#125;</code></pre>
+
+<p>如果streams[]中有就绪的流，就会唤醒当前线程，如果100个stream中只有1个stream就绪了，我们还是要遍历这100个stream，时间复杂度永远是O(n)，处理的流越多，性能就越慢。</p>
+</li>
+<li><p>最小轮询 epoll</p>
+<p>可以比 无差别轮询 监听更多的fd</p>
+<pre><code class="hljs c"><span class="hljs-keyword">while</span> <span class="hljs-literal">true</span> &#123;
+    active_stream[] = epoll_wait(epollfd)<span class="hljs-comment">// 阻塞 直到有事件就绪；只返回已经就绪的事件；epollfd-关注的文件描述符</span>
+    <span class="hljs-keyword">for</span> i in active_stream[] &#123;
+        read <span class="hljs-keyword">or</span> write till unavailable
+    &#125;
+&#125;</code></pre>
+
+
+
+</li>
+</ul>
+<h4 id="I-O多路复用的优势"><a href="#I-O多路复用的优势" class="headerlink" title="I/O多路复用的优势"></a>I/O多路复用的优势</h4><p>并不是对于单个连接能处理的更快，而是在于可以在单个线程/进程中处理更多的连接。</p>
+<blockquote>
+<p>异步处理的是比较快，但是整体性能来看，上下文切换的损耗不得不考虑一下</p>
+</blockquote>
+<h4 id="本质还是同步IO"><a href="#本质还是同步IO" class="headerlink" title="本质还是同步IO"></a>本质还是同步IO</h4><p>IO多路复用(select/poll/epoll) 本质上都是同步I/O，因为他们都需要在读写事件就绪后自己负责进行读写，也就是说这个读写过程是阻塞的</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/chewbee/article/details/78108223">https://blog.csdn.net/chewbee/article/details/78108223</a></p>
+<p>有更详细的 select/poll/epoll 函数原型的介绍</p>
+</blockquote>
+<h4 id="使用epoll的例子"><a href="#使用epoll的例子" class="headerlink" title="使用epoll的例子"></a>使用epoll的例子</h4><p>可以监视多个fd上发生的指定的n种事件，获取到这些事件然后做相应的处理，比如epoll的使用一般都是这个框架</p>
+<pre><code class="hljs c++"><span class="hljs-keyword">for</span>( ; ; )
+    &#123;
+        nfds = <span class="hljs-built_in">epoll_wait</span>(epfd,events,<span class="hljs-number">20</span>,<span class="hljs-number">500</span>);<span class="hljs-comment">//阻塞 直到有事件（就绪的io）</span>
+        <span class="hljs-keyword">for</span>(i=<span class="hljs-number">0</span>;i&lt;nfds;++i)
+        &#123;
+            <span class="hljs-keyword">if</span>(events[i].data.fd==listenfd) <span class="hljs-comment">//有新的连接</span>
+            &#123;
+                connfd = <span class="hljs-built_in">accept</span>(listenfd,(sockaddr *)&amp;clientaddr, &amp;clilen); <span class="hljs-comment">//accept这个连接</span>
+                ev.data.fd=connfd;
+                ev.events=EPOLLIN|EPOLLET;
+                <span class="hljs-built_in">epoll_ctl</span>(epfd,EPOLL_CTL_ADD,connfd,&amp;ev); <span class="hljs-comment">//将新的fd添加到epoll的监听队列中</span>
+            &#125;
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>( events[i].events&amp;EPOLLIN ) <span class="hljs-comment">//接收到数据，读socket</span>
+            &#123;
+                n = <span class="hljs-built_in">read</span>(sockfd, line, MAXLINE)) &lt; <span class="hljs-number">0</span>    <span class="hljs-comment">//读</span>
+                ev.data.ptr = md;     <span class="hljs-comment">//md为自定义类型，添加数据</span>
+                ev.events=EPOLLOUT|EPOLLET;
+                <span class="hljs-built_in">epoll_ctl</span>(epfd,EPOLL_CTL_MOD,sockfd,&amp;ev);<span class="hljs-comment">//修改标识符，等待下一个循环时发送数据，异步处理的精髓</span>
+            &#125;
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(events[i].events&amp;EPOLLOUT) <span class="hljs-comment">//有数据待发送，写socket</span>
+            &#123;
+                struct myepoll_data* md = (myepoll_data*)events[i].data.ptr;    <span class="hljs-comment">//取数据</span>
+                sockfd = md-&gt;fd;
+                <span class="hljs-built_in">send</span>( sockfd, md-&gt;ptr, <span class="hljs-built_in">strlen</span>((<span class="hljs-keyword">char</span>*)md-&gt;ptr), <span class="hljs-number">0</span> );        <span class="hljs-comment">//发送数据</span>
+                ev.data.fd=sockfd;
+                ev.events=EPOLLIN|EPOLLET;
+                <span class="hljs-built_in">epoll_ctl</span>(epfd,EPOLL_CTL_MOD,sockfd,&amp;ev); <span class="hljs-comment">//修改标识符，等待下一个循环时接收数据</span>
+            &#125;
+            <span class="hljs-keyword">else</span>
+            &#123;
+                <span class="hljs-comment">//其他的处理</span>
+            &#125;
+        &#125;
+    &#125;</code></pre>
+
+<blockquote>
+<p>这里也有关于epoll的参数介绍 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/fnlingnzb-learner/p/5835573.html">https://www.cnblogs.com/fnlingnzb-learner/p/5835573.html</a></p>
+</blockquote>
+<h4 id="关于linux-select-的一个问题"><a href="#关于linux-select-的一个问题" class="headerlink" title="关于linux select()的一个问题"></a>关于linux select()的一个问题</h4><p>问题  <a target="_blank" rel="noopener" href="https://www.zhihu.com/question/37271342">https://www.zhihu.com/question/37271342</a></p>
+<blockquote>
+<p>假如我调用了一个 select 函数，并且关注了几个fd， select 函数就会一直阻塞直到我关注的事件发生. 假如当有套接口可读时， select 函数就返回了，告诉我们套接口已经可读，然后我们去读这个套接口，可以用阻塞的read或者非阻塞的 read，阻塞 read 是无数据可读就阻塞进程，非阻塞 read是无数据可读就返回一个 EWOULDBLOCK 错误。那么问题来了：既然 select 都返回可读了，那就表示一定能读了，阻塞函数read也就能读取了也就不会阻塞了，非阻塞read的话，也有数据读了，也不会返回错误了，那么这俩不都一样了？一样直接读取数据知道读完，为什么还得用非阻塞函数？还有 Reactor 模式也是用的 IO 多路复用与非阻塞 IO，这是什么道理呢？</p>
+</blockquote>
+<p>答案</p>
+<blockquote>
+<ol>
+<li><blockquote>
+<p>Under Linux, select() may report a socket file descriptor as “ready for reading”, while nevertheless a subsequent read blocks.  This could for example happen when data has arrived but upon examination has wrong checksum and is discarded.  There may be other circumstances in which a file descriptor is spuriously reported  as ready.  Thus it  may be safer to use O_NONBLOCK on sockets that should not block.</p>
+<p>链接：<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/37271342/answer/81808421">https://www.zhihu.com/question/37271342/answer/81808421</a></p>
+</blockquote>
+<p>Linux环境下, select()可能收到socket fd回复的“读就绪”, 紧接着read()会阻塞。这可能因为数据准备完成之后发生了错误被丢弃了。 其他情况下fd可能被错误地报告为“读就绪”。所以在不该阻塞的IO操作中 还是用非阻塞比较安全。</p>
+</li>
+<li><p>select()返回可读之后就直接去read()并不一定能读取到数据，select()内部调用fd是否就绪 和 调用read() 是两次系统调用，这之间是可能有其他事件发生的，</p>
+<p>举个例子： 惊群现象，投一粒米，所有鸽子都来吃，只有一个吃到，然后所有鸽子都得回去睡觉。</p>
+<p>这个可读的数据可能就是已经被其他进程/线程读完了。</p>
+<p>链接：<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/37271342/answer/81757593">https://www.zhihu.com/question/37271342/answer/81757593</a></p>
+</li>
+</ol>
+</blockquote>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/categories/OS/">OS</a>
+                    
+                      <a class="hover-with-bg" href="/blog/categories/IO/">IO</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/IO/">IO</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/select/">select</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/epoll/">epoll</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2021/03/30/HTTPS/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">HTTPS</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2021/03/30/IP%E5%9C%B0%E5%9D%80/">
+                        <span class="hidden-mobile">关于IP地址</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":200})
+    NProgress.start()
+    document.addEventListener('DOMContentLoaded', function() {
+      window.NProgress && window.NProgress.inc();
+    })
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.staticfile.org/jquery/3.5.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/debouncer.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/blog/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.12.0/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/blog/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/blog/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+
+</body>
+</html>

@@ -181,19 +181,22 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/29/HTTPS/">HTTPS</a>
+        <a href="/blog/2021/03/30/%E4%B8%80%E8%87%B4%E6%80%A7hash/">一致性hash</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/29/HTTPS/">
+        <a href="/blog/2021/03/30/%E4%B8%80%E8%87%B4%E6%80%A7hash/">
           
           
             
           
-          HTTPTCP三次握手
-client 发送 SYN(seq=x) 到 server;   client进入SYN_SEND状态
-server 收到并回应 SYN(seq=y), ACK(seq=x+1);   server进入SYN_RECV状态
-client 收到 server 的SYN报文, 回应一个 ACK(seq=y+1) client发送完进入ESTABLISHED状态, server收
+          哈希算法https://blog.csdn.net/cywosp/article/details/23397179
+哈希算法Hash，也叫摘要算法Digest
+
+输入一组任意长度的数据，计算得到一个固定长度的摘要数据。
+
+java中重写equals()方法,为什么要重写hashCode()?
+如果只是重写equals(), equals()=true，但hashCode()==false,这有悖于
         </a>
       </p>
 
@@ -201,7 +204,7 @@ client 收到 server 的SYN报文, 回应一个 ACK(seq=y+1) client发送完进�
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-30 02:25" pubdate>
+            <time datetime="2021-03-30 15:00" pubdate>
               2021-03-30
             </time>
           </div>
@@ -210,7 +213,9 @@ client 收到 server 的SYN报文, 回应一个 ACK(seq=y+1) client发送完进�
           <div class="post-meta mr-3">
             <i class="iconfont icon-category"></i>
             
-              <a href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a>
+              <a href="/blog/categories/algorithm/">algorithm</a>
+            
+              <a href="/blog/categories/algorithm/hash/">hash</a>
             
           </div>
         
@@ -218,11 +223,13 @@ client 收到 server 的SYN报文, 回应一个 ACK(seq=y+1) client发送完进�
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/blog/tags/%E5%AE%89%E5%85%A8/">安全</a>
+              <a href="/blog/tags/%E6%91%98%E8%A6%81%E7%AE%97%E6%B3%95/">摘要算法</a>
             
-              <a href="/blog/tags/%E5%8A%A0%E5%AF%86/">加密</a>
+              <a href="/blog/tags/algorithm/">algorithm</a>
             
-              <a href="/blog/tags/%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86/">非对称加密</a>
+              <a href="/blog/tags/hash/">hash</a>
+            
+              <a href="/blog/tags/redis/">redis</a>
             
           </div>
         
@@ -236,30 +243,23 @@ client 收到 server 的SYN报文, 回应一个 ACK(seq=y+1) client发送完进�
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/29/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">I/O多路复用</a>
+        <a href="/blog/2021/03/30/%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E7%AE%97%E6%B3%95/">内存分配算法</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/29/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">
+        <a href="/blog/2021/03/30/%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E7%AE%97%E6%B3%95/">
           
           
             
           
-          简单说 IO：读取/写入 若干字节 从/到 单个文件描述符
+          常见的内存分配器实现: jemalloc, ptmalloc, tcmallocptmalloc: per thread malloc
 
-阻塞 / 非阻塞
+基于glibc(glibc是linux系统中最底层的api)实现的, 是一个标准实现, 兼容性好
+由于过于考虑性能, 多线程之间内存不共享, 各线程使用独立内存, 所以在内存开销很大.
 
-阻塞：如果文件描述符不处于就绪状态则阻塞直到其就绪
+tcmalloc: thread caching malloc
 
-非阻塞：如果文件描述符不处于就绪状态则返回一个错误码，比如 EAGAIN
-
-
-
-同步 / 异步
-
-同步和异步 是指 函数返回之时， 能不能保证任务完成。
-比如调用了read()直接返回了一个Future对象，你需要再调Future的函数来获取read()的结果。
-
+为每个线
         </a>
       </p>
 
@@ -267,7 +267,7 @@ client 收到 server 的SYN报文, 回应一个 ACK(seq=y+1) client发送完进�
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-30 02:25" pubdate>
+            <time datetime="2021-03-30 15:00" pubdate>
               2021-03-30
             </time>
           </div>
@@ -278,7 +278,7 @@ client 收到 server 的SYN报文, 回应一个 ACK(seq=y+1) client发送完进�
             
               <a href="/blog/categories/OS/">OS</a>
             
-              <a href="/blog/categories/IO/">IO</a>
+              <a href="/blog/categories/Netty/">Netty</a>
             
           </div>
         
@@ -286,11 +286,11 @@ client 收到 server 的SYN报文, 回应一个 ACK(seq=y+1) client发送完进�
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/blog/tags/IO/">IO</a>
+              <a href="/blog/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
             
-              <a href="/blog/tags/select/">select</a>
+              <a href="/blog/tags/OS/">OS</a>
             
-              <a href="/blog/tags/epoll/">epoll</a>
+              <a href="/blog/tags/netty/">netty</a>
             
           </div>
         
@@ -304,34 +304,24 @@ client 收到 server 的SYN报文, 回应一个 ACK(seq=y+1) client发送完进�
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/29/IP%E5%9C%B0%E5%9D%80/">关于IP地址</a>
+        <a href="/blog/2021/03/30/%E5%B9%82%E7%AD%89%E6%80%A7%E8%AE%BE%E8%AE%A1/">幂等性设计</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/29/IP%E5%9C%B0%E5%9D%80/">
+        <a href="/blog/2021/03/30/%E5%B9%82%E7%AD%89%E6%80%A7%E8%AE%BE%E8%AE%A1/">
           
           
             
           
-          ipv4地址
-比如：192.168.1.1
-转换成二进制
-0000 0000.0000 0000.0000 0000.0000 0000
-​     8   *   4
+          如何保证幂等性
+
+在数据库利用唯一索引。
+
+比如生成订单的时候，不能因为网络延迟而创建两次这个订单，所以可以根据这个订单的唯一id。
+第一个 insert 执行之后已经有了这个订单，下次 insert 的时候会报错，可以直接 try-catch 这个异常，在catch中 select by id 查询这个订单，查询到的结果也就是 insert 的期望结果了。
 
 
-
-ipv4地址类别
-二进制格式
-范围
-
-
-
-
-A类
-0xxx xxxx(1+7位网络号).0000 0000.0000 0000.0000 0000(8*3位主机号)
-1.0.0.0—126.0.0.0
-10.X.X.X是私有
+不过要利用这个唯一索引的话，订单的
         </a>
       </p>
 
@@ -339,7 +329,7 @@ A类
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-30 02:25" pubdate>
+            <time datetime="2021-03-30 15:00" pubdate>
               2021-03-30
             </time>
           </div>
@@ -348,57 +338,9 @@ A类
           <div class="post-meta mr-3">
             <i class="iconfont icon-category"></i>
             
-              <a href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a>
+              <a href="/blog/categories/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/">架构设计</a>
             
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/03/29/JVM_%E5%8F%82%E6%95%B0/">JVM的一些参数</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/03/29/JVM_%E5%8F%82%E6%95%B0/">
-          
-          
-            
-          
-          查看jvm参数(参数默认值): java -XX:+PrintFlagsFinal -version
-查看java进程的参数的配置: jinfo -flags [pid] `
-查看java进程的指定参数的配置: jinfo -flags [option] [pid]
-
-jinfo -flags NewRatio 15222
-
-SoftRefLRUPolicyMSPerMB
-关系到 软引用 再GC发
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-30 02:25" pubdate>
-              2021-03-30
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/Java/">Java</a>
-            
-              <a href="/blog/categories/Java/JVM/">JVM</a>
+              <a href="/blog/categories/%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1/">接口设计</a>
             
           </div>
         
@@ -413,20 +355,21 @@ SoftRefLRUPolicyMSPerMB
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/29/JVM_%E5%AE%89%E5%85%A8%E9%80%80%E5%87%BA/">JVM安全退出</a>
+        <a href="/blog/2021/03/30/%E5%BC%95%E5%AF%BC%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%A4%A7%E6%A6%82%E6%B5%81%E7%A8%8B/">一台计算机供电之后...</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/29/JVM_%E5%AE%89%E5%85%A8%E9%80%80%E5%87%BA/">
+        <a href="/blog/2021/03/30/%E5%BC%95%E5%AF%BC%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%A4%A7%E6%A6%82%E6%B5%81%E7%A8%8B/">
           
           
             
           
-          Shutdown HookSystem.getRuntime().addShutdownHook(Thread thread);
-public class JVMShutdownHook &#123;
-    public static void main(String[] args) throws InterruptedException &#123;
-        //hook
-      
+          给主板供电，让CPU运行BIOS，BIOS会按顺序走引导程序，装系统的时候不就是这样嘛  把macos系统引导放到了win boot前边就默认走macos了，the hackintosh。。
+
+BIOS（Base Input/Output System)一般存在主板的ROM（Read Only Memory）中。
+
+
+总线：数据总线，地址总线，控制总线。  总线其实就是数据线，一根传1位，32位有
         </a>
       </p>
 
@@ -434,7 +377,7 @@ public class JVMShutdownHook &#123;
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-30 02:25" pubdate>
+            <time datetime="2021-03-30 15:00" pubdate>
               2021-03-30
             </time>
           </div>
@@ -443,53 +386,7 @@ public class JVMShutdownHook &#123;
           <div class="post-meta mr-3">
             <i class="iconfont icon-category"></i>
             
-              <a href="/blog/categories/Java/">Java</a>
-            
-              <a href="/blog/categories/Java/JVM/">JVM</a>
-            
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/03/29/JVMjava8%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/">java8内存结构</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/03/29/JVMjava8%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/">
-          
-          
-            
-          
-          
-
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-30 02:25" pubdate>
-              2021-03-30
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/Java/">Java</a>
-            
-              <a href="/blog/categories/JVM/">JVM</a>
+              <a href="/blog/categories/OS/">OS</a>
             
           </div>
         
@@ -497,7 +394,7 @@ public class JVMShutdownHook &#123;
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/blog/tags/JVM/">JVM</a>
+              <a href="/blog/tags/BIOS/">BIOS</a>
             
           </div>
         
@@ -511,22 +408,29 @@ public class JVMShutdownHook &#123;
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/29/Java_AQS%E6%BA%90%E7%A0%81/">AQS-JUC中锁的抽象模板</a>
+        <a href="/blog/2021/03/30/%E6%AD%BB%E9%94%81/">死锁</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/29/Java_AQS%E6%BA%90%E7%A0%81/">
+        <a href="/blog/2021/03/30/%E6%AD%BB%E9%94%81/">
           
           
             
           
-          todo 
-https://www.cnblogs.com/waterystone/p/4920797.html
-AQS源码分析维护一个 volatile int 变量 state 代表加锁状态
-维护一个 队列代表请求锁资源的线程，head持有锁，后边的节点（线程）等待锁
-提供一套模板，实现类必须实现以下方法来实现自己加锁解锁的逻辑：
+          https://blog.csdn.net/hd12370/article/details/82814348
+四个必要条件
+互斥
+请求和保持（占有并等待）
+不可剥夺（不能抢）
+环路等待（循环等待）
 
-boolean tryAcquire(int)：独占式 尝试
+预防死锁
+资源一次性分配（破坏请求条件）
+一次性获取所有资源，不能全部获取就释放所有（破坏保持条件）
+资源有序分配（按照一定算法对资源进行排序，按顺序拿资源）
+资源可抢夺（需要设置优先级）
+
+死锁检测
         </a>
       </p>
 
@@ -534,7 +438,7 @@ boolean tryAcquire(int)：独占式 尝试
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-30 02:25" pubdate>
+            <time datetime="2021-03-30 15:00" pubdate>
               2021-03-30
             </time>
           </div>
@@ -543,21 +447,74 @@ boolean tryAcquire(int)：独占式 尝试
           <div class="post-meta mr-3">
             <i class="iconfont icon-category"></i>
             
-              <a href="/blog/categories/Java/">Java</a>
-            
-              <a href="/blog/categories/Java/JUC/">JUC</a>
+              <a href="/blog/categories/%E5%B9%B6%E5%8F%91/">并发</a>
             
           </div>
         
         
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/JUC/">JUC</a>
             
               <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">并发</a>
             
-              <a href="/blog/tags/%E5%90%8C%E6%AD%A5/">同步</a>
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/30/SpringCloud/">SpringCloud</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/30/SpringCloud/">
+          
+          
+            
+          
+          微服务架构要处理的四个问题：
+api
+通信：http、RPC
+服务注册和发现（解决高可用问题）
+熔断机制
+
+CAP原则：
+C    consistency    强一致性
+A     availability      可用性
+P      partition tolerance      分区容错性  （分区相当于对通信的时限要求）
+
+只能满足其中两点。P：当系统不能在时限内完成数据一致性，就需
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-30 15:00" pubdate>
+              2021-03-30
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
             
           </div>
         
@@ -571,11 +528,79 @@ boolean tryAcquire(int)：独占式 尝试
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/03/29/Java_HashMap&ConcurrentHashMap/">Java_HashMap 不止是HashMap</a>
+        <a href="/blog/2021/03/30/redis/">Redis</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/03/29/Java_HashMap&ConcurrentHashMap/">
+        <a href="/blog/2021/03/30/redis/">
+          
+          
+            
+          
+          配置文件示例
+http://download.redis.io/redis-stable/redis.conf
+
+本地缓存和分布式缓存
+本地缓存，比如java中的map，guava实现，轻量、快速，但是如果有多个实例，就需要每个实例都保存一份缓存，不具有一致性。
+
+
+ 分布式缓存，比如redis、memcached，缓存具有一致性。但是需要保持服务的高可用。
+
+
+redis VS memcache
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-30 15:00" pubdate>
+              2021-03-30
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+            
+              <a href="/blog/categories/NoSQL/">NoSQL</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E4%BD%8D%E5%9B%BE/">位图</a>
+            
+              <a href="/blog/tags/%E7%BC%93%E5%AD%98/">缓存</a>
+            
+              <a href="/blog/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">分布式锁</a>
+            
+              <a href="/blog/tags/%E4%B8%80%E8%87%B4%E6%80%A7hash-%E8%99%9A%E6%8B%9F%E6%A7%BDslot/">一致性hash+虚拟槽slot</a>
+            
+              <a href="/blog/tags/%E9%80%89%E4%B8%BE%E7%AD%96%E7%95%A5/">选举策略</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/03/30/Java_HashMap&ConcurrentHashMap/">Java_HashMap 不止是HashMap</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/03/30/Java_HashMap&ConcurrentHashMap/">
           
           
             
@@ -596,7 +621,7 @@ HashMap
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-03-30 02:25" pubdate>
+            <time datetime="2021-03-30 15:00" pubdate>
               2021-03-30
             </time>
           </div>

@@ -443,7 +443,7 @@ client 收到 server 的SYN报文, 回应一个 ACK(seq=y+1) client发送完进�
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/01/01/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">I/O多路复用</a>
+        <a href="/blog/2021/01/01/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">Linux I/O模型</a>
       </h1>
 
       <p class="index-excerpt">
@@ -452,7 +452,7 @@ client 收到 server 的SYN报文, 回应一个 ACK(seq=y+1) client发送完进�
           
             
           
-          简单说 IO：读取/写入 若干字节 从/到 单个文件描述符
+          I/O 简单点说就是：读取/写入 若干字节 从/到 单个文件描述符
 
 阻塞 / 非阻塞
 
@@ -465,8 +465,7 @@ client 收到 server 的SYN报文, 回应一个 ACK(seq=y+1) client发送完进�
 同步 / 异步
 
 同步和异步 是指 函数返回之时， 能不能保证任务完成。
-比如调用了read()直接返回了一个Future对象，你需要再调Future的函数来获取read()的结果。
-
+比如调用了read()直接返回了一个Future对象，你需要再调Future的函数来获取read()的
         </a>
       </p>
 
@@ -498,6 +497,8 @@ client 收到 server 的SYN报文, 回应一个 ACK(seq=y+1) client发送完进�
               <a href="/blog/tags/select/">select</a>
             
               <a href="/blog/tags/epoll/">epoll</a>
+            
+              <a href="/blog/tags/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">IO多路复用</a>
             
           </div>
         

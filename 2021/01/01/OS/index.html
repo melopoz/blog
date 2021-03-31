@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      4.8k 字
+      5k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      51
+      52
        分钟
     </span>
   
@@ -399,6 +399,12 @@
 <p>操作系统向I/O设备发送命令，比如访问设备、读写数据、读写设备配置，还要捕捉中断，处理设备的错误，并提供设备功能的抽象。</p>
 <h1 id="文件管理"><a href="#文件管理" class="headerlink" title="文件管理"></a>文件管理</h1><p>将硬盘的扇区组织成文件系统，实现文件读写操作</p>
 <p>比如 win使用NTFS、FAT32、FAT16；macOS使用APFS（apple file system）；linux使用EXT2 等等</p>
+<blockquote>
+<p>一个操作系统可以支持多种底层不同的文件系统（比如NTFS, FAT, ext3, ext4），为了给内核和用户进程提供统一的文件系统视图，Linux在用户进程和底层文件系统之间加入了一个抽象层，即<strong>虚拟文件系统(Virtual File System, VFS)</strong></p>
+<p>进程所有的文件操作都通过VFS，由VFS来适配各种底层不同的文件系统，完成实际的文件操作。</p>
+</blockquote>
+<p>Linux 内核 看去吧…</p>
+<p><a target="_blank" rel="noopener" href="https://www.kernel.org/doc/html/v4.14/index.html">https://www.kernel.org/doc/html/v4.14/index.html</a></p>
 
             </div>
             <hr>
@@ -420,11 +426,11 @@
                     
                       <a class="hover-with-bg" href="/blog/tags/epoll/">epoll</a>
                     
+                      <a class="hover-with-bg" href="/blog/tags/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">IO多路复用</a>
+                    
                       <a class="hover-with-bg" href="/blog/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
                     
                       <a class="hover-with-bg" href="/blog/tags/%E9%9B%B6%E6%8B%B7%E8%B4%9D/">零拷贝</a>
-                    
-                      <a class="hover-with-bg" href="/blog/tags/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">IO多路复用</a>
                     
                       <a class="hover-with-bg" href="/blog/tags/poll/">poll</a>
                     

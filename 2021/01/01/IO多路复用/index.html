@@ -17,7 +17,7 @@
   <meta name="description" content="Although things are always not as you wish, but effort will be lucy!">
   <meta name="author" content="melopoz">
   <meta name="keywords" content="">
-  <title>I/O多路复用 - Be your own god.</title>
+  <title>Linux I/O模型 - Be your own god.</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
 
@@ -162,7 +162,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="I/O多路复用">
+            <span class="h2" id="subtitle" title="Linux I/O模型">
               
             </span>
 
@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.7k 字
+      2.1k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      20
+      25
        分钟
     </span>
   
@@ -224,10 +224,10 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">I/O多路复用</h1>
+            <h1 style="display: none">Linux I/O模型</h1>
             
             <div class="markdown-body">
-              <p>简单说 IO：读取/写入 若干字节 从/到 <strong>单个文件描述符</strong></p>
+              <p>I/O 简单点说就是：读取/写入 若干字节 从/到 <strong>单个文件描述符</strong></p>
 <ul>
 <li><p>阻塞 / 非阻塞</p>
 <ul>
@@ -255,7 +255,44 @@
 </blockquote>
 </li>
 </ul>
-<h4 id="几种IO多路复用"><a href="#几种IO多路复用" class="headerlink" title="几种IO多路复用"></a>几种IO多路复用</h4><p>阻塞IO 处理一个IO就阻塞，所以一个线程只能处理一个fd，如果想要同时处理多个就得开多个线程， 效率不高消耗还大。</p>
+<blockquote>
+<p>poll   翻译过来就是轮询。。</p>
+</blockquote>
+<h1 id="Linux-五种-IO模型"><a href="#Linux-五种-IO模型" class="headerlink" title="Linux 五种 IO模型"></a>Linux 五种 IO模型</h1><blockquote>
+<p>用户态的进程调用read() 其实是有<a href="https://melopoz.github.io/blog/2021/01/01/OS/#%E7%BC%93%E5%AD%98IO">缓存IO</a>的，有两次拷贝过程。</p>
+</blockquote>
+<ul>
+<li><p>同步阻塞   <strong>BIO</strong>   blocking IO</p>
+<blockquote>
+<p>用户态阻塞等待内核返回结果，内核阻塞等待读写完毕再返回结果。</p>
+</blockquote>
+</li>
+<li><p>同步非阻塞  <strong>NIO</strong>  non-blocking IO</p>
+<blockquote>
+<p>用户态调用内核会直接得到结果，因为内核不等待读真正完成就返回结果（未完成就返回ERROR）。</p>
+<p>用户态得到的结果如果并不是已完成，就不断轮询，轮询期间可以做别的事情。</p>
+<blockquote>
+<p>非阻塞将<code>大整片时间的阻塞</code>分成<code>N 多的小片时间的阻塞</code>，所以进程不断地有机会拿到CPU时间片。</p>
+</blockquote>
+<p>当用户进程发出 read 操作时，如果 kernel 中的数据还没有准备好，那么它并不会 block 用户进程，而是立刻返回一个 error。从用户进程角度讲，它发起一个 read 操作后，并不需要等待，而是马上就得到了一个结果。用户进程判断结果是一个 error 时，它就知道数据还没有准备好，于是它可以再次发送 read 操作。一旦 kernel 中的数据准备好了，并且又再次收到了用户进程的 system call，那么它马上就将数据拷贝到了用户内存，然后返回。</p>
+<p>所以，nonblocking IO 的特点是用户进程需要不断的主动询问 kernel 数据好了没有。</p>
+</blockquote>
+</li>
+<li><p>IO多路复用</p>
+<blockquote>
+</blockquote>
+</li>
+<li><p>异步非阻塞IO</p>
+<blockquote>
+</blockquote>
+</li>
+<li><p>信号驱动IO</p>
+<blockquote>
+</blockquote>
+</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/486b0965c296">https://www.jianshu.com/p/486b0965c296</a>  todo todo </p>
+<h1 id="几种IO多路复用"><a href="#几种IO多路复用" class="headerlink" title="几种IO多路复用"></a>几种IO多路复用</h1><p>阻塞IO 处理一个IO就阻塞，所以一个线程只能处理一个fd，如果想要同时处理多个就得开多个线程， 效率不高消耗还大。</p>
 <p>非阻塞IO 就得轮询所有你关注的fd，查看他们是否准备好了</p>
 <ul>
 <li><p>忙轮询</p>
@@ -286,16 +323,16 @@
 
 </li>
 </ul>
-<h4 id="I-O多路复用的优势"><a href="#I-O多路复用的优势" class="headerlink" title="I/O多路复用的优势"></a>I/O多路复用的优势</h4><p>并不是对于单个连接能处理的更快，而是在于可以在单个线程/进程中处理更多的连接。</p>
+<h1 id="I-O多路复用的优势"><a href="#I-O多路复用的优势" class="headerlink" title="I/O多路复用的优势"></a>I/O多路复用的优势</h1><p>并不是对于单个连接能处理的更快，而是在于可以在单个线程/进程中处理更多的连接。</p>
 <blockquote>
 <p>异步处理的是比较快，但是整体性能来看，上下文切换的损耗不得不考虑一下</p>
 </blockquote>
-<h4 id="本质还是同步IO"><a href="#本质还是同步IO" class="headerlink" title="本质还是同步IO"></a>本质还是同步IO</h4><p>IO多路复用(select/poll/epoll) 本质上都是同步I/O，因为他们都需要在读写事件就绪后自己负责进行读写，也就是说这个读写过程是阻塞的</p>
+<h1 id="本质还是同步IO"><a href="#本质还是同步IO" class="headerlink" title="本质还是同步IO"></a>本质还是同步IO</h1><p>IO多路复用(select/poll/epoll) 本质上都是同步I/O，因为他们都需要在读写事件就绪后自己负责进行读写，也就是说这个读写过程是阻塞的</p>
 <blockquote>
 <p><a target="_blank" rel="noopener" href="https://blog.csdn.net/chewbee/article/details/78108223">https://blog.csdn.net/chewbee/article/details/78108223</a></p>
 <p>有更详细的 select/poll/epoll 函数原型的介绍</p>
 </blockquote>
-<h4 id="使用epoll的例子"><a href="#使用epoll的例子" class="headerlink" title="使用epoll的例子"></a>使用epoll的例子</h4><p>可以监视多个fd上发生的指定的n种事件，获取到这些事件然后做相应的处理，比如epoll的使用一般都是这个框架</p>
+<h1 id="使用epoll的例子"><a href="#使用epoll的例子" class="headerlink" title="使用epoll的例子"></a>使用epoll的例子</h1><p>可以监视多个fd上发生的指定的n种事件，获取到这些事件然后做相应的处理，比如epoll的使用一般都是这个框架</p>
 <pre><code class="hljs c++"><span class="hljs-keyword">for</span>( ; ; )
     &#123;
         nfds = <span class="hljs-built_in">epoll_wait</span>(epfd,events,<span class="hljs-number">20</span>,<span class="hljs-number">500</span>);<span class="hljs-comment">//阻塞 直到有事件（就绪的io）</span>
@@ -334,7 +371,7 @@
 <blockquote>
 <p>这里也有关于epoll的参数介绍 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/fnlingnzb-learner/p/5835573.html">https://www.cnblogs.com/fnlingnzb-learner/p/5835573.html</a></p>
 </blockquote>
-<h4 id="关于linux-select-的一个问题"><a href="#关于linux-select-的一个问题" class="headerlink" title="关于linux select()的一个问题"></a>关于linux select()的一个问题</h4><p>问题  <a target="_blank" rel="noopener" href="https://www.zhihu.com/question/37271342">https://www.zhihu.com/question/37271342</a></p>
+<h1 id="关于linux-select-的一个问题"><a href="#关于linux-select-的一个问题" class="headerlink" title="关于linux select()的一个问题"></a>关于linux select()的一个问题</h1><p>问题  <a target="_blank" rel="noopener" href="https://www.zhihu.com/question/37271342">https://www.zhihu.com/question/37271342</a></p>
 <blockquote>
 <p>假如我调用了一个 select 函数，并且关注了几个fd， select 函数就会一直阻塞直到我关注的事件发生. 假如当有套接口可读时， select 函数就返回了，告诉我们套接口已经可读，然后我们去读这个套接口，可以用阻塞的read或者非阻塞的 read，阻塞 read 是无数据可读就阻塞进程，非阻塞 read是无数据可读就返回一个 EWOULDBLOCK 错误。那么问题来了：既然 select 都返回可读了，那就表示一定能读了，阻塞函数read也就能读取了也就不会阻塞了，非阻塞read的话，也有数据读了，也不会返回错误了，那么这俩不都一样了？一样直接读取数据知道读完，为什么还得用非阻塞函数？还有 Reactor 模式也是用的 IO 多路复用与非阻塞 IO，这是什么道理呢？</p>
 </blockquote>
@@ -378,6 +415,8 @@
                       <a class="hover-with-bg" href="/blog/tags/select/">select</a>
                     
                       <a class="hover-with-bg" href="/blog/tags/epoll/">epoll</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">IO多路复用</a>
                     
                   </div>
                 

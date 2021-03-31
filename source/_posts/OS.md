@@ -294,3 +294,13 @@ mmap() 函数：
 将硬盘的扇区组织成文件系统，实现文件读写操作
 
 比如 win使用NTFS、FAT32、FAT16；macOS使用APFS（apple file system）；linux使用EXT2 等等
+
+> 一个操作系统可以支持多种底层不同的文件系统（比如NTFS, FAT, ext3, ext4），为了给内核和用户进程提供统一的文件系统视图，Linux在用户进程和底层文件系统之间加入了一个抽象层，即**虚拟文件系统(Virtual File System, VFS)**
+>
+> 进程所有的文件操作都通过VFS，由VFS来适配各种底层不同的文件系统，完成实际的文件操作。
+
+
+
+Linux 内核 看去吧...
+
+https://www.kernel.org/doc/html/v4.14/index.html

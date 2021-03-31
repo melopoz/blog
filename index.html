@@ -443,75 +443,6 @@ client 收到 server 的SYN报文, 回应一个 ACK(seq=y+1) client发送完进�
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/01/01/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">Linux I/O模型</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/01/01/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">
-          
-          
-            
-          
-          I/O 简单点说就是：读取/写入 若干字节 从/到 单个文件描述符
-
-阻塞 / 非阻塞
-
-阻塞：如果文件描述符不处于就绪状态则阻塞直到其就绪
-
-非阻塞：如果文件描述符不处于就绪状态则返回一个错误码，比如 EAGAIN
-
-
-
-同步 / 异步
-
-同步和异步 是指 函数返回之时， 能不能保证任务完成。
-比如调用了read()直接返回了一个Future对象，你需要再调Future的函数来获取read()的
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-01-01 20:46" pubdate>
-              2021-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/OS/">OS</a>
-            
-              <a href="/blog/categories/IO/">IO</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/IO/">IO</a>
-            
-              <a href="/blog/tags/select/">select</a>
-            
-              <a href="/blog/tags/epoll/">epoll</a>
-            
-              <a href="/blog/tags/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">IO多路复用</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
         <a href="/blog/2021/01/01/IP%E5%9C%B0%E5%9D%80/">关于IP地址</a>
       </h1>
 
@@ -717,6 +648,54 @@ boolean tryAcquire(int)：独占式 尝试
               <a href="/blog/tags/%E5%90%8C%E6%AD%A5/">同步</a>
             
           </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/Java_IO/">Java中的IO</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/Java_IO/">
+          
+          
+            
+          
+          IO1.4之前， 传统io，阻塞 所以又叫BIO（Blocking IO）
+数据的读取写入必须阻塞在一个线程内等待其完成。
+比如用socket，想要多个client同时访问就要开同样多个线程来处理client的链接，线程资源太宝贵了，这不OK。
+NIONew IO / Non blocking IO
+核心组件：
+channels通道是双向的，流的读写是单向的
+
+buffers比如ByteBuffe
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/Java/">Java</a>
+            
+          </div>
+        
         
       </div>
     </article>

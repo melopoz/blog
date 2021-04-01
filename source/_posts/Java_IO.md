@@ -11,7 +11,7 @@ updated: 2021/01/01 20:46:25
 
 ## IO
 
-1.4之前， 传统io，阻塞 所以又叫BIO（Blocking IO）
+Java 1.4 之前， 传统io，阻塞 所以又叫BIO（Blocking IO）
 
 数据的读取写入必须阻塞在一个线程内等待其完成。
 
@@ -48,6 +48,24 @@ New IO / Non blocking IO
 
 - 从通道（channels）读取：创建一个缓冲区，请求通道读取数据。
 - 从通道（channels）写入：创建一个环城区，填充数据，并要求通道写入数据。
+
+
+
+todo！！！  这好像是JVM的范围了。
+
+java中使用的堆外内存，也是用户空间的，因为他是JVM进程使用`malloc`申请的内存，只不过在JVM管理的内存范围内。
+
+https://sulangsss.github.io/2018/12/08/Java/Advance/ByteBuffer/
+
+不过GC也会帮助清理堆外内存，GC清理了DirectByteBuffer对象，下次GC会调用Cleaner对象的clean()
+
+https://kaiwu.lagou.com/course/courseInfo.htm?sid=&courseId=516#/detail/pc?id=4923
+
+https://tech.meituan.com/2016/11/04/nio.html
+
+
+
+
 
 
 

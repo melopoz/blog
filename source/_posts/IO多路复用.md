@@ -1,8 +1,8 @@
 ---
-title: Linux I/O模型
+title: I/O base Linux 
 tags: 
-  - IO
   - select
+  - poll
   - epoll
   - IO多路复用
 categories: 
@@ -15,6 +15,10 @@ updated: 2020/11/12 16:00:25
 
 
 I/O 简单点说就是：读取/写入 若干字节 从/到 **单个文件描述符**，用户进程需要调用内核并由内核来完成IO操作。
+
+用户态的进程调用read()其实是有[缓存IO](https://melopoz.github.io/blog/2021/01/01/OS/#%E7%BC%93%E5%AD%98IO)的，会有两次拷贝过程（内核将数据从磁盘/设备拷贝到内核空间，再从内核空间拷贝到用户空间）。
+
+
 
 - 阻塞 / 非阻塞
 
@@ -33,13 +37,9 @@ I/O 简单点说就是：读取/写入 若干字节 从/到 **单个文件描述
 
 
 
+# Linux 五种 IO模型
 
-
-## Linux 五种 IO模型
-
-> 用户态的进程调用read()其实是有[缓存IO](https://melopoz.github.io/blog/2021/01/01/OS/#%E7%BC%93%E5%AD%98IO)的，有两次拷贝过程。
-
-
+<img alt="IO模型时序图" src="https://raw.githubusercontent.com/melopoz/pics/master/img/IO%E6%A8%A1%E5%9E%8B%E6%97%B6%E5%BA%8F%E5%9B%BE.png" style="zoom:33%;" />
 
 ### 同步阻塞-BIO
 
@@ -47,9 +47,9 @@ I/O 简单点说就是：读取/写入 若干字节 从/到 **单个文件描述
 
 - 在IO执行的两个阶段都被block了；
 - 只需要一次系统调用（read）；
+- 一个线程（进程）只能处理一个fd的IO；
 - 数据处理最及时；
-- 内核实现简单；
-- 一个线程（进程）只能处理一个fd的IO。
+- 内核实现简单。
 
 
 
@@ -94,9 +94,9 @@ IO多路复用优势并不是对于单个连接能处理得更快，而是在于
 
 
 
-### 异步非阻塞IO -AIO
+### 异步IO -AIO
 
-> Asynchronous IO，异步IO并不会顺序执行。
+> Asynchronous IO，要注意都是 异步IO并不会顺序执行。
 
 用户进程发起`aio_read`操作之后，kernel会立刻返回，所以不会对用户进程产生任何block。
 
@@ -122,15 +122,25 @@ IO多路复用优势并不是对于单个连接能处理得更快，而是在于
 
 ### 信号驱动IO
 
-> 
+> signal-driven I/O
 
-<img alt="IO模型时序图" src="https://raw.githubusercontent.com/melopoz/pics/master/img/IO%E6%A8%A1%E5%9E%8B%E6%97%B6%E5%BA%8F%E5%9B%BE.png" style="zoom:33%;" />
+1. 用户进程调用系统函数，系统函数直接返回；
+2. 内核在数据拷贝到用户空间之后，向用户进程发送信号；
+3. 用户进程收到信号之后调用`recvfrom`（阻塞）（由内核）将数据从内核空间复制到用户空间。
+
+> 和IO多路复用也很类似，不过IO多路复用可以处理多个fd，而且IO多路复用的第一步也是阻塞的（看最上方的图）。
+
+异步IO和信号驱动IO的区别
+
+> 异步 I/O 的信号是**通知应用进程 I/O 完成**，而信号驱动 I/O 的信号是**通知应用进程可以开始 I/O**
 
 ---
 
+# select/poll/epoll
+
+Linux中IO多路复用的实现
 
 
-### select/poll/epoll
 
 #### select
 
@@ -161,7 +171,7 @@ select是通过维护一个用来存放大量fd的数据结构，这样会使得
 ##### 使用select
 
 ```c
-while true {
+while true {// 循环
     fd_set* readfds;
     fd_set* writefds;
     fd_set* exceptfds;
@@ -193,18 +203,6 @@ poll是`水平触发`如果本次报告了fd可用，如果用户进程没有处
 #### **epoll**
 
 epoll 是Linux2.6新增的优化版本，epoll 使用`一个fd`管理多个fd，将`用户进程关注的fd的事件`存放到内核的一个`事件表`中。
-
-epoll 对文件描述符的操作有两种模式：水平触发(**LT** level trigger) 和 边缘触发 (**ET** edge trigger)。
-
-> LT（**默认**）：用户进程**可以不立即处理** epoll\_wait 返回的事件，下次调用epoll_wait时，**会再次**响应应用程序并**通知此事件**。
->
-> > 同时支持 `block socket` 和 `no-block socket`
->
-> ET：用户进程**必须立即处理** epoll\_wait 返回的事件，如果不处理，下次调用 epoll_wait 时，epoll **不会再次**响应应用程序并**通知此事件**。
->
-> > ET模式在很大程度上减少了epoll事件被重复触发的次数，因此**效率更高**。
-> >
-> > 只支持非阻塞套接口 `no-block socket`
 
 
 
@@ -297,6 +295,24 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
 // *event: 要监听的事件
 ```
 
+事件的数据结构
+
+```c
+typedef union epoll_data {
+    void *ptr;
+    int fd;// 事件对应的文件描述符
+    __uint32_t u32;
+    __uint64_t u64;
+} epoll_data_t;
+
+struct epoll_event {
+    __uint32_t events; /* Epoll events */
+    epoll_data_t data; /* User data variable */
+};
+```
+
+
+
 > 1. 参数 **op** 可选的三个宏：增（EPOLL\_CTL\_**ADD**），改（EPOLL\_CTL\_**MOD**），删（EPOLL\_CTL\_**DEL**）
 >
 > 2. 参数 ***event** 有如下选择
@@ -383,45 +399,63 @@ for( ; ; )
 
 ##### epoll 实现原理
 
-todo
+> 在linux，一切皆文件．
+>
+> 当调用 **epoll_create** 时，内核给这个 epoll 分配一个特殊的只服务于 epoll 的 file（epoll文件描述符-**epfd**），**epfd** 用来存储用户进程关注的fd(epoll_ctl的参数 int fd，比如**socket**）；
+>
+> 所以当内核初始化 epoll 时，会开辟一块**内核高速cache区**，用于存放 **epfd**，用户进程关注的fd会以**红黑树**的形式保存在内核的cache(**epfd**)里，同时建立一个**list链表，用于存储准备就绪的事件**。
+>
+> 执行**epoll_ctl**时，把**socket**放到**epfd**的红黑树上，并**给内核中断处理程序注册一个回调函数**；
+>
+> 当**socket**上有数据到了，就会触发中断，内核在把网卡上的数据copy到内核中后就会调用该回调函数，把socket插入到**准备就绪链表**里。
+>
+> 所以调用**epoll_wait**时，只要在timeout时间内，这个list链表有数据则拷贝至用户空间的events数组(参数***event**)中。
 
-> 在linux，一切皆文件．所以当调用epoll_create时，内核给这个epoll分配一个file，但是这个不是普通的文件，而是只服务于epoll．
+
+
+#### epoll的两种模式
+
+水平触发(**LT** level trigger) 和 边缘触发 (**ET** edge trigger)。
+
+> LT（**默认**）：用户进程**可以不立即处理** epoll\_wait 返回的事件，下次调用epoll_wait时，**会再次**响应应用程序并**通知此事件**。
 >
-> 所以当内核初始化epoll时，会开辟一块内核高速cache区，用于安置我们监听的socket，这些socket会以红黑树的形式保存在内核的cache里，以支持快速的查找，插入，删除．同时，建立了一盒list链表，用于存储准备就绪的事件．所以调用epoll_wait时，在timeout时间内，只是简单的观察这个list链表是否有数据，如果没有，则睡眠至超时时间到返回；如果有数据，则在超时时间到，拷贝至用户态events数组中．
+> > 同时支持 `block socket` 和 `no-block socket`
 >
-> 那么，这个准备就绪list链表是怎么维护的呢？当我们执行epoll_ctl时，除了把socket放到epoll文件系统里file对象对应的红黑树上之外，还会给内核中断处理程序注册一个回调函数，告诉内核，如果这个句柄的中断到了，就把它放到准备就绪list链表里。所以，当一个socket上有数据到了，内核在把网卡上的数据copy到内核中后就来把socket插入到准备就绪链表里了。
+> ET：用户进程**必须立即处理** epoll\_wait 返回的事件，如果不处理，下次调用 epoll_wait 时，epoll **不会再次**响应应用程序并**通知此事件**。
 >
-> epoll有两种模式LT(水平触发)和ET(边缘触发)，LT模式下，主要缓冲区数据一次没有处理完，那么下次epoll_wait返回时，还会返回这个句柄；而ET模式下，缓冲区数据一次没处理结束，那么下次是不会再通知了，只在第一次返回．所以在ET模式下，一般是通过while循环，一次性读完全部数据．epoll默认使用的是LT．
+> > 只支持非阻塞套接口 `no-block socket`
 >
-> 这件事怎么做到的呢？当一个socket句柄上有事件时，内核会把该句柄插入上面所说的准备就绪list链表，这时我们调用epoll_wait，会把准备就绪的socket拷贝到用户态内存，然后清空准备就绪list链表，最后，epoll_wait干了件事，就是检查这些socket，如果不是ET模式（就是LT模式的句柄了），并且这些socket上确实有未处理的事件时，又把该句柄放回到刚刚清空的准备就绪链表了。所以，非ET的句柄，只要它上面还有事件，epoll_wait每次都会返回。而ET模式的句柄，除非有新中断到，即使socket上的事件没有处理完，也是不会次次从epoll_wait返回的．
+> 一个常见问题：谁效率高。。
 >
-> 经常看到比较ET和LT模式到底哪个效率高的问题．有一个回答是说ET模式下减少epoll系统调用．这话没错，也可以理解，但是在ET模式下，为了避免数据饿死问题，用户态必须用一个循环，将所有的数据一次性处理结束．所以在ET模式下下，虽然epoll系统调用减少了，但是用户态的逻辑复杂了，write/read调用增多了．所以这不好判断，要看用户的性能瓶颈在哪．
+> > ET模式减少了fd事件被重复触发的次数，所以只针对这一次epoll调用来说，ET模式**效率更高**。
+> >
+> > 但是在ET模式下，为了保证数据都会处理，用户态必须用一个循环，将所有的数据一次性处理结束。所以用户态的逻辑复杂了，write/read 调用增多了，可能性能并不会更高。
 
 
 
 #### epoll 和 select/poll 的区别/优化
 
-todo
-
-没有fd数量限制，只需在用户空间和内核空间copy一次。只复制`epoll_create()`创建的文件描述符(特殊的，共享内存，高级缓存)
-
-只对活跃的fd进行处理，而不是全部遍历所有的fd，效率提升，不是盲目轮询的方式，不会随着FD数目的增加效率下降。
-
-只有活跃可用的FD才会调用callback函数；即Epoll最大的优点就在于它只管你“活跃”的连接，而跟连接总数无关，因此
-
-内存拷贝`，利用mmap()文件映射内存加速与内核空间的消息传递；`即epoll使用mmap减少复制开销
-
-epoll支持的fd个数不受限制，它支持的fd上限是最大可以打开文件的数目，一般远大于2048，1G内存的机器上是大约10万左右．
-
-epoll使用的是共享内存，select全部复制，所以效率更低；epoll支持内核微调．
-
----
+1. epoll 没有fd数量限制，上限是最大可以打开文件的数目，一般远大于2048，1G内存的机器上是大约10万左右；
+2. epoll 只需在用户空间和内核空间copy一个fd——**epfd**，而且 epfd 占用空间小，使用了CPU高级缓存；
+3. epoll 只返回已就绪的fd，select / poll 都是返回用户进程关注的全部fd；
 
 
 
 
 
-### IO多路复用 第二步读取 推荐用非阻塞函数
+# 常见问题 & 拓展
+
+Redis 和 Memcache 都是使用了基于IO多路复用的高性能网络库。
+
+
+
+## Linux IO多路复用 使用了mmap？
+
+select/poll/epoll 中均并没发现用mmap的痕迹啊，而且我觉得...本身就是在内核空间直接操作文件了，还用啥mmap啊...
+
+
+
+## IO多路复用 第二步读取 推荐用非阻塞函数
 
 问题  https://www.zhihu.com/question/37271342
 
@@ -453,18 +487,4 @@ epoll使用的是共享内存，select全部复制，所以效率更低；epoll�
 
 
 
-Redis 和 Memcache 都是使用了基于IO多路复用的高性能网络库。
-
-# Java中的NIO
-
-todo！！！
-
-java中使用的堆外内存，也是用户空间的，因为他是JVM进程使用`malloc`申请的内存，只不过在JVM管理的内存范围内。
-
-https://sulangsss.github.io/2018/12/08/Java/Advance/ByteBuffer/
-
-不过GC也会帮助清理堆外内存，GC清理了DirectByteBuffer对象，下次GC会调用Cleaner对象的clean()
-
-https://kaiwu.lagou.com/course/courseInfo.htm?sid=&courseId=516#/detail/pc?id=4923
-
-https://tech.meituan.com/2016/11/04/nio.html
+## [Java中的NIO](#https://melopoz.github.io/blog/2021/01/01/Java_IO/#NIO)

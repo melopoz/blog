@@ -17,9 +17,25 @@
   <meta name="description" content="Although things are always not as you wish, but effort will be lucy!">
   <meta name="author" content="melopoz">
   <meta name="keywords" content="">
-  <title>分类 - JVM - Be your own god.</title>
+  <title>RPC:Remote Procedure Call - Be your own god.</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/blog/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.1.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+  
 
 
 
@@ -47,7 +63,7 @@
 
 
 <body>
-  <header style="height: 60vh;">
+  <header style="height: 70vh;">
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand"
@@ -146,9 +162,46 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="分类 - JVM">
+            <span class="h2" id="subtitle" title="RPC:Remote Procedure Call">
               
             </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-01-01 20:46" pubdate>
+        2021年1月1日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      304 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      3
+       分钟
+    </span>
+  
+
+  
+  
+</div>
 
             
           </div>
@@ -161,40 +214,107 @@
 
   <main>
     
-      <div class="container nopadding-md">
-        <div class="py-5" id="board"
-          >
-          
-          <div class="container">
-            <div class="row">
-              <div class="col-12 col-md-10 m-auto">
-                
-
-<div class="list-group">
-  <p class="h4">共计 1 篇文章</p>
-  <hr>
-  
-  
-    
       
-      <p class="h5">2021</p>
-    
-    <a href="/blog/2021/01/01/JVM_%E5%8F%82%E6%95%B0/" class="list-group-item list-group-item-action">
-      <span class="archive-post-title">JVM的一些参数</span>
-      <time style="float: right;">01-01</time>
-    </a>
-  
-</div>
 
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">RPC:Remote Procedure Call</h1>
+            
+            <div class="markdown-body">
+              <h2 id="RPC和HTTP区别"><a href="#RPC和HTTP区别" class="headerlink" title="RPC和HTTP区别"></a>RPC和HTTP区别</h2><p>在OSI中所处的层就不同，HTTP是在TCP的基础上，RPC是自己实现的传输层协议。</p>
+<p>OSI分层</p>
+<blockquote>
+<p>应用层（应用层+表示层+会话层）</p>
+<p>传输层</p>
+<p>网络层</p>
+<p>链路层</p>
+<p>物理层</p>
+</blockquote>
+<p>HTTP是应用层的协议，自己是此案</p>
+<p>性能对两者来说并不是重点,因为RPC也有使用HTTP协议的,比如JSON-RPC,使用场景是两者的最大区别:RPC场景是公司内部互相调用.最大的好处是包装合理的RPC你会觉得他就是本地的一个库或者内置函数.对于开发人员来说,无需处理请求返回的问题.编写代码的时候几乎无感,开发效率高(你可以想象一下一个模块中需要进行几十次的发送请求处理返回状态和返回体是多么的令人崩溃),HTTP reset的场景是对外服务,(这个对外值的是可控团体之外,一般理解为公司外部即可),需要进行请求和响应的处理.一般用于事务型接口(一个接口对应一个事务).</p>
+<p>todo todo todo</p>
+<p>todo  写个RPC框架</p>
 
-
-
-
-              </div>
             </div>
-          </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/todo/">todo</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/OSI/">OSI</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/RPC/">RPC</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2021/01/01/0_todo_%E5%88%86%E5%B8%83%E5%BC%8F_Elasticsearch/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">ElasticSearch</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2021/01/01/0_todo_%E7%BD%91%E7%BB%9C_TCP%20&amp;%20HTTP%20&amp;%20HTTPS/">
+                        <span class="hidden-mobile">TCP & HTTP & HTTPS</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
         </div>
       </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
     
 
     
@@ -277,9 +397,15 @@
 
 
 
+  <script  src="https://cdn.staticfile.org/tocbot/4.12.0/tocbot.min.js" ></script>
 
 
 
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.3.0/anchor.min.js" ></script>
 
 
 

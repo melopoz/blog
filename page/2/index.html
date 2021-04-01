@@ -181,413 +181,26 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/01/01/%E5%88%86%E5%B8%83%E5%BC%8F_HDFS/">HDFS</a>
+        <a href="/blog/2021/01/01/1_redo_Java_%E5%AF%B9%E8%B1%A1%E9%80%83%E9%80%B8EA/">EA-对象逃逸</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/01/01/%E5%88%86%E5%B8%83%E5%BC%8F_HDFS/">
+        <a href="/blog/2021/01/01/1_redo_Java_%E5%AF%B9%E8%B1%A1%E9%80%83%E9%80%B8EA/">
           
           
             
           
-          目录树结构
-角色namenode datanode 角色即进程
-角色NameNode基于内存存储文件元数据、目录结构、文件block的映射
-需要持久化方案提供数据可靠性
-提供副本放置策略
-DataNode基于本地磁盘存储block（块）（以文件形式）
-保存block的校验和数据 保证block的可靠性
-和NameNode保持心跳，汇报block的列表状态
-数据恢复策略：
-日志文件(记录所有操作，恢
-        </a>
-      </p>
+          逃逸分析 Escape Analysis  简称 EAEA允许java编译器在多种情况下优化我们的代码。
+https://blog.csdn.net/wolfcode_cn/article/details/83058235
+对象逃逸 的 三种状态
+全局级别逃逸 全局逃逸状态
 
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-01-01 20:46" pubdate>
-              2021-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
-            
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
+一个对象可能从一个方法或当前线程中逃逸。
 
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/01/01/%E5%88%86%E5%B8%83%E5%BC%8F_Hadoop/">Hadoop</a>
-      </h1>
+如果一个对象被作为方法的返回值，
 
-      <p class="index-excerpt">
-        <a href="/blog/2021/01/01/%E5%88%86%E5%B8%83%E5%BC%8F_Hadoop/">
-          
-          
-            
-          
-          概念主要包括ResourceManager、NodeManager
-安装安装好jdk1.8的linux系统下
+作为类静态字段 static field
 
-创建hadoop用户
-$ sudo useradd -m hadoop -s /bin/bash  #创建hadoop用户，并使用/bin/bash作为shell
-$ sudo passwd hadoop                   #为hadoop用户设置密码，之后需要连续输入
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-01-01 20:46" pubdate>
-              2021-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
-            
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/01/01/%E7%BD%91%E7%BB%9C_CDN/">CDN(Content Delivery Network，内容分发网络)</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/01/01/%E7%BD%91%E7%BB%9C_CDN/">
-          
-          
-            
-          
-          CDN ( Content Delivery Network，内容分发网络）
-通过将网站内容（如图片、JavaScript 、CSS、网页等）分发至全网加速节点，配合精准调度系统和边缘缓存，使最终用户可以就近获取所需内容，有效解决互联网网络拥塞问题，提高终端用户访问网站的响应速度和可用性，与此同时，可大幅降低源站压力。
-加速原理假设我们（client）访问的域名为www.example.com，该
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-01-01 20:46" pubdate>
-              2021-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/%E7%BD%91%E7%BB%9C/">网络</a>
-            
-              <a href="/blog/categories/%E7%BD%91%E7%BB%9C/basics/">basics</a>
-            
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/01/01/%E7%BD%91%E7%BB%9C_IP/">关于IP地址</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/01/01/%E7%BD%91%E7%BB%9C_IP/">
-          
-          
-            
-          
-          ipv4地址
-比如：192.168.1.1
-转换成二进制
-0000 0000.0000 0000.0000 0000.0000 0000
-​     8   *   4
-
-
-
-ipv4地址类别
-二进制格式
-范围
-
-
-
-
-A类
-0xxx xxxx(1+7位网络号).0000 0000.0000 0000.0000 0000(8*3位主机号)
-1.0.0.0—126.0.0.0
-10.X.X.X是私有
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-01-01 20:46" pubdate>
-              2021-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/%E7%BD%91%E7%BB%9C/">网络</a>
-            
-              <a href="/blog/categories/%E7%BD%91%E7%BB%9C/basics/">basics</a>
-            
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/01/01/%E7%BD%91%E7%BB%9C_Nginx/">Nginx</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/01/01/%E7%BD%91%E7%BB%9C_Nginx/">
-          
-          
-            
-          
-          官方中文文档：https://www.nginx.cn/doc
-功能：免费开源的 高性能的HTTP服务器、反向代理、IMAP/POP3代理服务器。
-特点：稳定，轻量级，配置简单，资源消耗低，功能丰富！
-相同功能还有Apache的Httpd，架构比较笨重，性能不如nginx，主要不会玩。
-配置服务器名称（域名）
-nginx通过请求的请求头中的Host获取要访问的server,
-
-可用精确名称、通配符
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-01-01 20:46" pubdate>
-              2021-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/%E7%BD%91%E7%BB%9C/">网络</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/HTTP%E6%9C%8D%E5%8A%A1%E5%99%A8/">HTTP服务器</a>
-            
-              <a href="/blog/tags/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86/">反向代理</a>
-            
-              <a href="/blog/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">负载均衡</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/01/01/OS/">OS</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/01/01/OS/">
-          
-          
-            
-          
-          操作系统四大特征：并发两个事件在同一段时间内发生，即宏观上同时运行；并行是两个事件在统一时刻发生，多(核)CPU可支持并行
-共享（资源复用）多个并发执行的进程共同使用同一系统资源，比如内存
-
-互斥共享：同一时刻只有一个进程可以访问，需要同步机制来实现互斥。互斥的资源成为临界资源。e.g.:摄像头
-同时访问：允许多个进程在同一段时间内访问同一资源，即宏观上的同时。（微观上还是交替进行）e.g.:磁盘
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-01-01 20:46" pubdate>
-              2021-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/OS/">OS</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
-            
-              <a href="/blog/tags/%E9%9B%B6%E6%8B%B7%E8%B4%9D/">零拷贝</a>
-            
-              <a href="/blog/tags/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">IO多路复用</a>
-            
-              <a href="/blog/tags/select/">select</a>
-            
-              <a href="/blog/tags/poll/">poll</a>
-            
-              <a href="/blog/tags/epoll/">epoll</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/01/01/NOSQL_Redis/">Redis</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/01/01/NOSQL_Redis/">
-          
-          
-            
-          
-          配置文件示例
-http://download.redis.io/redis-stable/redis.conf
-
-本地缓存和分布式缓存
-本地缓存，比如java中的map，guava实现，轻量、快速，但是如果有多个实例，就需要每个实例都保存一份缓存，不具有一致性。
-
-
- 分布式缓存，比如redis、memcached，缓存具有一致性。但是需要保持服务的高可用。
-
-
-redis VS memcache
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-01-01 20:46" pubdate>
-              2021-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/NoSQL/">NoSQL</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E4%BD%8D%E5%9B%BE/">位图</a>
-            
-              <a href="/blog/tags/%E7%BC%93%E5%AD%98/">缓存</a>
-            
-              <a href="/blog/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">分布式锁</a>
-            
-              <a href="/blog/tags/%E4%B8%80%E8%87%B4%E6%80%A7hash-%E8%99%9A%E6%8B%9F%E6%A7%BDslot/">一致性hash+虚拟槽slot</a>
-            
-              <a href="/blog/tags/%E9%80%89%E4%B8%BE%E7%AD%96%E7%95%A5/">选举策略</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/01/01/Java_HashMap&ConcurrentHashMap/">HashMap &amp; ConcurrentHashMap</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/01/01/Java_HashMap&ConcurrentHashMap/">
-          
-          
-            
-          
-          java.util.Map
-
-
-
-常用实现
-HashMap
-根据hashCode存储数据，访问速度快，遍历顺序不确定，允许一个key为null，允许任意value为null，非线程安全，同一时刻多个线程同时对一个hashMap进行put，可能会导致数据不一致。
-
-可用Collections#synchronizedMap方法得到一个线程安全的map（该类直接是对map对象加锁）或者用Concurr
         </a>
       </p>
 
@@ -612,11 +225,7 @@ HashMap
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/blog/tags/java1-8%E4%BC%98%E5%8C%96/">java1.8优化</a>
-            
-              <a href="/blog/tags/hash%E4%BC%98%E5%8C%96/">hash优化</a>
-            
-              <a href="/blog/tags/JUC/">JUC</a>
+              <a href="/blog/tags/redo/">redo</a>
             
           </div>
         
@@ -630,24 +239,21 @@ HashMap
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2020/01/01/OS_Linux_IO%E6%A8%A1%E5%9E%8B/">I/O base Linux</a>
+        <a href="/blog/2021/01/01/1_redo_MQ_Kafka/">Kafka</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2020/01/01/OS_Linux_IO%E6%A8%A1%E5%9E%8B/">
+        <a href="/blog/2021/01/01/1_redo_MQ_Kafka/">
           
           
             
           
-          I/O 简单点说就是：读取/写入 若干字节 从/到 单个文件描述符，用户进程需要调用内核并由内核来完成IO操作。
-用户态的进程调用read()其实是有缓存IO的，会有两次拷贝过程（内核将数据从磁盘/设备拷贝到内核空间，再从内核空间拷贝到用户空间）。
-
-阻塞 / 非阻塞
-
-阻塞：如果文件描述符不处于就绪状态则阻塞直到其就绪
-
-非阻塞：如果文件描述符不处于就绪状态则返回一个错误码，比如 EAGAIN
-
+          混乱。。。
+kafka百度网盘,git_note有pdf
+https://blog.csdn.net/qq_37502106/article/details/80271800
+https://blog.csdn.net/chenwiehuang/article/details/100172204
+javademo
+https://blog.csdn.net/Dongguabai/article/d
         </a>
       </p>
 
@@ -655,8 +261,8 @@ HashMap
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2020-01-01 20:46" pubdate>
-              2020-01-01
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
             </time>
           </div>
         
@@ -664,9 +270,7 @@ HashMap
           <div class="post-meta mr-3">
             <i class="iconfont icon-category"></i>
             
-              <a href="/blog/categories/OS/">OS</a>
-            
-              <a href="/blog/categories/OS/IO/">IO</a>
+              <a href="/blog/categories/MQ/">MQ</a>
             
           </div>
         
@@ -674,15 +278,444 @@ HashMap
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/blog/tags/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">IO多路复用</a>
-            
-              <a href="/blog/tags/select/">select</a>
-            
-              <a href="/blog/tags/poll/">poll</a>
-            
-              <a href="/blog/tags/epoll/">epoll</a>
+              <a href="/blog/tags/redo/">redo</a>
             
           </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/1_redo_%E5%88%86%E5%B8%83%E5%BC%8F_Zookeeper/">zookeeper</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/1_redo_%E5%88%86%E5%B8%83%E5%BC%8F_Zookeeper/">
+          
+          
+            
+          
+          Zookeeper分布式协调服务，为其他分布式应用程序提供基本的同步和组服务
+为了可靠性，不能一个宕机就完蛋，也要搭建集群，搭建集群就分布式，分布式就要保证一致性，一致性的解决方案。。又是Paxos
+选举一个leader，发送提案，多半同意则发送提交，
+
+这里会有个问题 https://www.zhihu.com/question/324291664
+https://www.zhihu.com/q
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/redo/">redo</a>
+            
+              <a href="/blog/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E5%8D%8F%E8%B0%83%E6%9C%8D%E5%8A%A1/">分布式协调服务</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/1_redo_%E6%9E%B6%E6%9E%84_%E5%B9%82%E7%AD%89%E6%80%A7%E8%AE%BE%E8%AE%A1/">幂等性设计</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/1_redo_%E6%9E%B6%E6%9E%84_%E5%B9%82%E7%AD%89%E6%80%A7%E8%AE%BE%E8%AE%A1/">
+          
+          
+            
+          
+          如何保证幂等性
+
+在数据库利用唯一索引。
+
+比如生成订单的时候，不能因为网络延迟而创建两次这个订单，所以可以根据这个订单的唯一id。
+第一个 insert 执行之后已经有了这个订单，下次 insert 的时候会报错，可以直接 try-catch 这个异常，在catch中 select by id 查询这个订单，查询到的结果也就是 insert 的期望结果了。
+
+
+不过要利用这个唯一索引的话，订单的
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/%E6%9E%B6%E6%9E%84/">架构</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/redo/">redo</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/Basics_Git/">Git</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/Basics_Git/">
+          
+          
+            
+          
+          初始化成git仓库git init
+绑定到远程仓库git remote add origin https://xxx.git
+第一次push 的时候携带的参数git push -u origin master
+revertgit revert HEAD^  git revert HEAD^^  git revert HEAD~3   一个^就是前1次commit 
+git revert &lt;c
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/basics/">basics</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/note/">note</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/Basics_WSL/">WSL</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/Basics_WSL/">
+          
+          
+            
+          
+          net stop LxssManager 停止子系统服务
+net start LxssManager 开启子系统服务
+
+
+
+
+
+
+linux 查看进程相关参数的命令lsof -i:3306 查看3306端口
+netstat -tap |grep mysql 查看mysql进程占用的端口
+
+zsh
+安装 sudo apt-get install zsh
+设置默认shell chsh -s /bin/
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/basics/">basics</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/note/">note</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/Basics_tail%E5%85%B3%E9%94%AE%E5%AD%97%E9%AB%98%E4%BA%AE/">tail关键词高亮</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/Basics_tail%E5%85%B3%E9%94%AE%E5%AD%97%E9%AB%98%E4%BA%AE/">
+          
+          
+            
+          
+          tail -f system.log |grep &quot;/write-down&quot; |grep &quot;payload=&quot; | perl -pe &#x27;s/(visitType)|(visitTerminal)|(operateType)/\e[1;33m$1\e[0m\e[1;33m$2\e[0m\e[1;33m$3\e[0m/g&#x27;
+perl命令 进行
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/basics/">basics</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/note/">note</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/Basics_%E4%BD%8D%E8%BF%90%E7%AE%97&%E8%A1%A5%E7%A0%81/"></a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/Basics_%E4%BD%8D%E8%BF%90%E7%AE%97&%E8%A1%A5%E7%A0%81/">
+          
+          
+            
+          
+          Java中的位运算&lt;&lt; / &gt;&gt;：算数位移，符号位不变
+&gt;&gt;&gt;：逻辑位移，忽略符号位的含义，直接将所有bit右移
+比如：-2用8位二进制表示：1111 1110
+算数右移一位得到-1(八位二进制：1111 1111)
+
+1111 1110, &gt;&gt;1: 0111 1111, 保留符号位：1111 1111，二进制负数求值1)反码:1000 000
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/basics/">basics</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E4%BD%8D%E8%BF%90%E7%AE%97/">位运算</a>
+            
+              <a href="/blog/tags/%E4%BA%8C%E8%BF%9B%E5%88%B6/">二进制</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/Basics_%E6%AD%BB%E9%94%81/">死锁</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/Basics_%E6%AD%BB%E9%94%81/">
+          
+          
+            
+          
+          四个必要条件
+互斥
+请求和保持（占有并等待）
+不可剥夺（不能抢）
+环路等待（循环等待）
+
+预防死锁
+资源一次性分配（破坏请求条件）
+一次性获取所有资源，不能全部获取就释放所有（破坏保持条件）
+资源有序分配（按照一定算法对资源进行排序，按顺序拿资源）
+资源可抢夺（需要设置优先级）
+
+
+场景：两个人同时向对方转账。
+解决方案：破坏 2 / 3 / 4
+破坏 2 不可抢占：synchronized不能实
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/basics/">basics</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">并发</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/CICD_Docker/">Docker</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/CICD_Docker/">
+          
+          
+            
+          
+          DockerDocker本身是一个容器运行载体（或称为 管理引擎）。我们把应用程序和配置依赖打包成一个可交付的运行环境，这个环境就是image镜像文件。只有通过这个image才能生成Docker容器。
+image文件生成的容器实例，本身也是一个文件。
+一个容器运行一种服务，需要的时候就通过docker客户端创建一个对应的运行实例
+仓库就是存放一堆镜像的地方，可以吧镜像发布到仓库中，需要的时候pul
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/CI-CD/">CI/CD</a>
+            
+          </div>
+        
         
       </div>
     </article>
@@ -692,7 +725,7 @@ HashMap
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <a class="extend prev" rel="prev" href="/blog/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/blog/">1</a><span class="page-number current">2</span>
+      <a class="extend prev" rel="prev" href="/blog/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/blog/">1</a><span class="page-number current">2</span><a class="page-number" href="/blog/page/3/">3</a><a class="page-number" href="/blog/page/4/">4</a><a class="extend next" rel="next" href="/blog/page/3/"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
   

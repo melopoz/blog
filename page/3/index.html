@@ -1,0 +1,862 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/favicon.png">
+  <link rel="icon" type="image/png" href="/blog/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Although things are always not as you wish, but effort will be lucy!">
+  <meta name="author" content="melopoz">
+  <meta name="keywords" content="">
+  <title>Be your own god.</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"melopoz.github.io","root":"/blog/","version":"1.8.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"copy_btn":true,"image_zoom":{"enable":true},"lazyload":{"enable":true,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 100vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/blog/">&nbsp;<strong>Fluid</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/blog/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="An elegant Material-Design theme for Hexo">
+              
+            </span>
+
+            
+          </div>
+
+          
+            <div class="scroll-down-bar">
+              <i class="iconfont icon-arrowdown"></i>
+            </div>
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      <div class="container nopadding-md">
+        <div class="py-5" id="board"
+          style=margin-top:0>
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/JVM_%E5%8F%82%E6%95%B0/">JVM的一些参数</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/JVM_%E5%8F%82%E6%95%B0/">
+          
+          
+            
+          
+          查看jvm参数(参数默认值): java -XX:+PrintFlagsFinal -version
+查看java进程的参数的配置: jinfo -flags [pid] `
+查看java进程的指定参数的配置: jinfo -flags [option] [pid]
+
+jinfo -flags NewRatio 15222
+
+SoftRefLRUPolicyMSPerMB
+关系到 软引用 再GC发
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/JVM/">JVM</a>
+            
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/JVM_%E5%AE%89%E5%85%A8%E9%80%80%E5%87%BA/">JVM安全退出</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/JVM_%E5%AE%89%E5%85%A8%E9%80%80%E5%87%BA/">
+          
+          
+            
+          
+          Shutdown HookSystem.getRuntime().addShutdownHook(Thread thread);
+public class JVMShutdownHook &#123;
+    public static void main(String[] args) throws InterruptedException &#123;
+        //hook
+      
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/JVM/">JVM</a>
+            
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/OS_%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E7%AE%97%E6%B3%95/">内存分配算法</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/OS_%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E7%AE%97%E6%B3%95/">
+          
+          
+            
+          
+          常见的内存分配器实现: jemalloc, ptmalloc, tcmallocptmalloc: per thread malloc
+
+基于glibc(glibc是linux系统中最底层的api)实现的, 是一个标准实现, 兼容性好
+由于过于考虑性能, 多线程之间内存不共享, 各线程使用独立内存, 所以在内存开销很大.
+
+tcmalloc: thread caching malloc
+
+为每个线
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/OS/">OS</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/OS/">OS</a>
+            
+              <a href="/blog/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
+            
+              <a href="/blog/tags/about-netty/">about netty</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/OS_%E5%BC%95%E5%AF%BC%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%A4%A7%E6%A6%82%E6%B5%81%E7%A8%8B/">一台计算机供电之后...</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/OS_%E5%BC%95%E5%AF%BC%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%A4%A7%E6%A6%82%E6%B5%81%E7%A8%8B/">
+          
+          
+            
+          
+          给主板供电，让CPU运行BIOS，BIOS会按顺序走引导程序，装系统的时候不就是这样嘛  把macos系统引导放到了win boot前边就默认走macos了，the hackintosh。。
+
+BIOS（Base Input/Output System)一般存在主板的ROM（Read Only Memory）中。
+
+
+总线：数据总线，地址总线，控制总线。  总线其实就是数据线，一根传1位，32位有
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/OS/">OS</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/BIOS/">BIOS</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/%E5%88%86%E5%B8%83%E5%BC%8F_HDFS/">HDFS</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/%E5%88%86%E5%B8%83%E5%BC%8F_HDFS/">
+          
+          
+            
+          
+          目录树结构
+角色namenode datanode 角色即进程
+角色NameNode基于内存存储文件元数据、目录结构、文件block的映射
+需要持久化方案提供数据可靠性
+提供副本放置策略
+DataNode基于本地磁盘存储block（块）（以文件形式）
+保存block的校验和数据 保证block的可靠性
+和NameNode保持心跳，汇报block的列表状态
+数据恢复策略：
+日志文件(记录所有操作，恢
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+            
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/%E5%88%86%E5%B8%83%E5%BC%8F_Hadoop/">Hadoop</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/%E5%88%86%E5%B8%83%E5%BC%8F_Hadoop/">
+          
+          
+            
+          
+          概念主要包括ResourceManager、NodeManager
+安装安装好jdk1.8的linux系统下
+
+创建hadoop用户
+$ sudo useradd -m hadoop -s /bin/bash  #创建hadoop用户，并使用/bin/bash作为shell
+$ sudo passwd hadoop                   #为hadoop用户设置密码，之后需要连续输入
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+            
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/%E7%BD%91%E7%BB%9C_CDN/">CDN(Content Delivery Network，内容分发网络)</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/%E7%BD%91%E7%BB%9C_CDN/">
+          
+          
+            
+          
+          CDN ( Content Delivery Network，内容分发网络）
+通过将网站内容（如图片、JavaScript 、CSS、网页等）分发至全网加速节点，配合精准调度系统和边缘缓存，使最终用户可以就近获取所需内容，有效解决互联网网络拥塞问题，提高终端用户访问网站的响应速度和可用性，与此同时，可大幅降低源站压力。
+加速原理假设我们（client）访问的域名为www.example.com，该
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/%E7%BD%91%E7%BB%9C/">网络</a>
+            
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/%E7%BD%91%E7%BB%9C_IP/">关于IP地址</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/%E7%BD%91%E7%BB%9C_IP/">
+          
+          
+            
+          
+          ipv4地址
+比如：192.168.1.1
+转换成二进制
+0000 0000.0000 0000.0000 0000.0000 0000
+​     8   *   4
+
+
+
+ipv4地址类别
+二进制格式
+范围
+
+
+
+
+A类
+0xxx xxxx(1+7位网络号).0000 0000.0000 0000.0000 0000(8*3位主机号)
+1.0.0.0—126.0.0.0
+10.X.X.X是私有
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/%E7%BD%91%E7%BB%9C/">网络</a>
+            
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/%E7%BD%91%E7%BB%9C_Nginx/">Nginx</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/%E7%BD%91%E7%BB%9C_Nginx/">
+          
+          
+            
+          
+          官方中文文档：https://www.nginx.cn/doc
+功能：免费开源的 高性能的HTTP服务器、反向代理、IMAP/POP3代理服务器。
+特点：稳定，轻量级，配置简单，资源消耗低，功能丰富！
+相同功能还有Apache的Httpd，架构比较笨重，性能不如nginx，主要不会玩。
+配置服务器名称（域名）
+nginx通过请求的请求头中的Host获取要访问的server,
+
+可用精确名称、通配符
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/%E7%BD%91%E7%BB%9C/">网络</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/HTTP%E6%9C%8D%E5%8A%A1%E5%99%A8/">HTTP服务器</a>
+            
+              <a href="/blog/tags/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86/">反向代理</a>
+            
+              <a href="/blog/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">负载均衡</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/00_todo_OS/">OS</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/00_todo_OS/">
+          
+          
+            
+          
+          操作系统四大特征：并发两个事件在同一段时间内发生，即宏观上同时运行；并行是两个事件在统一时刻发生，多(核)CPU可支持并行
+共享（资源复用）多个并发执行的进程共同使用同一系统资源，比如内存
+
+互斥共享：同一时刻只有一个进程可以访问，需要同步机制来实现互斥。互斥的资源成为临界资源。e.g.:摄像头
+同时访问：允许多个进程在同一段时间内访问同一资源，即宏观上的同时。（微观上还是交替进行）e.g.:磁盘
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/OS/">OS</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
+            
+              <a href="/blog/tags/%E9%9B%B6%E6%8B%B7%E8%B4%9D/">零拷贝</a>
+            
+              <a href="/blog/tags/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">IO多路复用</a>
+            
+              <a href="/blog/tags/select/">select</a>
+            
+              <a href="/blog/tags/poll/">poll</a>
+            
+              <a href="/blog/tags/epoll/">epoll</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+
+
+  <nav aria-label="navigation">
+    <span class="pagination" id="pagination">
+      <a class="extend prev" rel="prev" href="/blog/page/2/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/blog/">1</a><a class="page-number" href="/blog/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/blog/page/4/">4</a><a class="extend next" rel="next" href="/blog/page/4/"><i class="iconfont icon-arrowright"></i></a>
+    </span>
+  </nav>
+  
+  <script>
+    for (ele of document.getElementById("pagination").getElementsByTagName("a")) {
+      ele.href += '#board';
+    }
+  </script>
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":200})
+    NProgress.start()
+    document.addEventListener('DOMContentLoaded', function() {
+      window.NProgress && window.NProgress.inc();
+    })
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.staticfile.org/jquery/3.5.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/debouncer.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/blog/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/blog/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/blog/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+
+</body>
+</html>

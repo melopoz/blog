@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      52
+      53
        分钟
     </span>
   
@@ -377,7 +377,9 @@
 <p><code>remap_page_range()</code>函数的功能是<code>构造用于映射一段物理地址的新页表</code>，<strong>实现了内核空间与用户空间的映射</strong>。</p>
 <p>在内核<strong>驱动程序的初始化阶段</strong>，通过<code>ioremap()</code><strong>将物理地址映射到内核虚拟空间</strong>；</p>
 </blockquote>
-<h2 id="零拷贝"><a href="#零拷贝" class="headerlink" title="零拷贝"></a>零拷贝</h2><p>直接调用系统的read() 和 内存映射文件并读取的区别：</p>
+<h2 id="零拷贝"><a href="#零拷贝" class="headerlink" title="零拷贝"></a>零拷贝</h2><p>todo </p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/dt0h2UhaoRECvjpeMZMsUA">https://mp.weixin.qq.com/s/dt0h2UhaoRECvjpeMZMsUA</a></p>
+<p>直接调用系统的read() 和 内存映射文件并读取的区别：</p>
 <ul>
 <li><p>直接调用<code>read()</code>，需要内核来调用，步骤：1）从硬盘拷贝到内核缓冲区(内核空间)，2）从内核空间拷贝到用户空间；（即需要用到<a href="#%E7%BC%93%E5%AD%98IO">缓存IO</a>）</p>
 <blockquote>
@@ -458,8 +460,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/blog/2021/01/01/NOSQL_Redis/">
-                        <span class="hidden-mobile">Redis</span>
+                      <a href="/blog/2021/01/01/1_redo_%E5%88%86%E5%B8%83%E5%BC%8F_SpringCloud/">
+                        <span class="hidden-mobile">SpringCloud</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

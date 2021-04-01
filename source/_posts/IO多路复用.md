@@ -132,97 +132,290 @@ IO多路复用优势并不是对于单个连接能处理得更快，而是在于
 
 ### select/poll/epoll
 
+#### select
 
+`select`是`POSIX`规定的，一般操作系统都有实现。
+
+```c
+#include <winsock.h>
+#define __FD_SETSIZE    1024
+int select(
+    int nfds, // 本参数忽略，仅起到兼容作用
+    fd_set* readfds, // （可选）指针，指向一组等待可读性检查的套接口fd
+    fd_set* writefds, // （可选）指针，指向一组等待可写性检查的套接口fd
+    fd_set* exceptfds, // （可选）指针，指向一组等待错误检查的套接口fd
+    const struct timeval* timeout // timeout：select()最多等待时间，对阻塞操作则应为NULL。
+);
+```
+
+select是通过维护一个用来存放大量fd的数据结构，这样会使得用户空间和内核空间在传递这些fd时复制开销也随着fd的数量线性增大。也因此单个进程所打开的fd是有一定限制的，它由`FD_SETSIZE`设置，默认值是`1024`。
+
+> 一般来说这个数目和系统内存关系很大，具体数目可以`cat /proc/sys/fs/file-max`查看。32位机默认是1024个；64位机默认是2048。
+
+而且select对fd进行的是线性扫描，即轮询，效率较低。
+
+> 当套接字比较多的时候，每次select()都要遍历`fd_setsize`个fd来完成调度，不管其中fd是否活跃，都遍历一遍。
+>
+> 这会浪费很多CPU时间。`如果能给套接字注册某个回调函数，当他们活跃时，自动完成相关操作，那就避免了轮询`，这正是epoll与kqueue做的优化。
+
+##### 使用select
+
+```c
+while true {
+    fd_set* readfds;
+    fd_set* writefds;
+    fd_set* exceptfds;
+    select(.. readfds, writefds, exceptfds, ...) // 这里如果没有就绪的时间就阻塞
+    for ready_fd in readfds {
+        if read_fd has data
+            // 这里处理fd的时候还要注意 是不是已经处理过了 如果read()可能会一直阻塞下去，因为可能已经被其他人处理
+            read(read_fd, timeout) until unavailable
+    }
+}
+```
+
+
+
+#### poll
+
+和select不同的是存储fd_set使用的链表，理论上没有最大连接数限制，fd_set被整体复制，同样的浪费空间；
+
+poll是`水平触发`如果本次报告了fd可用，如果用户进程没有处理，下次还会报告这个fd。
+
+
+
+#### select 和 poll 的弱点
+
+都要传入fd数组，内核遍历数组把所有就绪的fd标记为已就绪，然后用户进程再遍历fd数组找到已就绪的fd进行处理。一般同一时间内要处理的fd只有少部分处于就绪状态。如果监控的fd越来越多，性能会线性下降。
+
+
+
+#### **epoll**
+
+epoll 是Linux2.6新增的优化版本，epoll 使用`一个fd`管理多个fd，将`用户进程关注的fd的事件`存放到内核的一个`事件表`中，这样在用户空间和内核空间的copy只需要一次。
+
+> 边缘触发：只告诉用户进程哪些fd刚刚变成就绪，且只通知一次。
+
+epoll 对文件描述符的操作有两种模式：水平触发(**LT** level trigger) 和 边缘出发 (**ET** edge trigger)。
+
+> LT（**默认**）：用户进程**可以不立即处理** epoll\_wait 返回的事件，下次调用epoll_wait时，**会再次**响应应用程序并**通知此事件**。
+>
+> > 同时支持 `block socket` 和 `no-block socket`
+>
+> ET：用户进程**必须立即处理** epoll\_wait 返回的事件，如果不处理，下次调用 epoll_wait 时，epoll **不会再次**响应应用程序并**通知此事件**。
+>
+> > ET模式在很大程度上减少了epoll事件被重复触发的次数，因此**效率更高**。
+> >
+> > 只支持非阻塞套接口 `no-block socket`
+
+
+
+epoll的接口非常简单，一共就三个函数：
+
+###### epoll_create(int size)
+
+创建一个epoll文件描述符 来监听多个fd
+
+> ```
+> epoll_create() creates a new epoll(7) instance.  Since Linux
+> 2.6.8, the size argument is ignored, but must be greater than
+> zero; see NOTES.
+> ```
+>
+> 参数size在2.6.8之后已经没什么用了，这个fd的size是内核动态调整的。不过参数size必须>0。
+>
+> https://man7.org/linux/man-pages/man2/epoll_create.2.html
+>
+> ```c
+> int epoll_create(int size);
+> 
+> SYSCALL_DEFINE1(epoll_create, int, size)
+> {
+>     if (size <= 0)
+>         return -EINVAL;
+>     return sys_epoll_create1(0);
+> }
+> 
+> /*
+>  * Open an eventpoll file descriptor.
+>  * 打开一个时间循环文件描述符
+>  */
+> SYSCALL_DEFINE1(epoll_create1, int, flags)
+> {
+>     int error, fd;
+>     struct eventpoll *ep = NULL;
+>     struct file *file;
+> 
+>     /* Check the EPOLL_* constant for consistency.  */
+>     BUILD_BUG_ON(EPOLL_CLOEXEC != O_CLOEXEC);
+> 
+>     if (flags & ~EPOLL_CLOEXEC)
+>         return -EINVAL;
+>     /*
+>      * Create the internal data structure ("struct eventpoll"). 内部数据结构
+>      */
+>     error = ep_alloc(&ep);
+>     if (error < 0)
+>         return error;
+>     /*
+>      * Creates all the items needed to setup an eventpoll file. That is,
+>      * a file structure and a free file descriptor.
+>      * 创建描述（监听的fd的时间轮询）的文件描述符
+>      */
+>     fd = get_unused_fd_flags(O_RDWR | (flags & O_CLOEXEC));
+>     if (fd < 0) {
+>         error = fd;
+>         goto out_free_ep;
+>     }
+>     file = anon_inode_getfile("[eventpoll]", &eventpoll_fops, ep,
+>                  O_RDWR | (flags & O_CLOEXEC));
+>     if (IS_ERR(file)) {
+>         error = PTR_ERR(file);
+>         goto out_free_fd;
+>     }
+>     ep->file = file;
+>     fd_install(fd, file);
+>     return fd;
+> 
+> out_free_fd:
+>     put_unused_fd(fd);
+> out_free_ep:
+>     ep_free(ep);
+>     return error;
+> }
+> ```
+
+
+
+###### epoll_ctl(...)
+
+epoll_ctl()用于向epoll注册事件，而且明确监听的事件类型
+
+```c
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
+// epfd: 返回值（epoll文件描述符）
+// op: 动作：有三个宏（类似enum）可选：EPOLL_CTL_ADD,EPOLL_CTL_MOD,EPOLL_CTL_DEL
+// fd: 要监听的fd
+// *event: 要监听的事件
+```
+
+> 1. 参数 **op** 可选的三个宏：增（EPOLL\_CTL\_**ADD**），改（EPOLL\_CTL\_**MOD**），删（EPOLL\_CTL\_**DEL**）
+>
+> 2. 参数 ***event** 有如下选择
+>
+>    | event        | 描述                                                         |
+>    | ------------ | ------------------------------------------------------------ |
+>    | EPOLLIN      | in,对应的文件描述符**可读**（包括对端 SOCKET 正常关闭）      |
+>    | EPOLLOUT     | out,对应的文件描述符**可写**                                 |
+>    | EPOLLPRI     | pri,对应的文件描述符**有紧急的数据可读**（这里应该表示有带外数据到来） |
+>    | EPOLLERR     | err,对应的文件描述符**发生错误**                             |
+>    | EPOLLHUP     | hup,对应的文件描述符**被挂断**                               |
+>    | EPOLLET      | et,将epoll从 水平触发 **LT**(Level Triggered) **设为** 边缘触发 **ET**(Edge Triggered) 模式 |
+>    | EPOLLONESHOT | oneshot,只监听一次事件，当监听完这次事件之后，如果还需要继续监听这个socket的话，需要再次把这个socket加入到epoll队列里 |
+
+
+
+###### epoll_wait(...timeout...)
+
+```c
+int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout);
+// epfd： 方法返回值
+// *events： 调用者自己开辟一块事件数组，用于存储就绪的事件
+// maxevents： *events size的最大值
+// timeout： 等待超时时间（0 表示立即返回;-1 表示永久阻塞,直到有就绪事件）
+```
+
+
+
+##### 使用epoll
+
+- 调用 create 创建 epoll 描述符（即下文代码中的 epfd 变量）
+- 调用 ctl： 添加关注的事件
+- 循环调用wait
+
+```c
+// --------------------------- 大致代码框架：
+while true {
+    active_fd[] = epoll_wait(epollfd) // 阻塞 直到有事件就绪(epoll_wait只返回已经就绪的事件)
+    for i in active_fd[] { // 遍历所有已就绪的fd
+        read or write till unavailable // 处理对应的事件
+    }
+}
+// --------------------------- 具体代码：网上找的一个socket使用epoll的例子
+epfd = epoll_create(1);
+epoll_ctl(epfd, EPPOLL_CTL_ADD, ...);
+for( ; ; )
+{
+    nfds = epoll_wait(epfd,events,20,500);// 调用epoll_wait,获取有事件发生的fd
+    for(i = 0; i < nfds; ++i)
+    {
+        if(events[i].data.fd==listenfd) //如果是主socket的事件，则表示有新的连接
+        {
+            connfd = accept(listenfd,(sockaddr *)&clientaddr, &clilen); //accept这个连接
+            ev.data.fd=connfd;
+            ev.events=EPOLLIN|EPOLLET;
+            epoll_ctl(epfd,EPOLL_CTL_ADD,connfd,&ev); //将新的fd添加到epoll的监听队列中
+        }
+        else if( events[i].events&EPOLLIN ) //接收到数据，读socket
+        {
+            if ( (sockfd = events[i].data.fd) < 0) continue;
+            n = read(sockfd, line, MAXLINE)) < 0    //读
+                ev.data.ptr = md;     //md为自定义类型，添加数据
+            ev.events=EPOLLOUT|EPOLLET;
+            epoll_ctl(epfd,EPOLL_CTL_MOD,sockfd,&ev);//修改标识符，等待下一个循环时发送数据，异步处理的精髓
+        }
+        else if(events[i].events&EPOLLOUT) //有数据待发送，写socket
+        {
+            struct myepoll_data* md = (myepoll_data*)events[i].data.ptr;    //取数据
+            sockfd = md->fd;
+            send( sockfd, md->ptr, strlen((char*)md->ptr), 0 );        //发送数据
+            ev.data.fd=sockfd;
+            ev.events=EPOLLIN|EPOLLET;
+            epoll_ctl(epfd,EPOLL_CTL_MOD,sockfd,&ev); //修改标识符，等待下一个循环时接收数据
+        }
+        else
+        {
+            //其他情况的处理
+        }
+    }
+}
+```
+
+
+
+##### epoll 实现原理
+
+> 在linux，一切皆文件．所以当调用epoll_create时，内核给这个epoll分配一个file，但是这个不是普通的文件，而是只服务于epoll．
+>
+> 所以当内核初始化epoll时，会开辟一块内核高速cache区，用于安置我们监听的socket，这些socket会以红黑树的形式保存在内核的cache里，以支持快速的查找，插入，删除．同时，建立了一盒list链表，用于存储准备就绪的事件．所以调用epoll_wait时，在timeout时间内，只是简单的观察这个list链表是否有数据，如果没有，则睡眠至超时时间到返回；如果有数据，则在超时时间到，拷贝至用户态events数组中．
+>
+> 那么，这个准备就绪list链表是怎么维护的呢？当我们执行epoll_ctl时，除了把socket放到epoll文件系统里file对象对应的红黑树上之外，还会给内核中断处理程序注册一个回调函数，告诉内核，如果这个句柄的中断到了，就把它放到准备就绪list链表里。所以，当一个socket上有数据到了，内核在把网卡上的数据copy到内核中后就来把socket插入到准备就绪链表里了。
+>
+> epoll有两种模式LT(水平触发)和ET(边缘触发)，LT模式下，主要缓冲区数据一次没有处理完，那么下次epoll_wait返回时，还会返回这个句柄；而ET模式下，缓冲区数据一次没处理结束，那么下次是不会再通知了，只在第一次返回．所以在ET模式下，一般是通过while循环，一次性读完全部数据．epoll默认使用的是LT．
+>
+> 这件事怎么做到的呢？当一个socket句柄上有事件时，内核会把该句柄插入上面所说的准备就绪list链表，这时我们调用epoll_wait，会把准备就绪的socket拷贝到用户态内存，然后清空准备就绪list链表，最后，epoll_wait干了件事，就是检查这些socket，如果不是ET模式（就是LT模式的句柄了），并且这些socket上确实有未处理的事件时，又把该句柄放回到刚刚清空的准备就绪链表了。所以，非ET的句柄，只要它上面还有事件，epoll_wait每次都会返回。而ET模式的句柄，除非有新中断到，即使socket上的事件没有处理完，也是不会次次从epoll_wait返回的．
+>
+> 经常看到比较ET和LT模式到底哪个效率高的问题．有一个回答是说ET模式下减少epoll系统调用．这话没错，也可以理解，但是在ET模式下，为了避免数据饿死问题，用户态必须用一个循环，将所有的数据一次性处理结束．所以在ET模式下下，虽然epoll系统调用减少了，但是用户态的逻辑复杂了，write/read调用增多了．所以这不好判断，要看用户的性能瓶颈在哪．
+
+
+
+#### epoll 和 select/poll 的区别/优化
+
+没有fd数量限制，只需在用户空间和内核空间copy一次。只复制`epoll_create()`创建的文件描述符(特殊的，共享内存，高级缓存)
+
+只对活跃的fd进行处理，而不是全部遍历所有的fd，效率提升，不是盲目轮询的方式，不会随着FD数目的增加效率下降。
+
+只有活跃可用的FD才会调用callback函数；即Epoll最大的优点就在于它只管你“活跃”的连接，而跟连接总数无关，因此
+
+内存拷贝`，利用mmap()文件映射内存加速与内核空间的消息传递；`即epoll使用mmap减少复制开销
+
+epoll支持的fd个数不受限制，它支持的fd上限是最大可以打开文件的数目，一般远大于2048，1G内存的机器上是大约10万左右．
+
+epoll使用的是共享内存，select全部复制，所以效率更低；epoll支持内核微调．
 
 ---
 
 
-
-- 忙轮询
-
-  无一例外从头到尾闷头轮询，如果长时间没有fd就绪，就相当于一直空轮询了
-
-- 无差别轮询
-
-  让一个代理（内核函数）去轮询，如果没有就绪的事件，就阻塞当前线程，直到关注的fd中有就绪事件，在linux中这个代理就是 select/poll
-
-  ```c
-  while true {
-      select(streams[]) // 这里如果没有就绪的时间就阻塞
-      for i in streams[] {
-          if i has data
-              read until unavailable//这里处理fd的时候还要注意 是不是已经处理过了 如果read()可能会一直阻塞下去，因为可能已经被其他人处理
-      }
-  }
-  ```
-
-  如果streams[]中有就绪的流，就会唤醒当前线程，如果100个stream中只有1个stream就绪了，我们还是要遍历这100个stream，时间复杂度永远是O(n)，处理的流越多，性能就越慢。
-
-- 最小轮询 epoll
-
-  可以比 无差别轮询 监听更多的fd
-
-  ```c
-  while true {
-      active_stream[] = epoll_wait(epollfd)// 阻塞 直到有事件就绪；只返回已经就绪的事件；epollfd-关注的文件描述符
-      for i in active_stream[] {
-          read or write till unavailable
-      }
-  }
-  ```
-
-
-
-
-
->https://blog.csdn.net/chewbee/article/details/78108223
->
->有更详细的 select/poll/epoll 函数原型的介绍
-
-
-
-### 使用epoll的例子
-
-可以监视多个fd上发生的指定的n种事件，获取到这些事件然后做相应的处理，比如epoll的使用一般都是这个框架
-
-```c++
-for( ; ; )
-    {
-        nfds = epoll_wait(epfd,events,20,500);//阻塞 直到有事件（就绪的io）
-        for(i=0;i<nfds;++i)
-        {
-            if(events[i].data.fd==listenfd) //有新的连接
-            {
-                connfd = accept(listenfd,(sockaddr *)&clientaddr, &clilen); //accept这个连接
-                ev.data.fd=connfd;
-                ev.events=EPOLLIN|EPOLLET;
-                epoll_ctl(epfd,EPOLL_CTL_ADD,connfd,&ev); //将新的fd添加到epoll的监听队列中
-            }
-            else if( events[i].events&EPOLLIN ) //接收到数据，读socket
-            {
-                n = read(sockfd, line, MAXLINE)) < 0    //读
-                ev.data.ptr = md;     //md为自定义类型，添加数据
-                ev.events=EPOLLOUT|EPOLLET;
-                epoll_ctl(epfd,EPOLL_CTL_MOD,sockfd,&ev);//修改标识符，等待下一个循环时发送数据，异步处理的精髓
-            }
-            else if(events[i].events&EPOLLOUT) //有数据待发送，写socket
-            {
-                struct myepoll_data* md = (myepoll_data*)events[i].data.ptr;    //取数据
-                sockfd = md->fd;
-                send( sockfd, md->ptr, strlen((char*)md->ptr), 0 );        //发送数据
-                ev.data.fd=sockfd;
-                ev.events=EPOLLIN|EPOLLET;
-                epoll_ctl(epfd,EPOLL_CTL_MOD,sockfd,&ev); //修改标识符，等待下一个循环时接收数据
-            }
-            else
-            {
-                //其他的处理
-            }
-        }
-    }
-```
-
-> 这里也有关于epoll的参数介绍 https://www.cnblogs.com/fnlingnzb-learner/p/5835573.html
 
 
 
@@ -257,6 +450,8 @@ for( ; ; )
 
 
 
+
+Redis 和 Memcache 都是使用了基于IO多路复用的高性能网络库。
 
 # Java中的NIO
 

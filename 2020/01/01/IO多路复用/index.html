@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      2.7k 字
+      5k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      31
+      59
        分钟
     </span>
   
@@ -325,81 +325,252 @@
 <img alt="IO模型时序图" src="https://raw.githubusercontent.com/melopoz/pics/master/img/IO%E6%A8%A1%E5%9E%8B%E6%97%B6%E5%BA%8F%E5%9B%BE.png" srcset="/blog/img/loading.gif" style="zoom:33%;" />
 
 <hr>
-<h3 id="select-poll-epoll"><a href="#select-poll-epoll" class="headerlink" title="select/poll/epoll"></a>select/poll/epoll</h3><hr>
-<ul>
-<li><p>忙轮询</p>
-<p>无一例外从头到尾闷头轮询，如果长时间没有fd就绪，就相当于一直空轮询了</p>
-</li>
-<li><p>无差别轮询</p>
-<p>让一个代理（内核函数）去轮询，如果没有就绪的事件，就阻塞当前线程，直到关注的fd中有就绪事件，在linux中这个代理就是 select/poll</p>
-<pre><code class="hljs c"><span class="hljs-keyword">while</span> <span class="hljs-literal">true</span> &#123;
-    select(streams[]) <span class="hljs-comment">// 这里如果没有就绪的时间就阻塞</span>
-    <span class="hljs-keyword">for</span> i in streams[] &#123;
-        <span class="hljs-keyword">if</span> i has data
-            read until unavailable<span class="hljs-comment">//这里处理fd的时候还要注意 是不是已经处理过了 如果read()可能会一直阻塞下去，因为可能已经被其他人处理</span>
+<h3 id="select-poll-epoll"><a href="#select-poll-epoll" class="headerlink" title="select/poll/epoll"></a>select/poll/epoll</h3><h4 id="select"><a href="#select" class="headerlink" title="select"></a>select</h4><p><code>select</code>是<code>POSIX</code>规定的，一般操作系统都有实现。</p>
+<pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;winsock.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> __FD_SETSIZE    1024</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">select</span><span class="hljs-params">(</span></span>
+<span class="hljs-function"><span class="hljs-params">    <span class="hljs-keyword">int</span> nfds, <span class="hljs-comment">// 本参数忽略，仅起到兼容作用</span></span></span>
+<span class="hljs-function"><span class="hljs-params">    fd_set* readfds, <span class="hljs-comment">// （可选）指针，指向一组等待可读性检查的套接口fd</span></span></span>
+<span class="hljs-function"><span class="hljs-params">    fd_set* writefds, <span class="hljs-comment">// （可选）指针，指向一组等待可写性检查的套接口fd</span></span></span>
+<span class="hljs-function"><span class="hljs-params">    fd_set* exceptfds, <span class="hljs-comment">// （可选）指针，指向一组等待错误检查的套接口fd</span></span></span>
+<span class="hljs-function"><span class="hljs-params">    <span class="hljs-keyword">const</span> struct timeval* timeout <span class="hljs-comment">// timeout：select()最多等待时间，对阻塞操作则应为NULL。</span></span></span>
+<span class="hljs-function"><span class="hljs-params">)</span></span>;</code></pre>
+
+<p>select是通过维护一个用来存放大量fd的数据结构，这样会使得用户空间和内核空间在传递这些fd时复制开销也随着fd的数量线性增大。也因此单个进程所打开的fd是有一定限制的，它由<code>FD_SETSIZE</code>设置，默认值是<code>1024</code>。</p>
+<blockquote>
+<p>一般来说这个数目和系统内存关系很大，具体数目可以<code>cat /proc/sys/fs/file-max</code>查看。32位机默认是1024个；64位机默认是2048。</p>
+</blockquote>
+<p>而且select对fd进行的是线性扫描，即轮询，效率较低。</p>
+<blockquote>
+<p>当套接字比较多的时候，每次select()都要遍历<code>fd_setsize</code>个fd来完成调度，不管其中fd是否活跃，都遍历一遍。</p>
+<p>这会浪费很多CPU时间。<code>如果能给套接字注册某个回调函数，当他们活跃时，自动完成相关操作，那就避免了轮询</code>，这正是epoll与kqueue做的优化。</p>
+</blockquote>
+<h5 id="使用select"><a href="#使用select" class="headerlink" title="使用select"></a>使用select</h5><pre><code class="hljs c"><span class="hljs-keyword">while</span> <span class="hljs-literal">true</span> &#123;
+    fd_set* readfds;
+    fd_set* writefds;
+    fd_set* exceptfds;
+    select(.. readfds, writefds, exceptfds, ...) <span class="hljs-comment">// 这里如果没有就绪的时间就阻塞</span>
+    <span class="hljs-keyword">for</span> ready_fd in readfds &#123;
+        <span class="hljs-keyword">if</span> read_fd has data
+            <span class="hljs-comment">// 这里处理fd的时候还要注意 是不是已经处理过了 如果read()可能会一直阻塞下去，因为可能已经被其他人处理</span>
+            read(read_fd, timeout) until unavailable
     &#125;
 &#125;</code></pre>
 
-<p>如果streams[]中有就绪的流，就会唤醒当前线程，如果100个stream中只有1个stream就绪了，我们还是要遍历这100个stream，时间复杂度永远是O(n)，处理的流越多，性能就越慢。</p>
-</li>
-<li><p>最小轮询 epoll</p>
-<p>可以比 无差别轮询 监听更多的fd</p>
-<pre><code class="hljs c"><span class="hljs-keyword">while</span> <span class="hljs-literal">true</span> &#123;
-    active_stream[] = epoll_wait(epollfd)<span class="hljs-comment">// 阻塞 直到有事件就绪；只返回已经就绪的事件；epollfd-关注的文件描述符</span>
-    <span class="hljs-keyword">for</span> i in active_stream[] &#123;
-        read <span class="hljs-keyword">or</span> write till unavailable
+
+
+<h4 id="poll"><a href="#poll" class="headerlink" title="poll"></a>poll</h4><p>和select不同的是存储fd_set使用的链表，理论上没有最大连接数限制，fd_set被整体复制，同样的浪费空间；</p>
+<p>poll是<code>水平触发</code>如果本次报告了fd可用，如果用户进程没有处理，下次还会报告这个fd。</p>
+<h4 id="select-和-poll-的弱点"><a href="#select-和-poll-的弱点" class="headerlink" title="select 和 poll 的弱点"></a>select 和 poll 的弱点</h4><p>都要传入fd数组，内核遍历数组把所有就绪的fd标记为已就绪，然后用户进程再遍历fd数组找到已就绪的fd进行处理。一般同一时间内要处理的fd只有少部分处于就绪状态。如果监控的fd越来越多，性能会线性下降。</p>
+<h4 id="epoll"><a href="#epoll" class="headerlink" title="epoll"></a><strong>epoll</strong></h4><p>epoll 是Linux2.6新增的优化版本，epoll 使用<code>一个fd</code>管理多个fd，将<code>用户进程关注的fd的事件</code>存放到内核的一个<code>事件表</code>中，这样在用户空间和内核空间的copy只需要一次。</p>
+<blockquote>
+<p>边缘触发：只告诉用户进程哪些fd刚刚变成就绪，且只通知一次。</p>
+</blockquote>
+<p>epoll 对文件描述符的操作有两种模式：水平触发(<strong>LT</strong> level trigger) 和 边缘出发 (<strong>ET</strong> edge trigger)。</p>
+<blockquote>
+<p>LT（<strong>默认</strong>）：用户进程<strong>可以不立即处理</strong> epoll_wait 返回的事件，下次调用epoll_wait时，<strong>会再次</strong>响应应用程序并<strong>通知此事件</strong>。</p>
+<blockquote>
+<p>同时支持 <code>block socket</code> 和 <code>no-block socket</code></p>
+</blockquote>
+<p>ET：用户进程<strong>必须立即处理</strong> epoll_wait 返回的事件，如果不处理，下次调用 epoll_wait 时，epoll <strong>不会再次</strong>响应应用程序并<strong>通知此事件</strong>。</p>
+<blockquote>
+<p>ET模式在很大程度上减少了epoll事件被重复触发的次数，因此<strong>效率更高</strong>。</p>
+<p>只支持非阻塞套接口 <code>no-block socket</code></p>
+</blockquote>
+</blockquote>
+<p>epoll的接口非常简单，一共就三个函数：</p>
+<h6 id="epoll-create-int-size"><a href="#epoll-create-int-size" class="headerlink" title="epoll_create(int size)"></a>epoll_create(int size)</h6><p>创建一个epoll文件描述符 来监听多个fd</p>
+<blockquote>
+<pre><code class="hljs mipsasm">epoll_create() creates a new epoll(<span class="hljs-number">7</span>) <span class="hljs-keyword">instance. </span> Since Linux
+<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">8</span>, the size argument is ignored, <span class="hljs-keyword">but </span>must <span class="hljs-keyword">be </span>greater than
+<span class="hljs-built_in">zero</span><span class="hljs-comment">; see NOTES.</span></code></pre>
+
+<p>参数size在2.6.8之后已经没什么用了，这个fd的size是内核动态调整的。不过参数size必须&gt;0。</p>
+<p><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/epoll_create.2.html">https://man7.org/linux/man-pages/man2/epoll_create.2.html</a></p>
+<pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">epoll_create</span><span class="hljs-params">(<span class="hljs-keyword">int</span> size)</span></span>;
+
+SYSCALL_DEFINE1(epoll_create, <span class="hljs-keyword">int</span>, size)
+&#123;
+    <span class="hljs-keyword">if</span> (size &lt;= <span class="hljs-number">0</span>)
+        <span class="hljs-keyword">return</span> -EINVAL;
+    <span class="hljs-keyword">return</span> sys_epoll_create1(<span class="hljs-number">0</span>);
+&#125;
+
+<span class="hljs-comment">/*</span>
+<span class="hljs-comment"> * Open an eventpoll file descriptor.</span>
+<span class="hljs-comment"> * 打开一个时间循环文件描述符</span>
+<span class="hljs-comment"> */</span>
+SYSCALL_DEFINE1(epoll_create1, <span class="hljs-keyword">int</span>, flags)
+&#123;
+    <span class="hljs-keyword">int</span> error, fd;
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">eventpoll</span> *<span class="hljs-title">ep</span> =</span> <span class="hljs-literal">NULL</span>;
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file</span> *<span class="hljs-title">file</span>;</span>
+
+    <span class="hljs-comment">/* Check the EPOLL_* constant for consistency.  */</span>
+    BUILD_BUG_ON(EPOLL_CLOEXEC != O_CLOEXEC);
+
+    <span class="hljs-keyword">if</span> (flags &amp; ~EPOLL_CLOEXEC)
+        <span class="hljs-keyword">return</span> -EINVAL;
+    <span class="hljs-comment">/*</span>
+<span class="hljs-comment">     * Create the internal data structure (&quot;struct eventpoll&quot;). 内部数据结构</span>
+<span class="hljs-comment">     */</span>
+    error = ep_alloc(&amp;ep);
+    <span class="hljs-keyword">if</span> (error &lt; <span class="hljs-number">0</span>)
+        <span class="hljs-keyword">return</span> error;
+    <span class="hljs-comment">/*</span>
+<span class="hljs-comment">     * Creates all the items needed to setup an eventpoll file. That is,</span>
+<span class="hljs-comment">     * a file structure and a free file descriptor.</span>
+<span class="hljs-comment">     * 创建描述（监听的fd的时间轮询）的文件描述符</span>
+<span class="hljs-comment">     */</span>
+    fd = get_unused_fd_flags(O_RDWR | (flags &amp; O_CLOEXEC));
+    <span class="hljs-keyword">if</span> (fd &lt; <span class="hljs-number">0</span>) &#123;
+        error = fd;
+        <span class="hljs-keyword">goto</span> out_free_ep;
     &#125;
+    file = anon_inode_getfile(<span class="hljs-string">&quot;[eventpoll]&quot;</span>, &amp;eventpoll_fops, ep,
+                 O_RDWR | (flags &amp; O_CLOEXEC));
+    <span class="hljs-keyword">if</span> (IS_ERR(file)) &#123;
+        error = PTR_ERR(file);
+        <span class="hljs-keyword">goto</span> out_free_fd;
+    &#125;
+    ep-&gt;file = file;
+    fd_install(fd, file);
+    <span class="hljs-keyword">return</span> fd;
+
+out_free_fd:
+    put_unused_fd(fd);
+out_free_ep:
+    ep_free(ep);
+    <span class="hljs-keyword">return</span> error;
 &#125;</code></pre>
+</blockquote>
+<h6 id="epoll-ctl-…"><a href="#epoll-ctl-…" class="headerlink" title="epoll_ctl(…)"></a>epoll_ctl(…)</h6><p>epoll_ctl()用于向epoll注册事件，而且明确监听的事件类型</p>
+<pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">epoll_ctl</span><span class="hljs-params">(<span class="hljs-keyword">int</span> epfd, <span class="hljs-keyword">int</span> op, <span class="hljs-keyword">int</span> fd, struct epoll_event *event)</span></span>;
+<span class="hljs-comment">// epfd: 返回值（epoll文件描述符）</span>
+<span class="hljs-comment">// op: 动作：有三个宏（类似enum）可选：EPOLL_CTL_ADD,EPOLL_CTL_MOD,EPOLL_CTL_DEL</span>
+<span class="hljs-comment">// fd: 要监听的fd</span>
+<span class="hljs-comment">// *event: 要监听的事件</span></code></pre>
 
-
-
-
-
+<blockquote>
+<ol>
+<li><p>参数 <strong>op</strong> 可选的三个宏：增（EPOLL_CTL_<strong>ADD</strong>），改（EPOLL_CTL_<strong>MOD</strong>），删（EPOLL_CTL_<strong>DEL</strong>）</p>
 </li>
+<li><p>参数 *<strong>event</strong> 有如下选择</p>
+<table>
+<thead>
+<tr>
+<th>event</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>EPOLLIN</td>
+<td>in,对应的文件描述符<strong>可读</strong>（包括对端 SOCKET 正常关闭）</td>
+</tr>
+<tr>
+<td>EPOLLOUT</td>
+<td>out,对应的文件描述符<strong>可写</strong></td>
+</tr>
+<tr>
+<td>EPOLLPRI</td>
+<td>pri,对应的文件描述符<strong>有紧急的数据可读</strong>（这里应该表示有带外数据到来）</td>
+</tr>
+<tr>
+<td>EPOLLERR</td>
+<td>err,对应的文件描述符<strong>发生错误</strong></td>
+</tr>
+<tr>
+<td>EPOLLHUP</td>
+<td>hup,对应的文件描述符<strong>被挂断</strong></td>
+</tr>
+<tr>
+<td>EPOLLET</td>
+<td>et,将epoll从 水平触发 <strong>LT</strong>(Level Triggered) <strong>设为</strong> 边缘触发 <strong>ET</strong>(Edge Triggered) 模式</td>
+</tr>
+<tr>
+<td>EPOLLONESHOT</td>
+<td>oneshot,只监听一次事件，当监听完这次事件之后，如果还需要继续监听这个socket的话，需要再次把这个socket加入到epoll队列里</td>
+</tr>
+</tbody></table>
+</li>
+</ol>
+</blockquote>
+<h6 id="epoll-wait-…timeout…"><a href="#epoll-wait-…timeout…" class="headerlink" title="epoll_wait(…timeout…)"></a>epoll_wait(…timeout…)</h6><pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">epoll_wait</span><span class="hljs-params">(<span class="hljs-keyword">int</span> epfd, struct epoll_event *events, <span class="hljs-keyword">int</span> maxevents, <span class="hljs-keyword">int</span> timeout)</span></span>;
+<span class="hljs-comment">// epfd： 方法返回值</span>
+<span class="hljs-comment">// *events： 调用者自己开辟一块事件数组，用于存储就绪的事件</span>
+<span class="hljs-comment">// maxevents： *events size的最大值</span>
+<span class="hljs-comment">// timeout： 等待超时时间（0 表示立即返回;-1 表示永久阻塞,直到有就绪事件）</span></code></pre>
+
+
+
+<h5 id="使用epoll"><a href="#使用epoll" class="headerlink" title="使用epoll"></a>使用epoll</h5><ul>
+<li>调用 create 创建 epoll 描述符（即下文代码中的 epfd 变量）</li>
+<li>调用 ctl： 添加关注的事件</li>
+<li>循环调用wait</li>
 </ul>
-<blockquote>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/chewbee/article/details/78108223">https://blog.csdn.net/chewbee/article/details/78108223</a></p>
-<p>有更详细的 select/poll/epoll 函数原型的介绍</p>
-</blockquote>
-<h3 id="使用epoll的例子"><a href="#使用epoll的例子" class="headerlink" title="使用epoll的例子"></a>使用epoll的例子</h3><p>可以监视多个fd上发生的指定的n种事件，获取到这些事件然后做相应的处理，比如epoll的使用一般都是这个框架</p>
-<pre><code class="hljs c++"><span class="hljs-keyword">for</span>( ; ; )
+<pre><code class="hljs c"><span class="hljs-comment">// --------------------------- 大致代码框架：</span>
+<span class="hljs-keyword">while</span> <span class="hljs-literal">true</span> &#123;
+    active_fd[] = epoll_wait(epollfd) <span class="hljs-comment">// 阻塞 直到有事件就绪(epoll_wait只返回已经就绪的事件)</span>
+    <span class="hljs-keyword">for</span> i in active_fd[] &#123; <span class="hljs-comment">// 遍历所有已就绪的fd</span>
+        read <span class="hljs-keyword">or</span> write till unavailable <span class="hljs-comment">// 处理对应的事件</span>
+    &#125;
+&#125;
+<span class="hljs-comment">// --------------------------- 具体代码：网上找的一个socket使用epoll的例子</span>
+epfd = epoll_create(<span class="hljs-number">1</span>);
+epoll_ctl(epfd, EPPOLL_CTL_ADD, ...);
+<span class="hljs-keyword">for</span>( ; ; )
+&#123;
+    nfds = epoll_wait(epfd,events,<span class="hljs-number">20</span>,<span class="hljs-number">500</span>);<span class="hljs-comment">// 调用epoll_wait,获取有事件发生的fd</span>
+    <span class="hljs-keyword">for</span>(i = <span class="hljs-number">0</span>; i &lt; nfds; ++i)
     &#123;
-        nfds = <span class="hljs-built_in">epoll_wait</span>(epfd,events,<span class="hljs-number">20</span>,<span class="hljs-number">500</span>);<span class="hljs-comment">//阻塞 直到有事件（就绪的io）</span>
-        <span class="hljs-keyword">for</span>(i=<span class="hljs-number">0</span>;i&lt;nfds;++i)
+        <span class="hljs-keyword">if</span>(events[i].data.fd==listenfd) <span class="hljs-comment">//如果是主socket的事件，则表示有新的连接</span>
         &#123;
-            <span class="hljs-keyword">if</span>(events[i].data.fd==listenfd) <span class="hljs-comment">//有新的连接</span>
-            &#123;
-                connfd = <span class="hljs-built_in">accept</span>(listenfd,(sockaddr *)&amp;clientaddr, &amp;clilen); <span class="hljs-comment">//accept这个连接</span>
-                ev.data.fd=connfd;
-                ev.events=EPOLLIN|EPOLLET;
-                <span class="hljs-built_in">epoll_ctl</span>(epfd,EPOLL_CTL_ADD,connfd,&amp;ev); <span class="hljs-comment">//将新的fd添加到epoll的监听队列中</span>
-            &#125;
-            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>( events[i].events&amp;EPOLLIN ) <span class="hljs-comment">//接收到数据，读socket</span>
-            &#123;
-                n = <span class="hljs-built_in">read</span>(sockfd, line, MAXLINE)) &lt; <span class="hljs-number">0</span>    <span class="hljs-comment">//读</span>
-                ev.data.ptr = md;     <span class="hljs-comment">//md为自定义类型，添加数据</span>
-                ev.events=EPOLLOUT|EPOLLET;
-                <span class="hljs-built_in">epoll_ctl</span>(epfd,EPOLL_CTL_MOD,sockfd,&amp;ev);<span class="hljs-comment">//修改标识符，等待下一个循环时发送数据，异步处理的精髓</span>
-            &#125;
-            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(events[i].events&amp;EPOLLOUT) <span class="hljs-comment">//有数据待发送，写socket</span>
-            &#123;
-                struct myepoll_data* md = (myepoll_data*)events[i].data.ptr;    <span class="hljs-comment">//取数据</span>
-                sockfd = md-&gt;fd;
-                <span class="hljs-built_in">send</span>( sockfd, md-&gt;ptr, <span class="hljs-built_in">strlen</span>((<span class="hljs-keyword">char</span>*)md-&gt;ptr), <span class="hljs-number">0</span> );        <span class="hljs-comment">//发送数据</span>
-                ev.data.fd=sockfd;
-                ev.events=EPOLLIN|EPOLLET;
-                <span class="hljs-built_in">epoll_ctl</span>(epfd,EPOLL_CTL_MOD,sockfd,&amp;ev); <span class="hljs-comment">//修改标识符，等待下一个循环时接收数据</span>
-            &#125;
-            <span class="hljs-keyword">else</span>
-            &#123;
-                <span class="hljs-comment">//其他的处理</span>
-            &#125;
+            connfd = accept(listenfd,(sockaddr *)&amp;clientaddr, &amp;clilen); <span class="hljs-comment">//accept这个连接</span>
+            ev.data.fd=connfd;
+            ev.events=EPOLLIN|EPOLLET;
+            epoll_ctl(epfd,EPOLL_CTL_ADD,connfd,&amp;ev); <span class="hljs-comment">//将新的fd添加到epoll的监听队列中</span>
         &#125;
-    &#125;</code></pre>
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>( events[i].events&amp;EPOLLIN ) <span class="hljs-comment">//接收到数据，读socket</span>
+        &#123;
+            <span class="hljs-keyword">if</span> ( (sockfd = events[i].data.fd) &lt; <span class="hljs-number">0</span>) <span class="hljs-keyword">continue</span>;
+            n = read(sockfd, line, MAXLINE)) &lt; <span class="hljs-number">0</span>    <span class="hljs-comment">//读</span>
+                ev.data.ptr = md;     <span class="hljs-comment">//md为自定义类型，添加数据</span>
+            ev.events=EPOLLOUT|EPOLLET;
+            epoll_ctl(epfd,EPOLL_CTL_MOD,sockfd,&amp;ev);<span class="hljs-comment">//修改标识符，等待下一个循环时发送数据，异步处理的精髓</span>
+        &#125;
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(events[i].events&amp;EPOLLOUT) <span class="hljs-comment">//有数据待发送，写socket</span>
+        &#123;
+            struct myepoll_data* md = (myepoll_data*)events[i].data.ptr;    <span class="hljs-comment">//取数据</span>
+            sockfd = md-&gt;fd;
+            send( sockfd, md-&gt;ptr, <span class="hljs-built_in">strlen</span>((<span class="hljs-keyword">char</span>*)md-&gt;ptr), <span class="hljs-number">0</span> );        <span class="hljs-comment">//发送数据</span>
+            ev.data.fd=sockfd;
+            ev.events=EPOLLIN|EPOLLET;
+            epoll_ctl(epfd,EPOLL_CTL_MOD,sockfd,&amp;ev); <span class="hljs-comment">//修改标识符，等待下一个循环时接收数据</span>
+        &#125;
+        <span class="hljs-keyword">else</span>
+        &#123;
+            <span class="hljs-comment">//其他情况的处理</span>
+        &#125;
+    &#125;
+&#125;</code></pre>
 
-<blockquote>
-<p>这里也有关于epoll的参数介绍 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/fnlingnzb-learner/p/5835573.html">https://www.cnblogs.com/fnlingnzb-learner/p/5835573.html</a></p>
+
+
+<h5 id="epoll-实现原理"><a href="#epoll-实现原理" class="headerlink" title="epoll 实现原理"></a>epoll 实现原理</h5><blockquote>
+<p>在linux，一切皆文件．所以当调用epoll_create时，内核给这个epoll分配一个file，但是这个不是普通的文件，而是只服务于epoll．</p>
+<p>所以当内核初始化epoll时，会开辟一块内核高速cache区，用于安置我们监听的socket，这些socket会以红黑树的形式保存在内核的cache里，以支持快速的查找，插入，删除．同时，建立了一盒list链表，用于存储准备就绪的事件．所以调用epoll_wait时，在timeout时间内，只是简单的观察这个list链表是否有数据，如果没有，则睡眠至超时时间到返回；如果有数据，则在超时时间到，拷贝至用户态events数组中．</p>
+<p>那么，这个准备就绪list链表是怎么维护的呢？当我们执行epoll_ctl时，除了把socket放到epoll文件系统里file对象对应的红黑树上之外，还会给内核中断处理程序注册一个回调函数，告诉内核，如果这个句柄的中断到了，就把它放到准备就绪list链表里。所以，当一个socket上有数据到了，内核在把网卡上的数据copy到内核中后就来把socket插入到准备就绪链表里了。</p>
+<p>epoll有两种模式LT(水平触发)和ET(边缘触发)，LT模式下，主要缓冲区数据一次没有处理完，那么下次epoll_wait返回时，还会返回这个句柄；而ET模式下，缓冲区数据一次没处理结束，那么下次是不会再通知了，只在第一次返回．所以在ET模式下，一般是通过while循环，一次性读完全部数据．epoll默认使用的是LT．</p>
+<p>这件事怎么做到的呢？当一个socket句柄上有事件时，内核会把该句柄插入上面所说的准备就绪list链表，这时我们调用epoll_wait，会把准备就绪的socket拷贝到用户态内存，然后清空准备就绪list链表，最后，epoll_wait干了件事，就是检查这些socket，如果不是ET模式（就是LT模式的句柄了），并且这些socket上确实有未处理的事件时，又把该句柄放回到刚刚清空的准备就绪链表了。所以，非ET的句柄，只要它上面还有事件，epoll_wait每次都会返回。而ET模式的句柄，除非有新中断到，即使socket上的事件没有处理完，也是不会次次从epoll_wait返回的．</p>
+<p>经常看到比较ET和LT模式到底哪个效率高的问题．有一个回答是说ET模式下减少epoll系统调用．这话没错，也可以理解，但是在ET模式下，为了避免数据饿死问题，用户态必须用一个循环，将所有的数据一次性处理结束．所以在ET模式下下，虽然epoll系统调用减少了，但是用户态的逻辑复杂了，write/read调用增多了．所以这不好判断，要看用户的性能瓶颈在哪．</p>
 </blockquote>
+<h4 id="epoll-和-select-poll-的区别-优化"><a href="#epoll-和-select-poll-的区别-优化" class="headerlink" title="epoll 和 select/poll 的区别/优化"></a>epoll 和 select/poll 的区别/优化</h4><p>没有fd数量限制，只需在用户空间和内核空间copy一次。只复制<code>epoll_create()</code>创建的文件描述符(特殊的，共享内存，高级缓存)</p>
+<p>只对活跃的fd进行处理，而不是全部遍历所有的fd，效率提升，不是盲目轮询的方式，不会随着FD数目的增加效率下降。</p>
+<p>只有活跃可用的FD才会调用callback函数；即Epoll最大的优点就在于它只管你“活跃”的连接，而跟连接总数无关，因此</p>
+<p>内存拷贝<code>，利用mmap()文件映射内存加速与内核空间的消息传递；</code>即epoll使用mmap减少复制开销</p>
+<p>epoll支持的fd个数不受限制，它支持的fd上限是最大可以打开文件的数目，一般远大于2048，1G内存的机器上是大约10万左右．</p>
+<p>epoll使用的是共享内存，select全部复制，所以效率更低；epoll支持内核微调．</p>
+<hr>
 <h3 id="IO多路复用-第二步读取-推荐用非阻塞函数"><a href="#IO多路复用-第二步读取-推荐用非阻塞函数" class="headerlink" title="IO多路复用 第二步读取 推荐用非阻塞函数"></a>IO多路复用 第二步读取 推荐用非阻塞函数</h3><p>问题  <a target="_blank" rel="noopener" href="https://www.zhihu.com/question/37271342">https://www.zhihu.com/question/37271342</a></p>
 <blockquote>
 <p>假如我调用了一个 select 函数，并且关注了几个fd， select 函数就会一直阻塞直到我关注的事件发生. 假如当有套接口可读时， select 函数就返回了，告诉我们套接口已经可读，接下来（<strong>IO Multiplexing的第二步系统调用</strong>）客户端进程可以用 <strong>阻塞的read</strong> 或者 <strong>非阻塞的 read</strong>：</p>
@@ -425,6 +596,7 @@
 </li>
 </ol>
 </blockquote>
+<p>Redis 和 Memcache 都是使用了基于IO多路复用的高性能网络库。</p>
 <h1 id="Java中的NIO"><a href="#Java中的NIO" class="headerlink" title="Java中的NIO"></a>Java中的NIO</h1><p>todo！！！</p>
 <p>java中使用的堆外内存，也是用户空间的，因为他是JVM进程使用<code>malloc</code>申请的内存，只不过在JVM管理的内存范围内。</p>
 <p><a target="_blank" rel="noopener" href="https://sulangsss.github.io/2018/12/08/Java/Advance/ByteBuffer/">https://sulangsss.github.io/2018/12/08/Java/Advance/ByteBuffer/</a></p>

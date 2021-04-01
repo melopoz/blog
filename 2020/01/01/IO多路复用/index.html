@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      59
+      58
        分钟
     </span>
   
@@ -248,7 +248,6 @@
 </ul>
 </li>
 </ul>
-<p>阻塞非阻塞说的是内核</p>
 <h2 id="Linux-五种-IO模型"><a href="#Linux-五种-IO模型" class="headerlink" title="Linux 五种 IO模型"></a>Linux 五种 IO模型</h2><blockquote>
 <p>用户态的进程调用read()其实是有<a href="https://melopoz.github.io/blog/2021/01/01/OS/#%E7%BC%93%E5%AD%98IO">缓存IO</a>的，有两次拷贝过程。</p>
 </blockquote>
@@ -362,11 +361,8 @@
 <h4 id="poll"><a href="#poll" class="headerlink" title="poll"></a>poll</h4><p>和select不同的是存储fd_set使用的链表，理论上没有最大连接数限制，fd_set被整体复制，同样的浪费空间；</p>
 <p>poll是<code>水平触发</code>如果本次报告了fd可用，如果用户进程没有处理，下次还会报告这个fd。</p>
 <h4 id="select-和-poll-的弱点"><a href="#select-和-poll-的弱点" class="headerlink" title="select 和 poll 的弱点"></a>select 和 poll 的弱点</h4><p>都要传入fd数组，内核遍历数组把所有就绪的fd标记为已就绪，然后用户进程再遍历fd数组找到已就绪的fd进行处理。一般同一时间内要处理的fd只有少部分处于就绪状态。如果监控的fd越来越多，性能会线性下降。</p>
-<h4 id="epoll"><a href="#epoll" class="headerlink" title="epoll"></a><strong>epoll</strong></h4><p>epoll 是Linux2.6新增的优化版本，epoll 使用<code>一个fd</code>管理多个fd，将<code>用户进程关注的fd的事件</code>存放到内核的一个<code>事件表</code>中，这样在用户空间和内核空间的copy只需要一次。</p>
-<blockquote>
-<p>边缘触发：只告诉用户进程哪些fd刚刚变成就绪，且只通知一次。</p>
-</blockquote>
-<p>epoll 对文件描述符的操作有两种模式：水平触发(<strong>LT</strong> level trigger) 和 边缘出发 (<strong>ET</strong> edge trigger)。</p>
+<h4 id="epoll"><a href="#epoll" class="headerlink" title="epoll"></a><strong>epoll</strong></h4><p>epoll 是Linux2.6新增的优化版本，epoll 使用<code>一个fd</code>管理多个fd，将<code>用户进程关注的fd的事件</code>存放到内核的一个<code>事件表</code>中。</p>
+<p>epoll 对文件描述符的操作有两种模式：水平触发(<strong>LT</strong> level trigger) 和 边缘触发 (<strong>ET</strong> edge trigger)。</p>
 <blockquote>
 <p>LT（<strong>默认</strong>）：用户进程<strong>可以不立即处理</strong> epoll_wait 返回的事件，下次调用epoll_wait时，<strong>会再次</strong>响应应用程序并<strong>通知此事件</strong>。</p>
 <blockquote>
@@ -556,7 +552,8 @@ epoll_ctl(epfd, EPPOLL_CTL_ADD, ...);
 
 
 
-<h5 id="epoll-实现原理"><a href="#epoll-实现原理" class="headerlink" title="epoll 实现原理"></a>epoll 实现原理</h5><blockquote>
+<h5 id="epoll-实现原理"><a href="#epoll-实现原理" class="headerlink" title="epoll 实现原理"></a>epoll 实现原理</h5><p>todo</p>
+<blockquote>
 <p>在linux，一切皆文件．所以当调用epoll_create时，内核给这个epoll分配一个file，但是这个不是普通的文件，而是只服务于epoll．</p>
 <p>所以当内核初始化epoll时，会开辟一块内核高速cache区，用于安置我们监听的socket，这些socket会以红黑树的形式保存在内核的cache里，以支持快速的查找，插入，删除．同时，建立了一盒list链表，用于存储准备就绪的事件．所以调用epoll_wait时，在timeout时间内，只是简单的观察这个list链表是否有数据，如果没有，则睡眠至超时时间到返回；如果有数据，则在超时时间到，拷贝至用户态events数组中．</p>
 <p>那么，这个准备就绪list链表是怎么维护的呢？当我们执行epoll_ctl时，除了把socket放到epoll文件系统里file对象对应的红黑树上之外，还会给内核中断处理程序注册一个回调函数，告诉内核，如果这个句柄的中断到了，就把它放到准备就绪list链表里。所以，当一个socket上有数据到了，内核在把网卡上的数据copy到内核中后就来把socket插入到准备就绪链表里了。</p>
@@ -564,7 +561,8 @@ epoll_ctl(epfd, EPPOLL_CTL_ADD, ...);
 <p>这件事怎么做到的呢？当一个socket句柄上有事件时，内核会把该句柄插入上面所说的准备就绪list链表，这时我们调用epoll_wait，会把准备就绪的socket拷贝到用户态内存，然后清空准备就绪list链表，最后，epoll_wait干了件事，就是检查这些socket，如果不是ET模式（就是LT模式的句柄了），并且这些socket上确实有未处理的事件时，又把该句柄放回到刚刚清空的准备就绪链表了。所以，非ET的句柄，只要它上面还有事件，epoll_wait每次都会返回。而ET模式的句柄，除非有新中断到，即使socket上的事件没有处理完，也是不会次次从epoll_wait返回的．</p>
 <p>经常看到比较ET和LT模式到底哪个效率高的问题．有一个回答是说ET模式下减少epoll系统调用．这话没错，也可以理解，但是在ET模式下，为了避免数据饿死问题，用户态必须用一个循环，将所有的数据一次性处理结束．所以在ET模式下下，虽然epoll系统调用减少了，但是用户态的逻辑复杂了，write/read调用增多了．所以这不好判断，要看用户的性能瓶颈在哪．</p>
 </blockquote>
-<h4 id="epoll-和-select-poll-的区别-优化"><a href="#epoll-和-select-poll-的区别-优化" class="headerlink" title="epoll 和 select/poll 的区别/优化"></a>epoll 和 select/poll 的区别/优化</h4><p>没有fd数量限制，只需在用户空间和内核空间copy一次。只复制<code>epoll_create()</code>创建的文件描述符(特殊的，共享内存，高级缓存)</p>
+<h4 id="epoll-和-select-poll-的区别-优化"><a href="#epoll-和-select-poll-的区别-优化" class="headerlink" title="epoll 和 select/poll 的区别/优化"></a>epoll 和 select/poll 的区别/优化</h4><p>todo</p>
+<p>没有fd数量限制，只需在用户空间和内核空间copy一次。只复制<code>epoll_create()</code>创建的文件描述符(特殊的，共享内存，高级缓存)</p>
 <p>只对活跃的fd进行处理，而不是全部遍历所有的fd，效率提升，不是盲目轮询的方式，不会随着FD数目的增加效率下降。</p>
 <p>只有活跃可用的FD才会调用callback函数；即Epoll最大的优点就在于它只管你“活跃”的连接，而跟连接总数无关，因此</p>
 <p>内存拷贝<code>，利用mmap()文件映射内存加速与内核空间的消息传递；</code>即epoll使用mmap减少复制开销</p>

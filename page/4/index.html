@@ -337,13 +337,13 @@ BIOS（Base Input/Output System)一般存在主板的ROM（Read Only Memory）�
             
               <a href="/blog/tags/select/">select</a>
             
+              <a href="/blog/tags/poll/">poll</a>
+            
               <a href="/blog/tags/epoll/">epoll</a>
             
               <a href="/blog/tags/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">IO多路复用</a>
             
               <a href="/blog/tags/%E9%9B%B6%E6%8B%B7%E8%B4%9D/">零拷贝</a>
-            
-              <a href="/blog/tags/poll/">poll</a>
             
           </div>
         
@@ -548,7 +548,7 @@ HashMap
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2020/01/01/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">Linux I/O模型</a>
+        <a href="/blog/2020/01/01/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">I/O base Linux</a>
       </h1>
 
       <p class="index-excerpt">
@@ -558,6 +558,7 @@ HashMap
             
           
           I/O 简单点说就是：读取/写入 若干字节 从/到 单个文件描述符，用户进程需要调用内核并由内核来完成IO操作。
+用户态的进程调用read()其实是有缓存IO的，会有两次拷贝过程（内核将数据从磁盘/设备拷贝到内核空间，再从内核空间拷贝到用户空间）。
 
 阻塞 / 非阻塞
 
@@ -565,12 +566,6 @@ HashMap
 
 非阻塞：如果文件描述符不处于就绪状态则返回一个错误码，比如 EAGAIN
 
-
-
-同步 / 异步
-
-同步和异步 是指 函数返回之时， 能不能保证任务完成。
-比如调用了read()直接返回了一个Future对象，你
         </a>
       </p>
 
@@ -597,9 +592,9 @@ HashMap
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/blog/tags/IO/">IO</a>
-            
               <a href="/blog/tags/select/">select</a>
+            
+              <a href="/blog/tags/poll/">poll</a>
             
               <a href="/blog/tags/epoll/">epoll</a>
             

@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      283 字
+      399 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      3
+      4
        分钟
     </span>
   
@@ -227,7 +227,7 @@
             <h1 style="display: none">Java中的IO</h1>
             
             <div class="markdown-body">
-              <h2 id="IO"><a href="#IO" class="headerlink" title="IO"></a>IO</h2><p>1.4之前， 传统io，阻塞 所以又叫BIO（Blocking IO）</p>
+              <h2 id="IO"><a href="#IO" class="headerlink" title="IO"></a>IO</h2><p>Java 1.4 之前， 传统io，阻塞 所以又叫BIO（Blocking IO）</p>
 <p>数据的读取写入必须阻塞在一个线程内等待其完成。</p>
 <p>比如用socket，想要多个client同时访问就要开同样多个线程来处理client的链接，线程资源太宝贵了，这不OK。</p>
 <h2 id="NIO"><a href="#NIO" class="headerlink" title="NIO"></a>NIO</h2><p>New IO / Non blocking IO</p>
@@ -251,6 +251,12 @@
 <li>从通道（channels）读取：创建一个缓冲区，请求通道读取数据。</li>
 <li>从通道（channels）写入：创建一个环城区，填充数据，并要求通道写入数据。</li>
 </ul>
+<p>todo！！！  这好像是JVM的范围了。</p>
+<p>java中使用的堆外内存，也是用户空间的，因为他是JVM进程使用<code>malloc</code>申请的内存，只不过在JVM管理的内存范围内。</p>
+<p><a target="_blank" rel="noopener" href="https://sulangsss.github.io/2018/12/08/Java/Advance/ByteBuffer/">https://sulangsss.github.io/2018/12/08/Java/Advance/ByteBuffer/</a></p>
+<p>不过GC也会帮助清理堆外内存，GC清理了DirectByteBuffer对象，下次GC会调用Cleaner对象的clean()</p>
+<p><a target="_blank" rel="noopener" href="https://kaiwu.lagou.com/course/courseInfo.htm?sid=&amp;courseId=516#/detail/pc?id=4923">https://kaiwu.lagou.com/course/courseInfo.htm?sid=&amp;courseId=516#/detail/pc?id=4923</a></p>
+<p><a target="_blank" rel="noopener" href="https://tech.meituan.com/2016/11/04/nio.html">https://tech.meituan.com/2016/11/04/nio.html</a></p>
 <h2 id="AIO"><a href="#AIO" class="headerlink" title="AIO"></a>AIO</h2><p><strong>Asynchronous</strong> IO</p>
 <p><strong>异步IO</strong>是基于<strong>事件</strong>和<strong>回调机制</strong>实现的，应用操作之后会直接返回。当后台处理完成，操作系统通知相应线程进行后续的操作。</p>
 

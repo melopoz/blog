@@ -250,6 +250,9 @@
 <h2 id="寻址空间"><a href="#寻址空间" class="headerlink" title="寻址空间"></a>寻址空间</h2><p>32位CPU， 理论上 寻址空间 2^32, 4GB（32bit，可以表示2^32^ = 4G 种可能(不是4GByte)）</p>
 <p>64位CPU， 理论上 寻址空间 2^64, 16EB = 160亿GB（只是理论上支持，但是大多64位PC也只能到32GB）</p>
 <p>但实际寻址空间还取决于<strong>总线宽度</strong>，而且一般没有那么大内存，64位机器常用的也就<code>2^42~2^47</code>（<code>4T~</code>）吧</p>
+<h1 id="总线-Bus"><a href="#总线-Bus" class="headerlink" title="总线 Bus"></a>总线 Bus</h1><p>数据总线</p>
+<p>地址总线</p>
+<p>控制总线</p>
 <h1 id="内核态-用户态"><a href="#内核态-用户态" class="headerlink" title="内核态 / 用户态"></a>内核态 / 用户态</h1><p>内核态：操作系统管理程序运行时的状态。运行在内核态的程序可以访问计算机的任何资源，比如协调CPU，分配内存资源；</p>
 <p>用户态：应用程序运行时的状态。用户态的程序只能访问当前CPU上执行的程序所在的地址空间。</p>
 <p>区分内核态和用户态是为了<strong>安全，控制权限，保护操作系统程序</strong>。</p>
@@ -426,13 +429,13 @@
                     
                       <a class="hover-with-bg" href="/blog/tags/select/">select</a>
                     
+                      <a class="hover-with-bg" href="/blog/tags/poll/">poll</a>
+                    
                       <a class="hover-with-bg" href="/blog/tags/epoll/">epoll</a>
                     
                       <a class="hover-with-bg" href="/blog/tags/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">IO多路复用</a>
                     
                       <a class="hover-with-bg" href="/blog/tags/%E9%9B%B6%E6%8B%B7%E8%B4%9D/">零拷贝</a>
-                    
-                      <a class="hover-with-bg" href="/blog/tags/poll/">poll</a>
                     
                   </div>
                 

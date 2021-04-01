@@ -1,7 +1,8 @@
 ---
 title: 关于IP地址
 categories:
-  - [计算机网络]
+  - 网络
+  - basics
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---

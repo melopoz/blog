@@ -6,8 +6,8 @@ tags:
   - epoll
   - IO多路复用
 categories: 
-  - [OS]
-  - [IO]
+  - OS
+  - IO
 date: 2020/01/01 20:46:25
 updated: 2020/11/12 16:00:25
 ---

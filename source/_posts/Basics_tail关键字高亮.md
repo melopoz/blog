@@ -1,10 +1,7 @@
 ---
-title: tail 关键词高亮
-tags: 
-  - tools
-  - linux
-categories: 
-  - [tools]
+title: tail关键词高亮
+tags: note
+categories: basics
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---

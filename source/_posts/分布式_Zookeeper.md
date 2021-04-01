@@ -1,10 +1,10 @@
 ---
 title: zookeeper
 tags: 
-  - 分布式
+  - todo
   - 分布式协调服务
 categories: 
-  - [分布式]
+  - 分布式
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---

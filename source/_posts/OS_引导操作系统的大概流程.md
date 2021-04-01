@@ -3,7 +3,7 @@ title: 一台计算机供电之后...
 tags: 
   - BIOS
 categories:
-  - [OS]
+  - OS
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---
@@ -43,13 +43,3 @@ CPU：从内存中拿到数据（命令）并执行
 > 加载 load  把磁盘中的数据复制到 内存中
 
 
-
-
-
-
-
-
-
-参考
-
-https://mp.weixin.qq.com/s/N6ZF0e1LSbmKyxKHgefrww

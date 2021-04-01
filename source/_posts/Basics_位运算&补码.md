@@ -3,10 +3,7 @@ titile: Java中的位运算
 tag:
   - 位运算
   - 二进制
-  - >>算数位移
-  - >>>逻辑位移
-categories:
-  - [Java]
+categories: basics
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---

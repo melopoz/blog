@@ -1,7 +1,8 @@
 ---
 title: CDN(Content Delivery Network，内容分发网络)
 categories:
-  - [计算机网络]
+  - 网络
+  - basics
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---

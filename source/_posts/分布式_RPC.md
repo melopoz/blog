@@ -1,11 +1,12 @@
 ---
 title: RPC:Remote Procedure Call
 tags:
+  - todo
   - OSI
   - RPC
 categories:
-  - [计算机网络]
-  - [分布式]
+  - 网络
+  - 分布式
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---
@@ -35,3 +36,7 @@ HTTP是应用层的协议，自己是此案
 
 
 todo todo todo
+
+
+
+todo  写个RPC框架

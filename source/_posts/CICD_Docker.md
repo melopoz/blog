@@ -1,7 +1,7 @@
 ---
 title: Docker
-tags: docker
-categories: docker
+tags: 
+categories: CI/CD
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---
@@ -448,6 +448,8 @@ sudo docker push registry.cn-beijing.aliyuncs.com/xx/xx:[镜像版本号]
 sudo docker pull registry.cn-beijing.aliyuncs.com/命名空间/仓库名:[镜像版本号]
 ```
 
+
+
 # 踩坑
 
 ## 多个仓库引用一个镜像时 要删除镜像
@@ -455,13 +457,6 @@ sudo docker pull registry.cn-beijing.aliyuncs.com/命名空间/仓库名:[镜像
 先使用镜像名删除
 
 
-
----
----
----
----
----
----
 
 
 ## 记第一次启动tomcat，启动成功，访问404

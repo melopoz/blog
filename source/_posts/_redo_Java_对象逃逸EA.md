@@ -1,8 +1,9 @@
 ---
-title: Java_对象逃逸
+title: EA-对象逃逸
 tags: 
+  - redo
 categories:
-  - [Java]
+  - Java
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---

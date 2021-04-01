@@ -1,12 +1,7 @@
 ---
 title: 一致性hash
-tags: 
-  - 摘要算法
-  - algorithm
-  - hash
-  - redis
-categories: 
-  - [algorithm, hash]
+tags: todo
+categories: basics
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---

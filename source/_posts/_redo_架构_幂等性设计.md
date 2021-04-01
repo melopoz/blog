@@ -1,9 +1,8 @@
 ---
 title: 幂等性设计
-tags: 
+tags: redo
 categories: 
-  - [架构设计]
-  - [接口设计]
+  - 架构
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---

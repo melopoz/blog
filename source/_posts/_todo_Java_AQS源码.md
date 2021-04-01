@@ -1,11 +1,10 @@
 ---
-title: AQS-JUC中锁的抽象模板
+title: AQS
 tags: 
   - JUC
-  - 并发
-  - 同步
 categories:
-  - [Java,JUC]
+  - Java
+  - JUC
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---

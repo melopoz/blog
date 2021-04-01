@@ -1,10 +1,10 @@
 ---
-title: Java_锁升级
+title: synchronized
 tags: 
+  - todo
   - synchronized
 categories:
-  - [Java,同步]
-  - [Java,JUC]
+  - Java
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---

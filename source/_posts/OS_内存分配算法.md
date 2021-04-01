@@ -2,11 +2,10 @@
 title: 内存分配算法
 tags: 
   - OS
-  - netty
   - 内存管理
+  - about netty
 categories:
-  - [OS]
-  - [Netty]
+  - OS
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---

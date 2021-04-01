@@ -1,10 +1,12 @@
 ---
 title: ElasticSearch
 tags: 
+  - todo
   - 分布式
   - 搜索引擎
 categories:
-  - [搜索引擎]
+  - 分布式
+  - 搜索
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---

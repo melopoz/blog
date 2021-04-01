@@ -1,13 +1,11 @@
 ---
-title: Java_HashMap 不止是HashMap
+title: HashMap & ConcurrentHashMap
 tags: 
   - java1.8优化
-  - hash散列的优化
+  - hash优化
   - JUC
-  - 并发
-  - 同步
 categories:
-  - [Java]
+  - Java
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---

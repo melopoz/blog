@@ -1,9 +1,8 @@
 ---
 title: Hadoop
 tags: 
-  - 分布式
 categories:
-  - [分布式, Hadoop]
+  - 分布式
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---
@@ -357,6 +356,6 @@ bin/hadoop dfsadmin -safemode leave
 
 1. 克隆4台虚拟机，并分别配置ip
 
-
+。。。
 
 

@@ -7,8 +7,7 @@ tags:
   - select
   - poll
   - epoll
-categories:
-  - OS
+categories: OS
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---
@@ -270,6 +269,12 @@ mmap() 函数：
 
 
 ## 零拷贝 
+
+todo 
+
+https://mp.weixin.qq.com/s/dt0h2UhaoRECvjpeMZMsUA
+
+
 
 直接调用系统的read() 和 内存映射文件并读取的区别：
 

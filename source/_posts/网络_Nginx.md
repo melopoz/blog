@@ -4,8 +4,7 @@ tags:
   - HTTP服务器
   - 反向代理
   - 负载均衡
-categories:
-  - 网络
+categories: 网络
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---

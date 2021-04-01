@@ -1,8 +1,7 @@
 ---
 title: 幂等性设计
 tags: redo
-categories: 
-  - 架构
+categories: 架构
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---

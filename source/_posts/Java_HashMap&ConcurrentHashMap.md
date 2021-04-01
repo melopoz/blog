@@ -4,8 +4,7 @@ tags:
   - java1.8优化
   - hash优化
   - JUC
-categories:
-  - Java
+categories: Java
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---

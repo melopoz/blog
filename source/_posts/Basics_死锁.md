@@ -2,8 +2,7 @@
 title: 死锁
 tags: 
   - 并发
-categories: 
-  - basics
+categories: basics
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---

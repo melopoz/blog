@@ -3,15 +3,14 @@ title: zookeeper
 tags: 
   - redo
   - 分布式协调服务
-categories: 
-  - 分布式
+categories: 分布式
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---
 
 
 
-# zookeeper
+# Zookeeper
 
 分布式协调服务，为其他分布式应用程序提供基本的同步和组服务
 

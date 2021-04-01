@@ -4,8 +4,7 @@ tags:
   - OS
   - 内存管理
   - about netty
-categories:
-  - OS
+categories: OS
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---

@@ -6,8 +6,7 @@ tags:
   - 分布式锁
   - 一致性hash+虚拟槽slot
   - 选举策略
-categories: 
-  - NoSQL
+categories: NoSQL
 date: 2021/01/01 20:46:25
 updated: 2021/01/01 20:46:25
 ---

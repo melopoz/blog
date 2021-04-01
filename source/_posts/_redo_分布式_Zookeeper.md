@@ -1,7 +1,7 @@
 ---
 title: zookeeper
 tags: 
-  - todo
+  - redo
   - 分布式协调服务
 categories: 
   - 分布式

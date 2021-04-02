@@ -4,6 +4,19 @@
   
   
   <entry>
+    <title></title>
+    <link href="/blog/2021/04/02/0_todo_Java_JUC/"/>
+    <url>/blog/2021/04/02/0_todo_Java_JUC/</url>
+    
+    <content type="html"><![CDATA[<p>Java线程池</p><p>java.util.concurrent包下</p><p>Executor</p><p>ExecutorService</p><p>AbstractExecutorService</p><p>ThreadPoolExecutor</p><p>静态工具类Executors</p><p>拒绝策略</p><blockquote><p>Abolicy</p></blockquote><p>执行原理 直接看代码</p><p>使用线程池的例子</p><p>netty的EventLoop、EventLoopGroup</p><p>阻塞队列</p><p>java.util.concurrent</p><p><img src="https://i.loli.net/2021/04/02/1sVvczI6hmJY3oN.png"></p>]]></content>
+    
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>一致性hash</title>
     <link href="/blog/2021/01/01/0_todo_Basics_%E4%B8%80%E8%87%B4%E6%80%A7hash/"/>
     <url>/blog/2021/01/01/0_todo_Basics_%E4%B8%80%E8%87%B4%E6%80%A7hash/</url>

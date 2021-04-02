@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      10.2k 字
+      10.3k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      124
+      125
        分钟
     </span>
   
@@ -270,11 +270,18 @@ io-threads <span class="hljs-number">4</span> <span class="hljs-comment">#配置
 <span class="hljs-comment">#官方建议：4核的机器建议设置为2或3个线程，8核的建议设置为6个线程，线程数一定要小于机器核数。</span>
 <span class="hljs-comment">#官方认为线程数并不是越大越好，超过了8个基本就没什么意义了</span></code></pre>
 </blockquote>
-<p>IO线程只能是同时都在读 或者 同时都在写；</p>
-<p>IO线程时负责读写socket解析命令，命令处理还是通过单线程的文件事件处理器处理；</p>
+<img alt="redis6线程模型" src="https://i.loli.net/2021/04/02/bEgYzjoiDw1HF9q.png" srcset="/blog/img/loading.gif" />
+
+<blockquote>
+<p>以前redis是主线程使用IO多路复用对socket进行读写。现在改成主线程把IO分配给多个IO线程 批量读、批量写。</p>
+</blockquote>
+<ul>
+<li>所以 <strong>IO线程只能是同时都在读</strong> 或者 <strong>同时都在写</strong>；</li>
+<li>IO线程时负责读写socket解析命令，命令处理还是通过单线程的文件事件处理器处理；</li>
+</ul>
 <blockquote>
 <ol>
-<li><p>主线程把准备好了的socket放到等待队列，然后阻塞等待IO线程去处理socket（生成对应的事件push到队列）</p>
+<li><p>主线程把准备好了的socket放到等待队列，然后阻塞等待IO线程去处理socket</p>
 <blockquote>
 <p>感觉就相当于 用多线程IO同时对一批socket进行处理，以提高QPS</p>
 </blockquote>
@@ -286,11 +293,31 @@ io-threads <span class="hljs-number">4</span> <span class="hljs-comment">#配置
 <li><p>再走1   这么个循环。</p>
 </li>
 </ol>
+<p>以前是：</p>
+<pre><code class="hljs c"><span class="hljs-keyword">while</span>(<span class="hljs-literal">true</span>) &#123;
+    epoll_wait(..关注的fd.)
+    <span class="hljs-keyword">for</span> (fd <span class="hljs-keyword">int</span> readyfd) &#123;
+        read(fd)
+    &#125;
+    push 到任务队列
+    ...<span class="hljs-comment">// 从任务队列取出处理完成的事件 写回到对应socket</span>
+&#125;</code></pre>
+
+<p>redis6是</p>
+<pre><code class="hljs c"><span class="hljs-keyword">while</span>(<span class="hljs-literal">true</span>) &#123;
+    epoll_wait(..关注的fd.)
+    <span class="hljs-keyword">for</span> (fd <span class="hljs-keyword">int</span> readyfd) &#123;
+        把fd分配给等待队列的IO线程
+    &#125;
+    ...<span class="hljs-comment">// 阻塞 把等待队列中的IO读完的数据 解析并push到任务队列</span>
+    ...<span class="hljs-comment">// 从任务队列取出处理完成的事件 写回到对应socket</span>
+&#125;</code></pre>
+
+
 </blockquote>
 <blockquote>
-<p>todo！ 看看redis源码吧   <a target="_blank" rel="noopener" href="https://github.com/redis/redis.git">https://github.com/redis/redis.git</a>       <a href="mailto:&#103;&#x69;&#116;&#64;&#x67;&#x69;&#116;&#x68;&#x75;&#x62;&#46;&#x63;&#111;&#x6d;">&#103;&#x69;&#116;&#64;&#x67;&#x69;&#116;&#x68;&#x75;&#x62;&#46;&#x63;&#111;&#x6d;</a>:redis/redis.git</p>
+<p>todo！ 看看redis源码吧   <a target="_blank" rel="noopener" href="https://github.com/redis/redis.git">https://github.com/redis/redis.git</a></p>
 </blockquote>
-<p>可以看看这篇文章：<a target="_blank" rel="noopener" href="https://ruby-china.org/topics/38957%EF%BC%89">https://ruby-china.org/topics/38957%EF%BC%89</a></p>
 <hr>
 <h3 id="fork子线程时-主线程阻塞"><a href="#fork子线程时-主线程阻塞" class="headerlink" title="fork子线程时 主线程阻塞"></a>fork子线程时 主线程阻塞</h3><h4 id="直观感受"><a href="#直观感受" class="headerlink" title="直观感受"></a>直观感受</h4><p>在Redis的实践中，众多因素限制了Redis单机的内存不能过大，例如：</p>
 <ul>

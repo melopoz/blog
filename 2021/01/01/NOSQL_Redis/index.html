@@ -316,7 +316,7 @@ io-threads <span class="hljs-number">4</span> <span class="hljs-comment">#配置
 
 </blockquote>
 <blockquote>
-<p>todo！ 看看redis源码吧   <a target="_blank" rel="noopener" href="https://github.com/redis/redis.git">https://github.com/redis/redis.git</a></p>
+<p>redis源码   <a target="_blank" rel="noopener" href="https://github.com/redis/redis.git">https://github.com/redis/redis.git</a></p>
 </blockquote>
 <hr>
 <h3 id="fork子线程时-主线程阻塞"><a href="#fork子线程时-主线程阻塞" class="headerlink" title="fork子线程时 主线程阻塞"></a>fork子线程时 主线程阻塞</h3><h4 id="直观感受"><a href="#直观感受" class="headerlink" title="直观感受"></a>直观感受</h4><p>在Redis的实践中，众多因素限制了Redis单机的内存不能过大，例如：</p>
@@ -856,7 +856,6 @@ b8e047aeacb9398c3f58f96d0602efbbea2078e2 192.168.0.107:6383 slave 5cd3ed3a84ead4
 <li><p>虚拟槽分区（<strong>cluster采用</strong>）</p>
 <p>用hash函数把数据分散到<strong>固定范围</strong>内的整数集合中，每个整数定义为槽<code>slot</code>。</p>
 <p>slot数量远大于节点数，每个节点负责一部分slot，这样更方便数据的拆分和集群扩容（增加节点）</p>
-<p>（相当于也融合了虚拟节点的概念吧）</p>
 <blockquote>
 <p>与一致性哈希的不同：</p>
 <blockquote>
@@ -872,7 +871,8 @@ b8e047aeacb9398c3f58f96d0602efbbea2078e2 192.168.0.107:6383 slave 5cd3ed3a84ead4
 <li>节点自身维护节点和slot的映射关系，无需客户端运算；</li>
 </ul>
 </blockquote>
-<p>带图的描述：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/myseries/p/10959050.html">https://www.cnblogs.com/myseries/p/10959050.html</a></p>
+<img alt="redis cluster slots" src="https://raw.githubusercontent.com/melopoz/pics/master/img/redis%20cluster%20slots.png" srcset="/blog/img/loading.gif" style="zoom:40%;" />
+
 </li>
 </ul>
 <p>数据分布存储的集群模式<strong>都</strong>会有的缺点：</p>
@@ -894,7 +894,7 @@ b8e047aeacb9398c3f58f96d0602efbbea2078e2 192.168.0.107:6383 slave 5cd3ed3a84ead4
 </ul>
 <p>客户端收到<code>MOVED</code>再去对应的节点请求执行。</p>
 <blockquote>
-<p>连接集群的客户端需要处理<code>MOVED</code>命令，所以和连接redis单机的客户端还是不同的。</p>
+<p>连接集群的客户端需要处理<code>MOVED</code>命令，比如使用redis-cli连接集群需要加参数 <code>-c</code>，<code>redis-cli -c -p 7001</code>；或者用Redisson</p>
 </blockquote>
 <h5 id="集群内节点通信"><a href="#集群内节点通信" class="headerlink" title="集群内节点通信"></a>集群内节点通信</h5><blockquote>
 <p>Redis Cluster 采用P2P的<code>Gossip</code>(流言/八卦)协议，原理就是：节点彼此不断交换信息，一段时间后所有节点都会知道集群所有节点的信息。</p>
@@ -916,7 +916,7 @@ b8e047aeacb9398c3f58f96d0602efbbea2078e2 192.168.0.107:6383 slave 5cd3ed3a84ead4
 <h6 id="Redis-Cluster-消息-数据结构"><a href="#Redis-Cluster-消息-数据结构" class="headerlink" title="Redis Cluster 消息 数据结构"></a>Redis Cluster 消息 数据结构</h6><p>消息头：clusterMsgData + <a href="#redis%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF16384%E4%B8%AA%E6%A7%BD">redis为什么是16384个槽</a> 里边的源码</p>
 <p>消息体：meet、ping、pong等类型的消息采用MsgDataGossip数组作为消息体。</p>
 <h6 id="发送消息的规则"><a href="#发送消息的规则" class="headerlink" title="发送消息的规则"></a>发送消息的规则</h6><ul>
-<li>每秒随机选取5个节点，找出最久没有通信的节点发送ping消息  ——1个</li>
+<li>每秒随机选取5个节点，找出其中最久没有通信的节点发送ping消息  ——1个</li>
 <li>每100毫秒(1秒10次)都会扫描本地节点列表，如果发现节点最近一次接受pong消息的时间大于<code>cluster-node-timeout / 2</code>则立刻发送ping消息</li>
 </ul>
 <p>所以每个节点每秒需要发送ping消息的数量 = <code>1 + 10 * num (node.pong_received &gt; cluster_node_timeout / 2)</code></p>
@@ -931,8 +931,9 @@ b8e047aeacb9398c3f58f96d0602efbbea2078e2 192.168.0.107:6383 slave 5cd3ed3a84ead4
 </blockquote>
 </blockquote>
 <p>ps: 集群中的每个节点都会单独开辟一个TCP通道用于节点之间彼此通信，通信端口号 = 基础端口 + 10000，比如16379</p>
-<h4 id="集群扩容"><a href="#集群扩容" class="headerlink" title="集群扩容"></a>集群扩容</h4><p>rehash重新分片，每增加一个节点只会影响到一个老节点，就是从老节点上分一些slot到新节点。</p>
-<p><code>redis-trib.rb</code>，这个脚本 就129行代码，可以看看。。<a target="_blank" rel="noopener" href="https://github.com/redis/redis/blob/unstable/src/redis-trib.rb">https://github.com/redis/redis/blob/unstable/src/redis-trib.rb</a> todo</p>
+<h4 id="集群扩容"><a href="#集群扩容" class="headerlink" title="集群扩容"></a>集群扩容</h4><p>rehash重新分片，每增加一个节点只会影响到一个旧节点，就是从旧节点上分一些slot到新节点。</p>
+<p>是通过<code>redis-trib</code>命令来实现。</p>
+<p><code>redis-trib.rb</code>，这个Ruby脚本 就129行代码，可以看看。。<a target="_blank" rel="noopener" href="https://github.com/redis/redis/blob/unstable/src/redis-trib.rb">https://github.com/redis/redis/blob/unstable/src/redis-trib.rb</a></p>
 <h4 id="集群高可用-amp-故障转移-amp-新master选举"><a href="#集群高可用-amp-故障转移-amp-新master选举" class="headerlink" title="集群高可用 &amp; 故障转移 &amp; 新master选举"></a>集群高可用 &amp; 故障转移 &amp; 新master选举</h4><p>Cluster保证集群高可用和Sentinel类似。</p>
 <p>某节点认为<code>master1</code>宕机，就会广播<code>fail</code>消息，此时<code>master1</code>是主观宕机状态，如果集群内<code>超过半数节点</code>都认为<code>master1</code>主观宕机，就会标记<code>master1</code>为客观宕机。</p>
 <p>然后就要开始进行故障转移：</p>
@@ -1021,7 +1022,7 @@ b8e047aeacb9398c3f58f96d0602efbbea2078e2 192.168.0.107:6383 slave 5cd3ed3a84ead4
 &#125; clusterMsg;</code></pre>
 
 <p>消息体的源码：</p>
-<pre><code class="hljs plain">。。算了哥  下次一定          todo</code></pre>
+<pre><code class="hljs plain">。。算了哥  下次一定</code></pre>
 
 <pre><code class="hljs c"><span class="hljs-comment">// https://github.com/redis/redis/blob/unstable/src/cluster.h </span>
 <span class="hljs-comment">// 特么太多了</span>

@@ -17,7 +17,7 @@
   <meta name="description" content="Although things are always not as you wish, but effort will be lucy!">
   <meta name="author" content="melopoz">
   <meta name="keywords" content="">
-  <title>EA-对象逃逸 - Be your own god.</title>
+  <title>Be your own god.</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
 
@@ -162,7 +162,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="EA-对象逃逸">
+            <span class="h2" id="subtitle" title="">
               
             </span>
 
@@ -172,8 +172,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2021-01-01 20:46" pubdate>
-        2021年1月1日 晚上
+      <time datetime="2021-04-04 20:22" pubdate>
+        2021年4月4日 晚上
       </time>
     </span>
   
@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      790 字
+      51 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      8
+      1
        分钟
     </span>
   
@@ -224,98 +224,32 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">EA-对象逃逸</h1>
+            <h1 style="display: none"></h1>
             
             <div class="markdown-body">
-              <h1 id="逃逸分析-Escape-Analysis-简称-EA"><a href="#逃逸分析-Escape-Analysis-简称-EA" class="headerlink" title="逃逸分析 Escape Analysis  简称 EA"></a>逃逸分析 Escape Analysis  简称 EA</h1><p>EA允许java编译器在多种情况下优化我们的代码。</p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/wolfcode_cn/article/details/83058235">https://blog.csdn.net/wolfcode_cn/article/details/83058235</a></p>
-<h2 id="对象逃逸-的-三种状态"><a href="#对象逃逸-的-三种状态" class="headerlink" title="对象逃逸 的 三种状态"></a>对象逃逸 的 三种状态</h2><ul>
-<li><p>全局级别逃逸 全局逃逸状态</p>
+              <p>Java线程池</p>
+<p>java.util.concurrent包下</p>
+<p>Executor</p>
+<p>ExecutorService</p>
+<p>AbstractExecutorService</p>
+<p>ThreadPoolExecutor</p>
+<p>静态工具类Executors</p>
+<p>拒绝策略</p>
 <blockquote>
-<p>一个对象可能从一个方法或当前线程中逃逸。</p>
-<ol>
-<li><p>如果一个对象被作为方法的返回值，</p>
-</li>
-<li><p>作为类静态字段 static field</p>
-<blockquote>
-<p>所以肯定存在堆内存。</p>
+<p>Abolicy</p>
 </blockquote>
-</li>
-<li><p>作为类字段 field</p>
-</li>
-<li><p>重写了finalize()方法</p>
-<blockquote>
-<p>这要求这个对象对JVM的finalizer必须是可见的，所以必须分配在堆内存。</p>
-</blockquote>
-<blockquote>
-<p>finalize()方法没啥意义，为了方便c/c++程序员适应java的。这里用来举例。</p>
-</blockquote>
-</li>
-</ol>
-<p>就会被标记为全集逃逸状态。</p>
-</blockquote>
-<p><strong>全局逃逸状态的对象一定会放入堆内存中。</strong></p>
-</li>
-<li><p>参数级别逃逸</p>
-<blockquote>
-<p>一个对象被作为参数传递给了一个方法，这个方法之外的还是无法访问该对象的(对其他线程不可见)，这个对象就会被标记为参数级别逃逸。</p>
-</blockquote>
-</li>
-<li><p>无逃逸状态</p>
-<blockquote>
-<p>不产生逃逸。</p>
-</blockquote>
-</li>
-</ul>
-<h2 id="推论"><a href="#推论" class="headerlink" title="推论"></a>推论</h2><ul>
-<li><p>理论上，无逃逸状态的对象不必须存储在堆空间中，那就是可以直接在栈上分配内存，甚至直接在CPU寄存器中分配空间，效率极高。</p>
-</li>
-<li><p>参数级别逃逸是可能在内存中去掉对象同步锁的，因为该对象不能被其他线程访问到。</p>
-<blockquote>
-<p>同步的代价很大，去掉同步锁可以提高并发性能。</p>
-</blockquote>
-</li>
-<li><p>无逃逸状态</p>
-<blockquote>
-<p>标量替换：java虚拟机中的原始数据类型(int,long等)都不能在进一步分解，他们就可以成为标量。相对的，如果一个数据可以继续分解，那么他成为聚合量，java中最典型的聚合量就是对象。如果逃逸分析证明一个对象不会被外部访问，并且这个这个对象是可以分解的，那么程序真正执行的时候可能不创建这个对象，而改为直接创建它的若干个被这个方法能够使用到的成员变量来代替。拆散后的变量便可以被单独的分析与优化，可以分别分配在栈帧或者寄存器上，原来的对象就不需要整体被分配在堆中。</p>
-</blockquote>
-</li>
-</ul>
-<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>一个方法中new一个对象并作为返回值return出去的时候，该返回的对象就是全局逃逸状态。</p>
-<p>如果在方法的参数中就传入承载计算结果的容器，在把这个方法计算的结果存入该参数，不用设置该大对象为返回值。</p>
-<blockquote>
-<p>例如</p>
-<pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">private</span> Object <span class="hljs-title">doSomething</span><span class="hljs-params">(Object arg1, Object arg2)</span></span>&#123;
-	<span class="hljs-comment">//do something...</span>
-	Object result = <span class="hljs-keyword">new</span> Object();
-	<span class="hljs-keyword">return</span> result;
-&#125;;</code></pre>
-
-<p>改为</p>
-<pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">doSomething</span><span class="hljs-params">(Object arg1, Object arg2, Object result)</span></span>&#123;&#125;;</code></pre>
-</blockquote>
-<p>就不会有全局对象逃逸，参数级别逃逸就可能去掉同步锁，可以提高并发性能。</p>
-<p>在一个线程中的一串任务中如果都使用这种方式，就可能节省堆空间，降低gc的压力。提高程序的性能。</p>
+<p>执行原理 直接看代码</p>
+<p>使用线程池的例子</p>
+<p>netty的EventLoop、EventLoopGroup</p>
+<p>阻塞队列</p>
+<p>java.util.concurrent</p>
+<p><img src="https://i.loli.net/2021/04/02/1sVvczI6hmJY3oN.png" srcset="/blog/img/loading.gif"></p>
 
             </div>
             <hr>
             <div>
               <div class="post-metas mb-3">
                 
-                  <div class="post-meta mr-3">
-                    <i class="iconfont icon-category"></i>
-                    
-                      <a class="hover-with-bg" href="/blog/categories/Java/">Java</a>
-                    
-                  </div>
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/blog/tags/redo/">redo</a>
-                    
-                  </div>
                 
               </div>
               
@@ -326,9 +260,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/blog/2021/01/01/0_todo_%E7%BD%91%E7%BB%9C_TCP%20&amp;%20HTTP%20&amp;%20HTTPS/">
+                      <a href="/blog/2021/04/04/0_todo_JVM_GC/">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">TCP & HTTP & HTTPS</span>
+                        <span class="hidden-mobile"></span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -336,8 +270,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/blog/2021/01/01/1_redo_MQ_Kafka/">
-                        <span class="hidden-mobile">Kafka</span>
+                      <a href="/blog/2021/01/01/0_todo_Basics_%E4%B8%80%E8%87%B4%E6%80%A7hash/">
+                        <span class="hidden-mobile">一致性hash</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

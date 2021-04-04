@@ -327,6 +327,8 @@ Zinterstore #
 zunionstore rank:last_week 7 rank:20150323 rank:20150324 rank:20150325  weights 1 1 1 1 1 1 1
 ```
 
+> zset集合的所有元素均 `< 64byte`，并且`数量 < 128` 时，使用压缩列表 `ZipList`，否则使用跳表 `SkipList`
+
 ---
 
 
@@ -928,13 +930,13 @@ b8e047aeacb9398c3f58f96d0602efbbea2078e2 192.168.0.107:6383 slave 5cd3ed3a84ead4
 >   > > 一致性哈希直接根据数据的hash值找对应的节点；
 >   > >
 >   > > 虚拟槽分区是先根据数据的hash找到节点，再去该节点进行操作。
->   
+> 
 >   > 优点：
 >>
 >   > - 节点负载均衡
 >   > - 解耦数据和节点的关系，方便数据的拆分和集群扩容；
 >   > - 节点自身维护节点和slot的映射关系，无需客户端运算；
->   
+> 
 >   <img alt="redis cluster slots" src="https://raw.githubusercontent.com/melopoz/pics/master/img/redis%20cluster%20slots.png" style="zoom:40%;" />
 >
 > 数据分布存储的集群模式**都**会有的缺点：

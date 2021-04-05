@@ -357,6 +357,14 @@ java.nio.channels.FileChannel#transferFrom()/transferTo()
 
 
 
+## mmap 和 sendfile总结
+
+1、都是Linux内核提供、实现零拷贝的API；
+2、sendfile 是将读到内核空间的数据，转到socket buffer，进行网络发送；
+3、mmap将磁盘文件映射到内存，支持读和写，对内存的操作会反映在磁盘文件上。
+
+
+
 
 
 # IO设备管理

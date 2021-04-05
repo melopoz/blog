@@ -17,25 +17,9 @@
   <meta name="description" content="Although things are always not as you wish, but effort will be lucy!">
   <meta name="author" content="melopoz">
   <meta name="keywords" content="">
-  <title>Java中的IO - Be your own god.</title>
+  <title>标签 - hash - Be your own god.</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/blog/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.1.2/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
-  
 
 
 
@@ -63,7 +47,7 @@
 
 
 <body>
-  <header style="height: 70vh;">
+  <header style="height: 80vh;">
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand"
@@ -162,46 +146,9 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="Java中的IO">
+            <span class="h2" id="subtitle" title="标签 - hash">
               
             </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2021-01-01 20:46" pubdate>
-        2021年1月1日 晚上
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      399 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      4
-       分钟
-    </span>
-  
-
-  
-  
-</div>
 
             
           </div>
@@ -214,124 +161,40 @@
 
   <main>
     
+      <div class="container nopadding-md">
+        <div class="py-5" id="board"
+          >
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+<div class="list-group">
+  <p class="h4">共计 1 篇文章</p>
+  <hr>
+  
+  
+    
       
+      <p class="h5">2021</p>
+    
+    <a href="/blog/2021/01/01/Basics_%E4%B8%80%E8%87%B4%E6%80%A7hash/" class="list-group-item list-group-item-action">
+      <span class="archive-post-title">一致性hash</span>
+      <time style="float: right;">01-01</time>
+    </a>
+  
+</div>
 
-<div class="container-fluid">
-  <div class="row">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-md">
-      <div class="container nopadding-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">Java中的IO</h1>
-            
-            <div class="markdown-body">
-              <h2 id="IO"><a href="#IO" class="headerlink" title="IO"></a>IO</h2><p>Java 1.4 之前， 传统io，阻塞 所以又叫BIO（Blocking IO）</p>
-<p>数据的读取写入必须阻塞在一个线程内等待其完成。</p>
-<p>比如用socket，想要多个client同时访问就要开同样多个线程来处理client的链接，线程资源太宝贵了，这不OK。</p>
-<h2 id="NIO"><a href="#NIO" class="headerlink" title="NIO"></a>NIO</h2><p>New IO / Non blocking IO</p>
-<h3 id="核心组件："><a href="#核心组件：" class="headerlink" title="核心组件："></a>核心组件：</h3><ul>
-<li><h5 id="channels"><a href="#channels" class="headerlink" title="channels"></a>channels</h5><p>通道是双向的，流的读写是单向的</p>
-</li>
-<li><h5 id="buffers"><a href="#buffers" class="headerlink" title="buffers"></a>buffers</h5><p>比如ByteBuffer，其他每种java基本类型(除了boolean)都对应一种缓冲区</p>
-</li>
-<li><h5 id="selectors"><a href="#selectors" class="headerlink" title="selectors"></a>selectors</h5><p>用于单个线程处理多个通道。</p>
-</li>
-</ul>
-<h3 id="NIO的特点也就是和IO的不同之处："><a href="#NIO的特点也就是和IO的不同之处：" class="headerlink" title="NIO的特点也就是和IO的不同之处："></a>NIO的特点也就是和IO的不同之处：</h3><ul>
-<li><p>NIO面向缓冲区，IO面向流</p>
-</li>
-<li><p>NIO有选择器，IO没有</p>
-</li>
-<li><p>NIO非阻塞，IO阻塞</p>
-</li>
-</ul>
-<h3 id="NIO读写数据的方式："><a href="#NIO读写数据的方式：" class="headerlink" title="NIO读写数据的方式："></a>NIO读写数据的方式：</h3><ul>
-<li>从通道（channels）读取：创建一个缓冲区，请求通道读取数据。</li>
-<li>从通道（channels）写入：创建一个环城区，填充数据，并要求通道写入数据。</li>
-</ul>
-<p>todo！！！  这好像是JVM的范围了。</p>
-<p>java中使用的堆外内存，也是用户空间的，因为他是JVM进程使用<code>malloc</code>申请的内存，只不过在JVM管理的内存范围内。</p>
-<p><a target="_blank" rel="noopener" href="https://sulangsss.github.io/2018/12/08/Java/Advance/ByteBuffer/">https://sulangsss.github.io/2018/12/08/Java/Advance/ByteBuffer/</a></p>
-<p>不过GC也会帮助清理堆外内存，GC清理了DirectByteBuffer对象，下次GC会调用Cleaner对象的clean()</p>
-<p><a target="_blank" rel="noopener" href="https://kaiwu.lagou.com/course/courseInfo.htm?sid=&amp;courseId=516#/detail/pc?id=4923">https://kaiwu.lagou.com/course/courseInfo.htm?sid=&amp;courseId=516#/detail/pc?id=4923</a></p>
-<p><a target="_blank" rel="noopener" href="https://tech.meituan.com/2016/11/04/nio.html">https://tech.meituan.com/2016/11/04/nio.html</a></p>
-<h2 id="AIO"><a href="#AIO" class="headerlink" title="AIO"></a>AIO</h2><p><strong>Asynchronous</strong> IO</p>
-<p><strong>异步IO</strong>是基于<strong>事件</strong>和<strong>回调机制</strong>实现的，应用操作之后会直接返回。当后台处理完成，操作系统通知相应线程进行后续的操作。</p>
 
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                  <div class="post-meta mr-3">
-                    <i class="iconfont icon-category"></i>
-                    
-                      <a class="hover-with-bg" href="/blog/categories/Java/">Java</a>
-                    
-                  </div>
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/blog/tags/todo/">todo</a>
-                    
-                      <a class="hover-with-bg" href="/blog/tags/IO/">IO</a>
-                    
-                  </div>
-                
+
+
+
               </div>
-              
-                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
-              
-              
-                <div class="post-prevnext row">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/blog/2021/01/01/0_todo_Java_AQS%E6%BA%90%E7%A0%81/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">AQS</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/blog/2021/01/01/0_todo_Java_synchronized/">
-                        <span class="hidden-mobile">synchronized</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
             </div>
-
-            
-          </article>
+          </div>
         </div>
       </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
-
-      </div>
-    
-  </div>
-</div>
-
-<!-- Custom -->
-
-
     
 
     
@@ -414,15 +277,9 @@
 
 
 
-  <script  src="https://cdn.staticfile.org/tocbot/4.12.0/tocbot.min.js" ></script>
 
 
 
-  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.staticfile.org/anchor-js/4.3.0/anchor.min.js" ></script>
 
 
 

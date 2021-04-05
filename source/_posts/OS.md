@@ -268,6 +268,14 @@ mmap() 函数：
 
 
 
+#### Java中的应用：
+
+> MappedByteBuffer使用mmap的文件映射，在full gc时才会进行释放。
+>
+> 当close时，需要手动清除内存映射文件，可以反射调用sun.misc.Cleaner方法
+
+
+
 ## 零拷贝
 
 > **零拷贝**（**Zero-copy**）技术是指计算机执行操作时，CPU不需要先将数据从某处内存复制到另一个特定区域。这种技术通常用于**通过网络传输文件时节省CPU周期和内存带宽**。
@@ -334,7 +342,18 @@ java.nio.channels.FileChannel#transferFrom()/transferTo()
 
 > 使用 sendfile
 >
+> ```java
+> File file = new File("demo.zip");
+> RandomAccessFile raf = new RandomAccessFile(file, "rw");
+> FileChannel fileChannel = raf.getChannel();
+> SocketChannel socketChannel = SocketChannel.open(new InetSocketAddress("", 1234));
+> // 直接使用了transferTo()进行通道间的数据传输
+> fileChannel.transferTo(0, fileChannel.size(), socketChannel);
+> ```
+>
 > <img src="https://raw.githubusercontent.com/melopoz/pics/master/img/java-nio-sendfile.png" style="zoom:50%;" />
+
+
 
 
 

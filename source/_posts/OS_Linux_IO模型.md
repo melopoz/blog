@@ -485,4 +485,6 @@ select/poll/epoll 中均并没发现用mmap的痕迹啊，而且我觉得...本�
 
 
 
-## [Java中的NIO](#https://melopoz.github.io/blog/2021/01/01/Java_IO/#NIO)
+## Java中的NIO
+
+https://www.jianshu.com/p/874744d19d0d

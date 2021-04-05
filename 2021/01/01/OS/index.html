@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      5.2k 字
+      5.3k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      56
+      57
        分钟
     </span>
   
@@ -439,6 +439,7 @@ fileChannel.transferTo(<span class="hljs-number">0</span>, fileChannel.size(), s
 
 <img src="https://raw.githubusercontent.com/melopoz/pics/master/img/java-nio-sendfile.png" srcset="/blog/img/loading.gif" style="zoom:50%;" />
 </blockquote>
+<h2 id="mmap-和-sendfile总结"><a href="#mmap-和-sendfile总结" class="headerlink" title="mmap 和 sendfile总结"></a>mmap 和 sendfile总结</h2><p>1、都是Linux内核提供、实现零拷贝的API；<br>2、sendfile 是将读到内核空间的数据，转到socket buffer，进行网络发送；<br>3、mmap将磁盘文件映射到内存，支持读和写，对内存的操作会反映在磁盘文件上。</p>
 <h1 id="IO设备管理"><a href="#IO设备管理" class="headerlink" title="IO设备管理"></a>IO设备管理</h1><p>操作系统向I/O设备发送命令，比如访问设备、读写数据、读写设备配置，还要捕捉中断，处理设备的错误，并提供设备功能的抽象。</p>
 <h1 id="文件管理"><a href="#文件管理" class="headerlink" title="文件管理"></a>文件管理</h1><p>将硬盘的扇区组织成文件系统，实现文件读写操作</p>
 <p>比如 win使用NTFS、FAT32、FAT16；macOS使用APFS（apple file system）；linux使用EXT2 等等</p>

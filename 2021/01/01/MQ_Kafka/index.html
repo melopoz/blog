@@ -1,0 +1,724 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/favicon.png">
+  <link rel="icon" type="image/png" href="/blog/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Although things are always not as you wish, but effort will be lucy!">
+  <meta name="author" content="melopoz">
+  <meta name="keywords" content="">
+  <title>Kafka - Be your own god.</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/blog/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.1.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"melopoz.github.io","root":"/blog/","version":"1.8.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"copy_btn":true,"image_zoom":{"enable":true},"lazyload":{"enable":true,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/blog/">&nbsp;<strong>Fluid</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/blog/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Kafka">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-01-01 20:46" pubdate>
+        2021年1月1日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.1k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      36
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Kafka</h1>
+            
+            <div class="markdown-body">
+              <h1 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h1><img alt="Kafka架构图" src="https://raw.githubusercontent.com/melopoz/pics/master/img/kafka%E6%9E%B6%E6%9E%84%E5%9B%BE.png" srcset="/blog/img/loading.gif" style="zoom:80%;" />
+
+<p>通过 zookeeper 保存元数据，管理集群配置、选举Leader、Consumer Group发生变化时进行rebalance。</p>
+<img alt="Kafka元数据在zookeeper中的数据结构" src="https://raw.githubusercontent.com/melopoz/pics/master/img/kafka%E5%85%83%E6%95%B0%E6%8D%AE%E5%9C%A8zookeeper%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84.png" srcset="/blog/img/loading.gif" style="zoom:60%;" />
+
+<h2 id="Topic"><a href="#Topic" class="headerlink" title="Topic"></a>Topic</h2><p>Kafka是发布/订阅模式的消息队列，生产、消费消息，都是面向Topic的。</p>
+<blockquote>
+<p>另一种是<strong>点对点</strong>消息队列，即一条消息被一个消费者消费一次就没了</p>
+</blockquote>
+<h2 id="Consumer-Group"><a href="#Consumer-Group" class="headerlink" title="Consumer Group"></a>Consumer Group</h2><p>一条消息可以发送到不同的Consumer Group，但一个Consumer Group中只能有一个Consumer能消费这条消息。</p>
+<blockquote>
+<p>即 Topic下的一个<a href="#Partition">Partition</a>只能被同一个Consumer Group下的一个Consumer线程来消费。</p>
+</blockquote>
+<p>Topic有几个分区，消费这个Topic的Consumer Group就有几个Consumer即可，效率也最高，Consumer多了就会有Consumer拿不到消息。</p>
+<img src="https://raw.githubusercontent.com/melopoz/pics/master/img/Kafka-%E5%88%86%E5%8C%BA%E6%95%B0%E6%B6%88%E8%B4%B9%E8%80%85%E6%95%B0.png" srcset="/blog/img/loading.gif" />
+
+
+
+<h2 id="Partition"><a href="#Partition" class="headerlink" title="Partition"></a>Partition</h2><p>物理概念，每个 Topic 包含一个或多个 Partition，一个 Partition 对应一个文件夹（命名规则：<code>Topic 名称+分区序号</code>），存储 Partition 的数据和索引文件（因为每个Partition又分为了多个<a href="#Segment">Segment</a>），每个 Partition 内部是有序的，且每个 Partition 中的消息不一样。</p>
+<blockquote>
+<p>由于生产者生产的消息会不断追加到 log 文件末尾，为防止 log 文件过大导致数据定位效率低，Kafka 采取了<strong>分片</strong>和<strong>索引</strong>机制，将每个 Partition 分为多个 <a href="#Segment">Segment</a></p>
+</blockquote>
+<img src="https://raw.githubusercontent.com/melopoz/pics/master/img/kafka-%E5%88%86%E5%8C%BA%E6%95%B0%E6%B6%88%E8%B4%B9%E8%80%85%E6%95%B0.png" srcset="/blog/img/loading.gif" style="zoom:80%;" />
+
+<h3 id="分区分配策略"><a href="#分区分配策略" class="headerlink" title="分区分配策略"></a>分区分配策略</h3><blockquote>
+<p>通过 <code>Partition.assignment.strategy</code> 配置</p>
+</blockquote>
+<ul>
+<li>range：<strong>随机</strong>（默认）</li>
+<li>roundrobin：<strong>循环</strong></li>
+<li>StickyAssignor：粘性分配</li>
+</ul>
+<blockquote>
+<p>当有下列情况发生的时候，Kafka会进行一次Partition分配（<strong>rebalance</strong>）：</p>
+<ol>
+<li>Topic 新增 Partition</li>
+<li>Consumer Group 新增 consumer</li>
+<li>consumer 离开所在 group （shut down / crashes(崩溃)）</li>
+</ol>
+</blockquote>
+<h2 id="Segment"><a href="#Segment" class="headerlink" title="Segment"></a>Segment</h2><p>每个 Segment 文件包括 <code>.index</code> 文件 和 <code>.log</code> 文件，这些文件位于同一个 Partition 文件夹下。Segment文件大小默认1G。</p>
+<blockquote>
+<p>例如，Topic “first” 有三个分区，则其对应的文件夹为 <code>first-0</code>，<code>first-1</code>，<code>first-2</code></p>
+</blockquote>
+<p><code>.index</code> 和 <code>.log</code> 文件均以当前 Segment 的第一条消息的 offset 命名:</p>
+<blockquote>
+<p>在 Kafka 的 <code>server.properties</code> 配置的 <code>log.dirs</code> 为数据的目录，该目录下有文件夹 <code>Topic名-分区号</code>，每个分区中包含如下文件</p>
+<pre><code class="hljs pgsql"><span class="hljs-number">00000000000000000000.</span><span class="hljs-keyword">index</span>
+<span class="hljs-number">00000000000000000000.</span><span class="hljs-keyword">log</span>
+<span class="hljs-number">00000000000000170410.</span><span class="hljs-keyword">index</span>
+<span class="hljs-number">00000000000000170410.</span><span class="hljs-keyword">log</span>
+<span class="hljs-number">00000000000000239430.</span><span class="hljs-keyword">index</span>
+<span class="hljs-number">00000000000000239430.</span><span class="hljs-keyword">log</span>
+
+<span class="hljs-number">00000000000000000000.</span>timeindex
+Leader-epoch-<span class="hljs-keyword">checkpoint</span></code></pre>
+
+<p><code>.index</code> 文件存储索引信息，<code>.log</code> 文件存储数据，索引文件中的元数据指向对应数据文件中 message 的物理偏移地址 <code>offset</code>。</p>
+</blockquote>
+<h2 id="Producer"><a href="#Producer" class="headerlink" title="Producer"></a>Producer</h2><h3 id="2种消息发送机制"><a href="#2种消息发送机制" class="headerlink" title="2种消息发送机制"></a>2种消息发送机制</h3><ul>
+<li><p>Sync Producer：低延迟，低吞吐率，无数据丢失</p>
+</li>
+<li><p>Async Producer：高延迟，高吞吐率，可能会有数据丢失</p>
+<pre><code class="hljs java"><span class="hljs-function">Future&lt;RecordMetadata&gt; <span class="hljs-title">send</span><span class="hljs-params">(ProducerRecord&lt;K, V&gt; record)</span></span>;
+<span class="hljs-function">Future&lt;RecordMetadata&gt; <span class="hljs-title">send</span><span class="hljs-params">(ProducerRecord&lt;K, V&gt; record, Callback callback)</span></span>;</code></pre>
+
+</li>
+</ul>
+<h4 id="异步发送"><a href="#异步发送" class="headerlink" title="异步发送"></a>异步发送</h4><blockquote>
+<p>在 Kafka 1.0 以后，客户端默认发送都是异步发送，首先追加到生产者的内存缓存中，其内存存储结构如下：</p>
+<p><code>ConcurrentMap&lt;TopicPartition，Deque&lt;ProducerBatch&gt;&gt; batches</code></p>
+<p>Producer 会为每一个 Topic 的每一个 Partition 单独维护一个队列，即 <code>ArrayDeque</code>，内部存放的元素就是一批消息 <code>ProducerBatch</code>，即Kafka消息发送是<strong>批量发送</strong>的。</p>
+</blockquote>
+<p>若需要同步发送，只要拿到 <code>send(record)</code> 方法返回的 <code>future</code>，调用get方法，此时如果消息未发送到Broker上，该方法就会被阻塞，等到 broker 返回消息发送结果后该方法会被唤醒并得到消息发送结果；</p>
+<p>若需要异步发送，则建议使用 <code>send(ProducerRecord&lt; K, V &gt; record, Callback callback)</code>，但是不要调用get方法，Callback 会在收到 broker 的响应结果后被调用，并且支持<strong>拦截器</strong>。</p>
+<blockquote>
+<p>拦截器可以在 <code>消息发送前</code> 和 <code>回调函数被调用前</code> 触发。</p>
+</blockquote>
+<h3 id="发送确认机制"><a href="#发送确认机制" class="headerlink" title="发送确认机制"></a>发送确认机制</h3><p>通过<code>request.required.asks</code>配置</p>
+<ul>
+<li><strong>0</strong>：消息发送给Leader后，不需要确认。性能高，风险最大，如果broker宕机，宕机之后发送的消息就会丢失</li>
+<li><strong>1</strong>：只要集群中的Leader确认即可返回</li>
+<li><strong>-1</strong>：需要ISR中的所有Relica(副本)（集群中的所有broker）确认。还是有可能出现数据丢失，因为ISR可能缩小到只有一个Replica。</li>
+</ul>
+<h2 id="Consumer"><a href="#Consumer" class="headerlink" title="Consumer"></a>Consumer</h2><ul>
+<li><p>消费者是主动 <code>pull</code> 消息</p>
+<blockquote>
+<p>因为 Broker 中的消息是无状态的，Broker 不知道哪个消息是可以消费的，这样还会降低Broker的压力。</p>
+</blockquote>
+</li>
+<li><p>Consumer 消费消息之后必须要去通知 ZooKeeper 记录下消费的 offset（所以可能<a href="#%E9%87%8D%E5%A4%8D%E6%B6%88%E8%B4%B9">重复消费</a>）</p>
+</li>
+</ul>
+<h3 id="提交方式"><a href="#提交方式" class="headerlink" title="提交方式"></a>提交方式</h3><ul>
+<li>自动提交</li>
+<li>手动提交（灵活控制offset）</li>
+</ul>
+<h3 id="poll模型"><a href="#poll模型" class="headerlink" title="poll模型"></a>poll模型</h3><p>通过 <code>poll</code> 方法，先调用 <code>fetcher</code> 中的 <code>fetchedRecords</code> 方法</p>
+<blockquote>
+<p>如果 <code>fetchedRecords </code> 获取不到数据，就会发起一个新的 <code>sendFetches</code> 请求。</p>
+</blockquote>
+<p>而在消费数据的时候，每个批次从Kafka Broker Server中拉取数据是有最大数据量限制，由属性 <code>max.poll.records</code> 控制，默认是500条。</p>
+<blockquote>
+<p>提示：<code>max.poll.records</code> 返回的是一个poll请求的数据总和，<strong>与多少个分区无关</strong>；因此，每次Consumer所有分区中拉取Topic的消息数据，总条数不会超过max.poll.records所设置的值。</p>
+</blockquote>
+<p>而在Fetcher的类中，在sendFetches方法中有限制拉取数据容量的限制，由属性（max.partition.fetch.bytes），默认1MB。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://matt33.com/2017/11/11/consumer-pollonce/#pollOnce-%E6%96%B9%E6%B3%95">https://matt33.com/2017/11/11/consumer-pollonce/#pollOnce-%E6%96%B9%E6%B3%95</a></p>
+</blockquote>
+<h1 id="消息持久化"><a href="#消息持久化" class="headerlink" title="消息持久化"></a>消息持久化</h1><ul>
+<li><p><strong>LSO</strong>：Last Stable Offset, 日志开始偏移量, 标志日志文件起始处</p>
+</li>
+<li><p><strong>LEO</strong>：log end offset, 日志结束偏移量，表示当前日志文件中下一条待写入的消息的offset</p>
+</li>
+<li><p><strong>HW</strong>：High Watermark. 高水位, 表示特定的消息的offset, 消费者只能消费这个offset之前的消息</p>
+</li>
+<li><p><strong>LW</strong>：Low Watermark. 低水位, AR集合中最小的LSO值</p>
+</li>
+</ul>
+<h3 id="删除策略"><a href="#删除策略" class="headerlink" title="删除策略"></a>删除策略</h3><p>Kafka日志管理器中会有一个专门的日志删除任务来<strong>周期性</strong>检测和删除不符合保留条件的日志分段文件，通过broker端参数 <code>log.retention.check.interval.ms</code> 来配置，默认值为 <code>300000</code> (5分钟)。</p>
+<ul>
+<li>基于时间</li>
+<li>基于大小</li>
+<li>基于起始偏移量</li>
+</ul>
+<h3 id="顺序写"><a href="#顺序写" class="headerlink" title="顺序写"></a>顺序写</h3><p>以为顺序写，所以读操作不会阻塞写操作</p>
+<h1 id="零拷贝"><a href="#零拷贝" class="headerlink" title="零拷贝"></a>零拷贝</h1><p>总的来说Kafka快的原因：</p>
+<ul>
+<li>Partition顺序读写，充分利用磁盘特性，这是基础；</li>
+<li>Producer生产的数据持久化到broker，采用mmap文件映射，实现顺序的快速写入；（<strong>mmap+write</strong>)</li>
+<li>Customer从broker读取数据时，Kafka使用sendfile，将磁盘文件读到OS内核缓冲区后，直接转到socket buffer进行网络发送。(<strong>sendfile</strong>)</li>
+</ul>
+<h1 id="事务特性"><a href="#事务特性" class="headerlink" title="事务特性"></a>事务特性</h1><p>主要就是将多条消息的发送作为一个事务，要么都发送成功要么都失败。</p>
+<h1 id="集群"><a href="#集群" class="headerlink" title="集群"></a>集群</h1><img alt="Producer连接Kafka集群" src="https://raw.githubusercontent.com/melopoz/pics/master/img/kakfa%E9%9B%86%E7%BE%A4.png" srcset="/blog/img/loading.gif" style="zoom:80%;" />
+
+<h4 id="Controller"><a href="#Controller" class="headerlink" title="Controller"></a>Controller</h4><blockquote>
+<p>Kafka集群中的一个broker会被选举为controller，负责Partition的管理和replica状态管理，也会执行Partition重分配的任务。</p>
+</blockquote>
+<p>Leader</p>
+<blockquote>
+<p>Leader通过单独的线程定期检测ISR中Follower</p>
+</blockquote>
+<h4 id="Replica-副本"><a href="#Replica-副本" class="headerlink" title="Replica 副本"></a>Replica 副本</h4><blockquote>
+<p><a target="_blank" rel="noopener" href="https://blog.51cto.com/zero01/2501495#h3">https://blog.51cto.com/zero01/2501495#h3</a></p>
+</blockquote>
+<ul>
+<li>副本集是指将日志复制多份（Kafka的数据是存储在日志文件中的，这就相当于数据的备份、冗余）</li>
+<li>可以为每个Topic设置副本集，所以副本集是相对于Topic来说的</li>
+<li>可以配置默认的副本集数量</li>
+</ul>
+<p>为了提高数据的可靠性</p>
+<blockquote>
+<p>一个Topic的副本集可以分布在多个Broker中，当一个Broker挂掉了，其他的Broker上还有数据。</p>
+<p>每个Partition在每个broker上最多只能有一个replica（也因此可以由Broker id指定Partition的具体replica；replica<strong>默认均匀分布</strong>到所以broker上）</p>
+</blockquote>
+<p>我们都知道在Kafka中的Topic只是个逻辑概念，实际存储数据的是物理分区Partition，所以真正被复制的也是Partition。如下图：</p>
+<img alt="kafka副本" src="https://raw.githubusercontent.com/melopoz/pics/master/img/kafka%20replica.png" srcset="/blog/img/loading.gif" style="zoom:50%;" />
+
+
+
+<h5 id="副本因子"><a href="#副本因子" class="headerlink" title="副本因子"></a>副本因子</h5><p>副本因子其实决定了一个Partition的副本数量是多少</p>
+<blockquote>
+<p>例如副本因子为1，则代表将Topic中的所有Partition按照Broker的数量复制一份，并分布到各个Broker上（每个broker上都有备份）</p>
+</blockquote>
+<h5 id="副本分配算法"><a href="#副本分配算法" class="headerlink" title="副本分配算法"></a>副本分配算法</h5><p>将所有 <code>N</code> 个 Broker 和待分配的 <code>i</code> 个 Partition 排序</p>
+<p>将第 <code>i</code> 个Partition 分配到第 <code>(i mod n)</code> 个 Broker 上</p>
+<p>将第 <code>i</code> 个Partition 的第 <code>j</code> 个副本分配到第 <code>((i + j) mod n)</code> 个 Broker 上</p>
+<h5 id="Replica-分为-Leader-和-Follower"><a href="#Replica-分为-Leader-和-Follower" class="headerlink" title="Replica 分为 Leader 和 Follower"></a>Replica 分为 Leader 和 Follower</h5><ul>
+<li><strong>Leader</strong>：只有Leader对外提供服务（生产、消费），producer和consumer都是和Leader交互。</li>
+<li><strong>Follower</strong>：同步的时候数据是由Follower周期性尝试将数据pull过来，副本的同步机制是 <strong>ISR</strong>。不完全同步，也不完全异步。</li>
+</ul>
+<h5 id="副本数据同步策略-ISR-OSR-AR"><a href="#副本数据同步策略-ISR-OSR-AR" class="headerlink" title="副本数据同步策略 ISR (OSR / AR)"></a>副本数据同步策略 ISR (OSR / AR)</h5><blockquote>
+<p>AR：Assigned Replicas 所有副本</p>
+<p>ISR：In-Sync Replicas 与Leader保持一定程度同步的副本（包括Leader副本）</p>
+<p>OSR：Out-Sync Replicas 与Leader副本同步落后过多的副本（不包括Leader副本）</p>
+</blockquote>
+<p>AR = ISR + OSR</p>
+<blockquote>
+<p>正常情况下，所有Follower副本都应该与Leader副本保持一定程度的同步，即AR=ISR，OSR为空。</p>
+</blockquote>
+<p>Leader负责跟踪<strong>ISR</strong>中Follower副本的之后状态，掉队就移除。</p>
+<blockquote>
+<p>只有ISR集合中的副本才有资格被选举为Leader</p>
+</blockquote>
+<p><code>replica.lag.time.max.ms</code>：Follower能落后Leader的最长时间间隔，默认 10s。</p>
+<blockquote>
+<p>Follower因不能及时跟上Leader的同步而被踢出ISR之后还会继续同步，之后如果跟上了Leader，还会被加入ISR。</p>
+</blockquote>
+<p>ISR的管理在zookeeper中的节点位置：<code>/brokers/Topics/[Topic]/Partitions/[Partition]/state</code></p>
+<h5 id="备份恢复机制"><a href="#备份恢复机制" class="headerlink" title="备份恢复机制"></a>备份恢复机制</h5><p>如果Leader挂掉了，会从replica中选取一个做为新的Leader，并且从ISR中移除原Leader。</p>
+<p>如果所有的副本都宕机后，有两种策略：</p>
+<ol>
+<li>等待ISR中的任意一个replica恢复，并选举为Leader；如果ISR中一个也不能恢复，该Partition永久不可用。相对较少丢失数据。</li>
+<li>选取第一个恢复的replica作为Leader，不论是不是在ISR中（可能是OSR）。较高的可用性但是可能会丢失数据。</li>
+</ol>
+<h5 id="Leader选举"><a href="#Leader选举" class="headerlink" title="Leader选举"></a>Leader选举</h5><p>直接从ISR中选一个最快的设为Leader</p>
+<h1 id="通信协议"><a href="#通信协议" class="headerlink" title="通信协议"></a>通信协议</h1><p>基于TCP</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="http://09itblog.site/?p=867">http://09itblog.site/?p=867</a></p>
+</blockquote>
+<h1 id="常见问题☆"><a href="#常见问题☆" class="headerlink" title="常见问题☆"></a>常见问题☆</h1><p>消息丢失</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_39983554/article/details/110361423">https://blog.csdn.net/weixin_39983554/article/details/110361423</a></p>
+<p>数据大小限制？</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_37502106/article/details/80271800">https://blog.csdn.net/qq_37502106/article/details/80271800</a></p>
+<p>问题集锦</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/chenwiehuang/article/details/100172204">https://blog.csdn.net/chenwiehuang/article/details/100172204</a></p>
+<h4 id="消息丢失"><a href="#消息丢失" class="headerlink" title="消息丢失"></a>消息丢失</h4><ul>
+<li><p>生产端</p>
+<blockquote>
+<p>同步模式下：消息确认模式为1的时候(保证写入Leader成功)，如果刚好Leader Partition挂了，会丢失数据。</p>
+<p>异步模式下：缓存区满了，消息确认模式为0的时候(消息发出不需要确认)，会丢失数据。</p>
+</blockquote>
+</li>
+<li><p>消费端</p>
+<blockquote>
+<p>consumer从Topic中拉取到消息，还没有消费成功就提交了offset。</p>
+</blockquote>
+</li>
+</ul>
+<h4 id="重复消费"><a href="#重复消费" class="headerlink" title="重复消费"></a>重复消费</h4><ol>
+<li><p>强行kill线程、消费系统宕机、重启等各种原因导致消费数据后，<strong>offset没有成功提交</strong>；</p>
+</li>
+<li><p>设置offset为自动提交，如果在close之前（提交offset），调用了consumer.unsubscribe()就有可能部分offset还没提交，下次就会重复消费；</p>
+</li>
+<li><p>Consumer消费消息需要太长时间导致会话超时（或心跳机制检测出问题）</p>
+<blockquote>
+<pre><code class="hljs stylus">session<span class="hljs-selector-class">.timeout</span><span class="hljs-selector-class">.ms</span> 默认 <span class="hljs-number">10s</span>
+group<span class="hljs-selector-class">.min</span><span class="hljs-selector-class">.session</span><span class="hljs-selector-class">.timeout</span><span class="hljs-selector-class">.ms</span> 默认 <span class="hljs-number">6s</span>
+group<span class="hljs-selector-class">.max</span><span class="hljs-selector-class">.session</span><span class="hljs-selector-class">.timeout</span><span class="hljs-selector-class">.ms</span> 默认 <span class="hljs-number">30</span>min</code></pre>
+
+<p>当Consumer处理消费的业务逻辑的时候，如果在<code>10s</code>内没有处理完，那么消费者客户端就会与Kafka Broker Server断开，即使Consumer设置了<strong>自动提交</strong>属性，也会报错（提交失败），broker会认为这个Consumer出问题了所以把这个Partition的消息rebalance到其他的Consumer，导致重新消费。</p>
+<p>所以每次拉取的消息数 和 timeout 要合理。</p>
+</blockquote>
+</li>
+</ol>
+<h5 id="如何保证不重复消费"><a href="#如何保证不重复消费" class="headerlink" title="如何保证不重复消费"></a>如何保证不重复消费</h5><p>只好结合业务场景对消息消费做<strong>幂等处理</strong>。</p>
+<blockquote>
+<p>比如在redis或数据库记录已消费的消息，producer生产消息的时候入库消息未消费，consumer消费完在数据库update为已消费。</p>
+<p>或者换RocketMQ…</p>
+</blockquote>
+<h4 id="如何处理replica的全部宕机"><a href="#如何处理replica的全部宕机" class="headerlink" title="如何处理replica的全部宕机"></a>如何处理replica的全部宕机</h4><p><a href="#%E5%A4%87%E4%BB%BD%E6%81%A2%E5%A4%8D%E6%9C%BA%E5%88%B6">备份恢复机制</a></p>
+<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p>配置文件<code>config/server.properties</code></p>
+<pre><code class="hljs properties"><span class="hljs-comment">#日志所在目录</span>
+<span class="hljs-meta">log.dirs</span>=<span class="hljs-string">/tmp/Kafka-logs</span>
+<span class="hljs-comment">#开启可能会造成数据丢失</span>
+<span class="hljs-meta">unclean.Leader.election.enable</span>=<span class="hljs-string">false</span>
+<span class="hljs-comment">#如果Leader发现Follower有 多久(10s) 没有发送fetch请求了，那么Leader就把它从ISR移除。</span>
+<span class="hljs-meta">replica.lag.time.max.ms</span>=<span class="hljs-string">10000</span>
+<span class="hljs-comment">#至少保证ISR中有几个replica</span>
+<span class="hljs-meta">min.insync.replicas</span>=<span class="hljs-string">1</span>
+<span class="hljs-comment">#发送确认机制：0/1/-1</span>
+<span class="hljs-meta">request.required.asks</span>=<span class="hljs-string">0</span></code></pre>
+
+
+
+
+
+<h1 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h1><pre><code class="hljs sh">bin/Kafka-server-start.sh config/server.properties <span class="hljs-comment">#启动</span>
+bin/Kafka-server-start.sh -daemon config/server.properties <span class="hljs-comment">#后台启动</span></code></pre>
+
+<p>命令均在Kafka的bin目录下</p>
+<pre><code class="hljs sh"><span class="hljs-comment">#创建Topic</span>
+bin/Kafka-Topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --Partitions 1 --Topic <span class="hljs-built_in">test</span>
+<span class="hljs-comment">#查看Topic列表</span>
+bin/Kafka-Topics.sh --list --zookeeper localhost:2181
+<span class="hljs-comment">#产生消息，创建消息生产者</span>
+bin/Kafka-console-producer.sh --broker-list localhost:9092 --Topic <span class="hljs-built_in">test</span>
+<span class="hljs-comment">#消费消息，创建消息消费者</span>
+bin/Kafka-console-consumer.sh --broker-list localhost:9092 --Topic <span class="hljs-built_in">test</span>
+<span class="hljs-comment">#查看Topic的消息</span>
+bin/Kafka-Topics.sh --describe --zookeeper localhost:2181 --Topic <span class="hljs-built_in">test</span>
+<span class="hljs-comment">#删除Topic</span>
+bin/Kafka-Topics.sh --delete --zookeeper localhost:2181 --Topic <span class="hljs-built_in">test</span>
+<span class="hljs-comment">#修改分区数为6</span>
+bin/Kafka-Topics.sh --alter --Partitions 6 --zookeeper localhost:2181 --Topic <span class="hljs-built_in">test</span></code></pre>
+
+
+
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/categories/MQ/">MQ</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/redo/">redo</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2021/01/01/JVM_%E5%AE%89%E5%85%A8%E9%80%80%E5%87%BA/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">JVM安全退出</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2021/01/01/OS_%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E7%AE%97%E6%B3%95/">
+                        <span class="hidden-mobile">内存分配算法</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":200})
+    NProgress.start()
+    document.addEventListener('DOMContentLoaded', function() {
+      window.NProgress && window.NProgress.inc();
+    })
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.staticfile.org/jquery/3.5.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/debouncer.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/blog/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.12.0/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/blog/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/blog/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+
+</body>
+</html>

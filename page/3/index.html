@@ -181,54 +181,6 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/01/01/JVM_%E5%8F%82%E6%95%B0/">JVM的一些参数</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/01/01/JVM_%E5%8F%82%E6%95%B0/">
-          
-          
-            
-          
-          查看jvm参数(参数默认值): java -XX:+PrintFlagsFinal -version
-查看java进程的参数的配置: jinfo -flags [pid] `
-查看java进程的指定参数的配置: jinfo -flags [option] [pid]
-
-jinfo -flags NewRatio 15222
-
-SoftRefLRUPolicyMSPerMB
-关系到 软引用 再GC发
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-01-01 20:46" pubdate>
-              2021-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/JVM/">JVM</a>
-            
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
         <a href="/blog/2021/01/01/JVM_%E5%AE%89%E5%85%A8%E9%80%80%E5%87%BA/">JVM安全退出</a>
       </h1>
 
@@ -263,6 +215,63 @@ public class JVMShutdownHook &#123;
             
           </div>
         
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/blog/2021/01/01/MQ_Kafka/">Kafka</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/MQ_Kafka/">
+          
+          
+            
+          
+          整体架构
+
+通过 zookeeper 保存元数据，管理集群配置、选举Leader、Consumer Group发生变化时进行rebalance。
+
+
+TopicKafka是发布/订阅模式的消息队列，生产、消费消息，都是面向Topic的。
+
+另一种是点对点消息队列，即一条消息被一个消费者消费一次就没了
+
+Consumer Group一条消息可以发送到不同的Consumer Group，但一个Cons
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/MQ/">MQ</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/redo/">redo</a>
+            
+          </div>
         
       </div>
     </article>

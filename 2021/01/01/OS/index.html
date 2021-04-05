@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      5k 字
+      5.2k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      53
+      56
        分钟
     </span>
   
@@ -349,7 +349,7 @@
 <p>CPU通过<strong>TLB</strong>（Translation Lookaside Buffer，转换检测缓冲区）提升虚拟地址到物理地址的转换速度</p>
 </blockquote>
 </blockquote>
-<p>绝大多数情况下，虚拟地址空间比实际系统可用的物理内存(RAM)大，内核和CPU必须考虑如何将实际可用的物理内存映射到虚拟地址空间。一个方法是通过页表(Page Table)将虚拟地址映射到物理地址。每个单元格是一个<code>page frame</code>。<a href="#%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84">内存映射</a></p>
+<p>绝大多数情况下，虚拟地址空间比实际系统可用的物理内存(RAM)大，内核和CPU必须考虑如何将实际可用的物理内存映射到虚拟地址空间。一个方法是通过页表(Page Table)将虚拟地址映射到物理地址。每个单元格是一个<code>page frame</code>。<a href="#%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84mmap">内存映射mmap</a></p>
 <img alt="mmap" src="https://raw.githubusercontent.com/melopoz/pics/master/img/mmap.png" srcset="/blog/img/loading.gif" style="zoom:50%;" />
 
 <blockquote>
@@ -358,7 +358,7 @@
 <h5 id="多级页表"><a href="#多级页表" class="headerlink" title="多级页表"></a>多级页表</h5><blockquote>
 <p>因为虚拟地址空间的绝大多数区域实际并没有使用，这些页实际并没有和page frame关联，引入多级页表(multilevel paging)能极大降低页表使用的内存，提高查询效率。<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/63375062">https://www.zhihu.com/question/63375062</a></p>
 </blockquote>
-<h2 id="内存映射"><a href="#内存映射" class="headerlink" title="内存映射"></a>内存映射</h2><blockquote>
+<h2 id="内存映射mmap"><a href="#内存映射mmap" class="headerlink" title="内存映射mmap"></a>内存映射mmap</h2><blockquote>
 <p>Memory Mapping，底层的一个函数 <code>mmap()</code></p>
 </blockquote>
 <p>内存映射是将来自某个数据源的数据(也可以是某个设备的I/O端口等)转移到某个进程的虚拟内存空间。</p>
@@ -377,13 +377,19 @@
 <p><code>remap_page_range()</code>函数的功能是<code>构造用于映射一段物理地址的新页表</code>，<strong>实现了内核空间与用户空间的映射</strong>。</p>
 <p>在内核<strong>驱动程序的初始化阶段</strong>，通过<code>ioremap()</code><strong>将物理地址映射到内核虚拟空间</strong>；</p>
 </blockquote>
-<h2 id="零拷贝"><a href="#零拷贝" class="headerlink" title="零拷贝"></a>零拷贝</h2><p>todo </p>
-<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/dt0h2UhaoRECvjpeMZMsUA">https://mp.weixin.qq.com/s/dt0h2UhaoRECvjpeMZMsUA</a></p>
-<p>直接调用系统的read() 和 内存映射文件并读取的区别：</p>
+<h4 id="Java中的应用："><a href="#Java中的应用：" class="headerlink" title="Java中的应用："></a>Java中的应用：</h4><blockquote>
+<p>MappedByteBuffer使用mmap的文件映射，在full gc时才会进行释放。</p>
+<p>当close时，需要手动清除内存映射文件，可以反射调用sun.misc.Cleaner方法</p>
+</blockquote>
+<h2 id="零拷贝"><a href="#零拷贝" class="headerlink" title="零拷贝"></a>零拷贝</h2><blockquote>
+<p><strong>零拷贝</strong>（<strong>Zero-copy</strong>）技术是指计算机执行操作时，CPU不需要先将数据从某处内存复制到另一个特定区域。这种技术通常用于<strong>通过网络传输文件时节省CPU周期和内存带宽</strong>。</p>
+</blockquote>
+<p>并不是真的<strong>零</strong>拷贝，只是减少内核态和用户态的切换次数 和 数据拷贝次数。</p>
+<h3 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h3><h4 id="mmap-read-write"><a href="#mmap-read-write" class="headerlink" title="mmap+read/write"></a>mmap+read/write</h4><p>直接调用系统的<code>read()</code>和 内存映射文件并读取<code>mmap()</code>的区别：</p>
 <ul>
 <li><p>直接调用<code>read()</code>，需要内核来调用，步骤：1）从硬盘拷贝到内核缓冲区(内核空间)，2）从内核空间拷贝到用户空间；（即需要用到<a href="#%E7%BC%93%E5%AD%98IO">缓存IO</a>）</p>
 <blockquote>
-<p>首先将文件内容从硬盘拷贝到内核空间的一个缓冲区，然后再将这些数据拷贝到用户空间，这个过程实际上完成了<strong>两次数据拷贝</strong>；</p>
+<p>首先将文件内容从硬盘拷贝到内核空间的一个缓冲区，然后再将这些数据拷贝到用户空间，这个过程实际上发生了<strong>两次</strong>数据拷贝；</p>
 </blockquote>
 </li>
 <li><p>普通文件/设备通过<code>mmap()</code>被映射到进程地址空间（虚拟内存）后，进程可以像访问普通内存一样对文件进行访问，只要在分配的地址范围内进行读取或者写入即可，不必再调用 read / write。具体步骤如下：</p>
@@ -397,11 +403,43 @@
 </ul>
 <p><code>mmap()</code>虽然也是系统调用，但它没有直接调用<code>read()</code>进行数据拷贝，<strong>真正的数据拷贝是在缺页中断处理时进行的</strong>，由于mmap()将文件直接映射到用户空间，所以<strong>中断处理程序</strong>根据这个映射关系，<strong>直接将文件从硬盘拷贝到用户空间</strong>，<strong>只进行</strong>了<strong>一次数据拷贝</strong> 。因此，内存映射的效率要比read/write效率高。</p>
 <blockquote>
-<p>零拷贝是有一次拷贝过程，但是该拷贝操作如果存在，也不是直接属于此进程，而是由中断处理程序处理一个缺页异常，这样看来进程其实是没有进行拷贝操作的。<strong>可能因此才叫零拷贝吧</strong>。。。该拷贝操作是正常的，也是必须的，必须得读取文件到内存中。</p>
+<p>零拷贝是有一次拷贝过程，但是该拷贝操作如果存在，也不是直接属于此进程，而是由中断处理程序处理一个缺页异常，这样看来进程其实是没有进行拷贝操作的。估计因此才叫的<strong>零</strong>拷贝，该拷贝操作是无法避免的，必须得读取文件到内存中。</p>
 </blockquote>
-<p>所以mmap()对<strong>处理大文件</strong>提高了效率，kafka的零拷贝也就是这回事吧。</p>
-<h1 id="IO设备管理"><a href="#IO设备管理" class="headerlink" title="IO设备管理"></a>IO设备管理</h1><p>页面管理95理设备的错误，并提供设备功能的抽象。</p>
-<p>操作系统向I/O设备发送命令，比如访问设备、读写数据、读写设备配置，还要捕捉中断，处理设备的错误，并提供设备功能的抽象。</p>
+<p>所以mmap()对<strong>处理大文件</strong>提高了效率。</p>
+<h4 id="sendfile"><a href="#sendfile" class="headerlink" title="sendfile"></a>sendfile</h4><p>Linux2.1的sendfile()如下，<strong>三次拷贝</strong>（两次DMA拷贝，一次CPU拷贝）</p>
+<img alr="Linux2.1 sendfile()" src="https://raw.githubusercontent.com/melopoz/pics/master/img/linux2.1-sendfile.png" srcset="/blog/img/loading.gif" style="zoom:50%;" />
+
+<blockquote>
+<p>图片来自<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/dt0h2UhaoRECvjpeMZMsUA">https://mp.weixin.qq.com/s/dt0h2UhaoRECvjpeMZMsUA</a></p>
+</blockquote>
+<h4 id="Linux2-4-sendfile：DMA-Scatter-Gatter"><a href="#Linux2-4-sendfile：DMA-Scatter-Gatter" class="headerlink" title="Linux2.4-sendfile：DMA Scatter/Gatter"></a>Linux2.4-sendfile：DMA Scatter/Gatter</h4><blockquote>
+<p>DMA（Direct Memory Access，直接存储器访问）</p>
+<p>引入新的硬件支持 – Scatter/Gatter（分散/聚集）（两次DMA拷贝，没有CPU拷贝）</p>
+</blockquote>
+<img alr="Linux2.4 sendfile()" src="https://raw.githubusercontent.com/melopoz/pics/master/img/Linux-2.4-sendfile.png" srcset="/blog/img/loading.gif" style="zoom:50%;" />
+
+<h3 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h3><p>RocketMQ</p>
+<blockquote>
+<p>mmap+read/write</p>
+</blockquote>
+<p>Kafka</p>
+<blockquote>
+<p>持久化使用 mmap+write</p>
+<p>发送数据使用 sendfile</p>
+</blockquote>
+<p>java.nio.channels.FileChannel#transferFrom()/transferTo()</p>
+<blockquote>
+<p>使用 sendfile</p>
+<pre><code class="hljs java">File file = <span class="hljs-keyword">new</span> File(<span class="hljs-string">&quot;demo.zip&quot;</span>);
+RandomAccessFile raf = <span class="hljs-keyword">new</span> RandomAccessFile(file, <span class="hljs-string">&quot;rw&quot;</span>);
+FileChannel fileChannel = raf.getChannel();
+SocketChannel socketChannel = SocketChannel.open(<span class="hljs-keyword">new</span> InetSocketAddress(<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-number">1234</span>));
+<span class="hljs-comment">// 直接使用了transferTo()进行通道间的数据传输</span>
+fileChannel.transferTo(<span class="hljs-number">0</span>, fileChannel.size(), socketChannel);</code></pre>
+
+<img src="https://raw.githubusercontent.com/melopoz/pics/master/img/java-nio-sendfile.png" srcset="/blog/img/loading.gif" style="zoom:50%;" />
+</blockquote>
+<h1 id="IO设备管理"><a href="#IO设备管理" class="headerlink" title="IO设备管理"></a>IO设备管理</h1><p>操作系统向I/O设备发送命令，比如访问设备、读写数据、读写设备配置，还要捕捉中断，处理设备的错误，并提供设备功能的抽象。</p>
 <h1 id="文件管理"><a href="#文件管理" class="headerlink" title="文件管理"></a>文件管理</h1><p>将硬盘的扇区组织成文件系统，实现文件读写操作</p>
 <p>比如 win使用NTFS、FAT32、FAT16；macOS使用APFS（apple file system）；linux使用EXT2 等等</p>
 <blockquote>
@@ -450,9 +488,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/blog/2021/01/01/%E7%BD%91%E7%BB%9C_TCP%20&amp;%20HTTP%20&amp;%20HTTPS/">
+                      <a href="/blog/2021/01/01/1_redo_%E5%88%86%E5%B8%83%E5%BC%8F_SpringCloud/">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">TCP & HTTP & HTTPS</span>
+                        <span class="hidden-mobile">SpringCloud</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -460,8 +498,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/blog/2021/01/01/1_redo_%E5%88%86%E5%B8%83%E5%BC%8F_SpringCloud/">
-                        <span class="hidden-mobile">SpringCloud</span>
+                      <a href="/blog/2021/01/01/NOSQL_Redis/">
+                        <span class="hidden-mobile">Redis</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

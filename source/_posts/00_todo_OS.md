@@ -232,7 +232,7 @@ OS使用`虚拟内存`抽象了物理内存的使用，上层（应用）调用�
 >
 > > CPU通过**TLB**（Translation Lookaside Buffer，转换检测缓冲区）提升虚拟地址到物理地址的转换速度
 
-绝大多数情况下，虚拟地址空间比实际系统可用的物理内存(RAM)大，内核和CPU必须考虑如何将实际可用的物理内存映射到虚拟地址空间。一个方法是通过页表(Page Table)将虚拟地址映射到物理地址。每个单元格是一个`page frame`。[内存映射](#内存映射)
+绝大多数情况下，虚拟地址空间比实际系统可用的物理内存(RAM)大，内核和CPU必须考虑如何将实际可用的物理内存映射到虚拟地址空间。一个方法是通过页表(Page Table)将虚拟地址映射到物理地址。每个单元格是一个`page frame`。[内存映射mmap](#内存映射mmap)
 
 <img alt="mmap" src="https://raw.githubusercontent.com/melopoz/pics/master/img/mmap.png" style="zoom:50%;" />
 
@@ -244,7 +244,7 @@ OS使用`虚拟内存`抽象了物理内存的使用，上层（应用）调用�
 
 
 
-## 内存映射
+## 内存映射mmap
 
 > Memory Mapping，底层的一个函数 `mmap()`
 
@@ -268,19 +268,23 @@ mmap() 函数：
 
 
 
-## 零拷贝 
+## 零拷贝
 
-todo 
+> **零拷贝**（**Zero-copy**）技术是指计算机执行操作时，CPU不需要先将数据从某处内存复制到另一个特定区域。这种技术通常用于**通过网络传输文件时节省CPU周期和内存带宽**。
 
-https://mp.weixin.qq.com/s/dt0h2UhaoRECvjpeMZMsUA
+并不是真的**零**拷贝，只是减少内核态和用户态的切换次数 和 数据拷贝次数。
 
 
 
-直接调用系统的read() 和 内存映射文件并读取的区别：
+### 实现方式
+
+#### mmap+read/write
+
+直接调用系统的`read()`和 内存映射文件并读取`mmap()`的区别：
 
 - 直接调用`read()`，需要内核来调用，步骤：1）从硬盘拷贝到内核缓冲区(内核空间)，2）从内核空间拷贝到用户空间；（即需要用到[缓存IO](#缓存IO)）
 
-  > 首先将文件内容从硬盘拷贝到内核空间的一个缓冲区，然后再将这些数据拷贝到用户空间，这个过程实际上完成了**两次数据拷贝**；
+  > 首先将文件内容从硬盘拷贝到内核空间的一个缓冲区，然后再将这些数据拷贝到用户空间，这个过程实际上发生了**两次**数据拷贝；
 
 - 普通文件/设备通过`mmap()`被映射到进程地址空间（虚拟内存）后，进程可以像访问普通内存一样对文件进行访问，只要在分配的地址范围内进行读取或者写入即可，不必再调用 read / write。具体步骤如下：
 
@@ -290,15 +294,53 @@ https://mp.weixin.qq.com/s/dt0h2UhaoRECvjpeMZMsUA
 
 `mmap()`虽然也是系统调用，但它没有直接调用`read()`进行数据拷贝，**真正的数据拷贝是在缺页中断处理时进行的**，由于mmap()将文件直接映射到用户空间，所以**中断处理程序**根据这个映射关系，**直接将文件从硬盘拷贝到用户空间**，**只进行**了**一次数据拷贝** 。因此，内存映射的效率要比read/write效率高。
 
-> 零拷贝是有一次拷贝过程，但是该拷贝操作如果存在，也不是直接属于此进程，而是由中断处理程序处理一个缺页异常，这样看来进程其实是没有进行拷贝操作的。**可能因此才叫零拷贝吧**。。。该拷贝操作是正常的，也是必须的，必须得读取文件到内存中。
+> 零拷贝是有一次拷贝过程，但是该拷贝操作如果存在，也不是直接属于此进程，而是由中断处理程序处理一个缺页异常，这样看来进程其实是没有进行拷贝操作的。估计因此才叫的**零**拷贝，该拷贝操作是无法避免的，必须得读取文件到内存中。
 
-所以mmap()对**处理大文件**提高了效率，kafka的零拷贝也就是这回事吧。
+所以mmap()对**处理大文件**提高了效率。
+
+
+
+#### sendfile
+
+Linux2.1的sendfile()如下，**三次拷贝**（两次DMA拷贝，一次CPU拷贝）
+
+<img alr="Linux2.1 sendfile()" src="https://raw.githubusercontent.com/melopoz/pics/master/img/linux2.1-sendfile.png" style="zoom:50%;" />
+
+> 图片来自https://mp.weixin.qq.com/s/dt0h2UhaoRECvjpeMZMsUA
+
+
+
+#### Linux2.4-sendfile：DMA Scatter/Gatter
+
+> DMA（Direct Memory Access，直接存储器访问）
+>
+> 引入新的硬件支持 -- Scatter/Gatter（分散/聚集）（两次DMA拷贝，没有CPU拷贝）
+
+<img alr="Linux2.4 sendfile()" src="https://raw.githubusercontent.com/melopoz/pics/master/img/Linux-2.4-sendfile.png" style="zoom:50%;" />
+
+### 应用
+
+RocketMQ
+
+> mmap+read/write
+
+Kafka
+
+> 持久化使用 mmap+write
+>
+> 发送数据使用 sendfile
+
+java.nio.channels.FileChannel#transferFrom()/transferTo()
+
+> 使用 sendfile
+>
+> <img src="https://raw.githubusercontent.com/melopoz/pics/master/img/java-nio-sendfile.png" style="zoom:50%;" />
+
+
 
 
 
 # IO设备管理
-
-页面管理95理设备的错误，并提供设备功能的抽象。
 
 操作系统向I/O设备发送命令，比如访问设备、读写数据、读写设备配置，还要捕捉中断，处理设备的错误，并提供设备功能的抽象。
 

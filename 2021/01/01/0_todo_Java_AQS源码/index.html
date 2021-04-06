@@ -230,7 +230,7 @@
               <p>todo </p>
 <p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/waterystone/p/4920797.html">https://www.cnblogs.com/waterystone/p/4920797.html</a></p>
 <h1 id="AQS源码分析"><a href="#AQS源码分析" class="headerlink" title="AQS源码分析"></a>AQS源码分析</h1><p>维护一个 <code>volatile int</code> 变量 <code>state</code> 代表加锁状态</p>
-<p>维护一个 队列代表请求锁资源的线程，head持有锁，后边的节点（线程）等待锁</p>
+<p>维护一个 队列代表请求锁资源的线程，head持有锁，后边的节点（线程）等待锁（CLH锁）</p>
 <p>提供一套模板，实现类必须实现以下方法来实现自己加锁解锁的逻辑：</p>
 <ul>
 <li>boolean tryAcquire(int)：独占式 尝试获取资源，成功则返回true，失败则返回false。</li>

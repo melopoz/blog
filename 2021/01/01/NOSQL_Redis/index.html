@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      10.4k 字
+      10.3k 字
     </span>
   
 
@@ -498,8 +498,6 @@ zunionstore rank:last_week 7 rank:20150323 rank:20150324 rank:20150325  weights 
 <p> 注 7、8 为 Redis 4.0 新增。</p>
 <p> <strong>volatile</strong>为前缀的策略都是从<strong>已过期的数据集</strong>中进行淘汰。</p>
 <p> <strong>allkeys</strong>为前缀的策略都是面向<strong>所有key</strong>进行淘汰。</p>
-<p> <strong>LRU</strong>（least recently used）最近最少用到的。</p>
-<p> <strong>LFU</strong>（Least Frequently Used）最不常用的。</p>
 </blockquote>
 <hr>
 <h3 id="持久化机制"><a href="#持久化机制" class="headerlink" title="持久化机制"></a>持久化机制</h3><p>redis支持持久化，这是redis不同于memcached很重要的一点。</p>

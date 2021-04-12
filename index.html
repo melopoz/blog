@@ -213,7 +213,7 @@ java.util.concu
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-04-13 00:08" pubdate>
+            <time datetime="2021-04-13 00:45" pubdate>
               2021-04-13
             </time>
           </div>
@@ -239,12 +239,11 @@ java.util.concu
           
             
           
-          现在很多项目都引入缓存以提高性能、降低数据库压力。举个例子（简单点说）就是 mysql + redis。
+          背景现在很多项目都引入缓存以提高性能、降低数据库压力。举个例子（简单点说）就是 mysql + redis。
 实现的时候无非就是把数据库和缓存中的数据都更新。如果这是一个原子性操作，啥事没有…
 既然是两个操作，执行总会有先后（两个操作之间可能发生一些事情导致结果并不是你想看到的…没想到这些就是”有bug”，想到了就是”实现不了”）。
 也就是有如下几种更新策略：（无数据库锁、单机数据库）
-
-先更新cac
+缓存的更新
         </a>
       </p>
 
@@ -252,7 +251,7 @@ java.util.concu
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-04-13 00:08" pubdate>
+            <time datetime="2021-04-13 00:45" pubdate>
               2021-04-13
             </time>
           </div>

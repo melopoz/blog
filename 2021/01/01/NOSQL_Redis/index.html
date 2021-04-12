@@ -582,7 +582,7 @@ zunionstore rank:last_week 7 rank:20150323 rank:20150324 rank:20150325  weights 
 <p>解决方案：</p>
 <blockquote>
 <ol>
-<li><p>设置热点数据永不过期（因为大量请求说明可能是热点数据，但是要注意这个缓存key的更新策略，可能会影响到数据一致性，见另一篇笔记：<a target="_blank" rel="noopener" href="https://google.com/">缓存的数据一致性</a>）。</p>
+<li><p>设置热点数据永不过期（因为大量请求说明可能是热点数据，但是要注意这个缓存key的更新策略，可能会影响到数据一致性，见另一篇笔记：<a href="https://melopoz.github.io/blog/2021/04/12/%E6%9E%B6%E6%9E%84_%E7%BC%93%E5%AD%98%E7%9A%84%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/">缓存的数据一致性</a>）。</p>
 </li>
 <li><p><strong>加锁</strong>。这里也就是靠谱一点的解决方案了。但是加锁又会导致性能问题，所以具体情况具体分析吧，折中处理。</p>
 <pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> V <span class="hljs-title">getData</span><span class="hljs-params">(K key)</span> <span class="hljs-keyword">throws</span> InterruptException </span>&#123;

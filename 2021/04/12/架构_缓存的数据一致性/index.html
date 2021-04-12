@@ -17,7 +17,7 @@
   <meta name="description" content="Although things are always not as you wish, but effort will be lucy!">
   <meta name="author" content="melopoz">
   <meta name="keywords" content="">
-  <title>Be your own god.</title>
+  <title>缓存的数据一致性 - Be your own god.</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
 
@@ -162,7 +162,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="">
+            <span class="h2" id="subtitle" title="缓存的数据一致性">
               
             </span>
 
@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      51 字
+      1.2k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      1
+      12
        分钟
     </span>
   
@@ -224,32 +224,90 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none"></h1>
+            <h1 style="display: none">缓存的数据一致性</h1>
             
             <div class="markdown-body">
-              <p>Java线程池</p>
-<p>java.util.concurrent包下</p>
-<p>Executor</p>
-<p>ExecutorService</p>
-<p>AbstractExecutorService</p>
-<p>ThreadPoolExecutor</p>
-<p>静态工具类Executors</p>
-<p>拒绝策略</p>
+              <p>现在很多项目都引入缓存以提高性能、降低数据库压力。举个例子（简单点说）就是 <code>mysql</code> + <code>redis</code>。</p>
+<p>实现的时候无非就是把数据库和缓存中的数据都更新。如果这是一个原子性操作，啥事没有…</p>
+<p>既然是两个操作，执行总会有先后（两个操作之间可能发生一些事情导致结果并不是你想看到的…没想到这些就是”有bug”，想到了就是”实现不了”）。</p>
+<p>也就是有如下几种<strong>更新策略</strong>：（无数据库锁、单机数据库）</p>
+<ul>
+<li>先更新cache，再更新db：肯定不行，别想了，<code>更新cache</code>成功，<code>更新db</code>失败，还是脏数据。</li>
+<li>先更新db，再更新cache：如果这两个操作之间有另一个事务T2完成了（执行完<code>更新db</code>+<code>更新cache</code>），当前事务的<code>更新cache</code>就是把脏数据放到了数据库。</li>
+</ul>
+<p>如果<code>cache未命中，从db读取</code>，肯定会填充cache，所以直接把cache删掉，下次从db读取的时候再填充cache就能解决上述问题。</p>
+<p>所以有 <code>更新db</code> + <code>删除cache</code> 的组合：</p>
+<ul>
+<li>先删除cache，再更新db：如果两个操作之间有读请求因为没有命中cache而把db的旧数据填充到了cache，相当于cache中还是脏数据。</li>
+<li><strong>先更新db，再删除cache（常用）</strong>：起码能保证当前事务自身不会把脏数据、旧数据放到cache。</li>
+</ul>
+<p>但是也会有问题：</p>
+<ol>
+<li><p>缓存已失效的情况下，查询和更新同时进行。（一般读多写少，这种情况概率极低）</p>
 <blockquote>
-<p>Abolicy</p>
+<blockquote>
+<p>缓存已过期</p>
 </blockquote>
-<p>执行原理 直接看代码</p>
-<p>使用线程池的例子</p>
-<p>netty的EventLoop、EventLoopGroup</p>
-<p>阻塞队列</p>
-<p>java.util.concurrent</p>
-<p><img src="https://i.loli.net/2021/04/02/1sVvczI6hmJY3oN.png" srcset="/blog/img/loading.gif"></p>
+<p>T1 请求查询，缓存未命中，查询db；</p>
+<p>T2 请求 更新数据库，并删除cache（本来cache也是空的）；</p>
+<p>T1 将查询到的（旧）数据填充到cache。<strong>导致数据不一致</strong></p>
+</blockquote>
+</li>
+<li><p>读写分离的数据库架构</p>
+<blockquote>
+<p>T1 更新db（更新到master，还未同步到slave），删除cache；</p>
+<p>T2 请求查询，从slave读取到旧数据并填充缓存。<strong>导致数据不一致</strong></p>
+</blockquote>
+<p>如果不要求强一致性，就是用缓存的过期时间来兜底。</p>
+</li>
+<li><p>如果<strong>删除cache失败</strong>（可能网络故障等等原因。如果因此就回滚db事务或者重试删除，性能下降会很严重。）</p>
+<ul>
+<li>回滚事务：性能下降严重</li>
+<li>重试删除cache：性能下降严重</li>
+<li>删除失败再<strong>异步删除cache</strong>：<strong>折中</strong>，保证性能的同时，争取提高数据的一致性。但是因为要引入消息队列，<strong>增加了复杂度</strong>。</li>
+</ul>
+<p>如果是主从架构的数据库：</p>
+<ul>
+<li>因为主从同步是通过binlog实现，所以可以监听binlog，binlog更新就更新缓存。</li>
+</ul>
+</li>
+<li><p>删除key可能主动造成<strong>缓存击穿</strong>（大量请求正在访问这个key，突然一个更新的事务把这个key删掉了）</p>
+<p>那就要走缓存击穿的解决方案了：加锁。会影响性能，所以视具体情况折中处理。</p>
+</li>
+</ol>
+<p>为保证最基本的<strong>最终一致性</strong>，就是设置过期时间。这样就算有脏数据，也会有个期限，在缓存过期之后就会从db拿最新数据。</p>
+<blockquote>
+<p>这也是为什么缓存数据要设置过期时间的原因之一了。（没用了会占用内存，而且不然不知道啥时候该删除那个缓存）</p>
+<p>如果每次访问cache更新缓存的过期时间，那就没有了最终一致性的保证。就必须在更新数据的时候保证将db中的最新数据更新到cache。</p>
+</blockquote>
+<p>具体可以参考其他的缓存的思路，比如操作系统的缓存，cpu的缓存行，java的缓存和volitale。总会是性能和一致性的权衡。</p>
+<h3 id="如果非要保证强一致性"><a href="#如果非要保证强一致性" class="headerlink" title="如果非要保证强一致性"></a>如果非要保证强一致性</h3><p>那就是db一旦修改，缓存中的就数据必须失效。所有读请求在<code>写事务完成之前</code>必须都是阻塞的，以读取到最新数据。</p>
+<p>单机数据库可以 先删除缓存，并在数据库的对应的数据行加锁，要小心gapLock的特殊情况导致”锁表”。</p>
+<p>数据库读写分离，就需要使用分布式锁了。性能下降肯定会严重。</p>
+<p>如果使用读写锁，就可能导致写锁饥饿，解决方案就是公平锁，公平锁又会导致性能有下降。比如Java的ReentrantLock的 ReadWriteLock 的写锁饥饿和优化方案：StampLock（使用CLH锁和MCS锁）。</p>
+<p><strong>分布式读写锁</strong>实现比较复杂。可以使用中间件：Curator的 <a target="_blank" rel="noopener" href="https://curator.apache.org/apidocs/org/apache/curator/framework/recipes/locks/InterProcessReadWriteLock.html">InterProcessReadWriteLock</a>，Redisson的 <a target="_blank" rel="noopener" href="https://static.javadoc.io/org.redisson/redisson/3.3.2/org/redisson/api/RReadWriteLock.html">RReadWriteLock</a>。</p>
 
             </div>
             <hr>
             <div>
               <div class="post-metas mb-3">
                 
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/categories/%E6%9E%B6%E6%9E%84/">架构</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/">数据一致性</a>
+                    
+                  </div>
                 
               </div>
               
@@ -260,12 +318,18 @@
                   <article class="post-prev col-6">
                     
                     
+                      <a href="/blog/2021/04/12/0_todo_Java_JUC/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/blog/2021/04/12/%E6%9E%B6%E6%9E%84_%E7%BC%93%E5%AD%98%E7%9A%84%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/">
-                        <span class="hidden-mobile">缓存的数据一致性</span>
+                      <a href="/blog/2021/01/01/0_todo_DB_MySQL/">
+                        <span class="hidden-mobile">Mysql</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

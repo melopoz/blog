@@ -181,6 +181,68 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
+        <a href="/blog/2021/01/01/OS/">OS</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/OS/">
+          
+          
+            
+          
+          操作系统四大特征：并发两个事件在同一段时间内发生，即宏观上同时运行；并行是两个事件在统一时刻发生，多(核)CPU可支持并行
+共享（资源复用）多个并发执行的进程共同使用同一系统资源，比如内存
+
+互斥共享：同一时刻只有一个进程可以访问，需要同步机制来实现互斥。互斥的资源成为临界资源。e.g.:摄像头
+同时访问：允许多个进程在同一段时间内访问同一资源，即宏观上的同时。（微观上还是交替进行）e.g.:磁盘
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/OS/">OS</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
+            
+              <a href="/blog/tags/%E9%9B%B6%E6%8B%B7%E8%B4%9D/">零拷贝</a>
+            
+              <a href="/blog/tags/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">IO多路复用</a>
+            
+              <a href="/blog/tags/select/">select</a>
+            
+              <a href="/blog/tags/poll/">poll</a>
+            
+              <a href="/blog/tags/epoll/">epoll</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
         <a href="/blog/2021/01/01/NOSQL_Redis/">Redis</a>
       </h1>
 
@@ -197,10 +259,11 @@ http://download.redis.io/redis-stable/redis.conf
 本地缓存，比如java中的map，guava实现，轻量、快速，但是如果有多个实例，就需要每个实例都保存一份缓存，不具有一致性。
 
 
- 分布式缓存，比如redis、memcached，缓存具有一致性。但是需要保持服务的高可用。
+ 分布式缓存，比如redis、memcached。但是需要保持服务的高可用。
 
 
-redis VS memcache
+redis VS memcached
+redis数
         </a>
       </p>
 

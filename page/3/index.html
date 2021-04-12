@@ -181,6 +181,63 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
+        <a href="/blog/2021/01/01/MQ_Kafka/">Kafka</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/MQ_Kafka/">
+          
+          
+            
+          
+          整体架构
+
+通过 zookeeper 保存元数据，管理集群配置、选举Leader、Consumer Group发生变化时进行rebalance。
+
+
+TopicKafka是发布/订阅模式的消息队列，生产、消费消息，都是面向Topic的。
+
+另一种是点对点消息队列，即一条消息被一个消费者消费一次就没了
+
+Consumer Group一条消息可以发送到不同的Consumer Group，但一个Cons
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/MQ/">MQ</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/redo/">redo</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
         <a href="/blog/2021/01/01/OS_%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E7%AE%97%E6%B3%95/">内存分配算法</a>
       </h1>
 
@@ -663,68 +720,6 @@ P      partition tolerance      分区容错性  （分区相当于对通信的�
               <a href="/blog/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
             
               <a href="/blog/tags/redo/">redo</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/01/01/OS/">OS</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/01/01/OS/">
-          
-          
-            
-          
-          操作系统四大特征：并发两个事件在同一段时间内发生，即宏观上同时运行；并行是两个事件在统一时刻发生，多(核)CPU可支持并行
-共享（资源复用）多个并发执行的进程共同使用同一系统资源，比如内存
-
-互斥共享：同一时刻只有一个进程可以访问，需要同步机制来实现互斥。互斥的资源成为临界资源。e.g.:摄像头
-同时访问：允许多个进程在同一段时间内访问同一资源，即宏观上的同时。（微观上还是交替进行）e.g.:磁盘
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-01-01 20:46" pubdate>
-              2021-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/OS/">OS</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">内存管理</a>
-            
-              <a href="/blog/tags/%E9%9B%B6%E6%8B%B7%E8%B4%9D/">零拷贝</a>
-            
-              <a href="/blog/tags/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">IO多路复用</a>
-            
-              <a href="/blog/tags/select/">select</a>
-            
-              <a href="/blog/tags/poll/">poll</a>
-            
-              <a href="/blog/tags/epoll/">epoll</a>
             
           </div>
         

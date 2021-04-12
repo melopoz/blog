@@ -486,7 +486,7 @@ auto-aof-rewrite-min-size 64mb
 
 
 
-### 缓存穿透
+### 缓存穿透（绕过）
 
 穿透  `同时大量请求一个不存在的key`
 

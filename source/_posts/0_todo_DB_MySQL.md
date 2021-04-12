@@ -198,13 +198,21 @@ delete操作可能并不会直接删除原有数据
 
 ## InnoDB的锁
 
+https://www.cnblogs.com/rjzheng/p/9950951.html
+
+> `lock in share mode`、`for update`
+
 `Record Lock`行锁
 
-`Gap Lock`间隙锁
+`Gap Lock`间隙锁（只在可重复读和序列化执行的事务隔离级别下才有）
 
 `Next-Key Lock`       InnoDB对于行的查询都是采用这个锁定算法
 
 > 如果筛选条件为`where id = 10`，id是主键，则不会加间隙锁，Next-Key Lock会降级为Record Lock，只锁定id=10，此时insert id = 9 是不会阻塞的
+
+`Repeatable`隔离级别下，如果where条件是没有索引的列，会在每行加锁、每个间隙加间隙锁，所以像是锁表。
+
+`RU`和`RC`级别下，如果where条件是没有索引的列，也只会加行锁
 
 ### InnoDB解决幻读：
 

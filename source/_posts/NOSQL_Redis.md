@@ -25,7 +25,7 @@ http://download.redis.io/redis-stable/redis.conf
 
 > 本地缓存，比如java中的map，guava实现，轻量、快速，但是如果有多个实例，就需要每个实例都保存一份缓存，不具有一致性。
 
->  分布式缓存，比如redis、memcached，缓存具有一致性。但是需要保持服务的高可用。
+>  分布式缓存，比如redis、memcached。但是需要保持服务的高可用。
 
 ---
 
@@ -510,9 +510,9 @@ auto-aof-rewrite-min-size 64mb
 
 解决方案：
 
-> 1. 设置热点数据永不过期（因为大量请求说明可能是热点数据）。
+> 1. 设置热点数据永不过期（因为大量请求说明可能是热点数据，但是要注意这个缓存key的更新策略，可能会影响到数据一致性，见另一篇笔记：[缓存的数据一致性](https://google.com)）。
 >
-> 2. 加锁。
+> 2. **加锁**。这里也就是靠谱一点的解决方案了。但是加锁又会导致性能问题，所以具体情况具体分析吧，折中处理。
 >
 >    ```java
 >    public V getData(K key) throws InterruptException {

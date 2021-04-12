@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      2.9k 字
+      3k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      33
+      34
        分钟
     </span>
   
@@ -352,12 +352,18 @@
 <h3 id="purge-–-将缓冲池中的数据刷回磁盘时进行merge"><a href="#purge-–-将缓冲池中的数据刷回磁盘时进行merge" class="headerlink" title="purge – 将缓冲池中的数据刷回磁盘时进行merge"></a>purge – 将缓冲池中的数据刷回磁盘时进行merge</h3><p>delete操作可能并不会直接删除原有数据</p>
 <p>因为InnoDB支持MVCC，所以数据不能再事务提交之后就立即处理（其他事务可能也在引用这行数据）。</p>
 <p>在最后purge的时候才会真正完成 delete、update操作，update也是删除之前版本的那‘行’记录</p>
-<h2 id="InnoDB的锁"><a href="#InnoDB的锁" class="headerlink" title="InnoDB的锁"></a>InnoDB的锁</h2><p><code>Record Lock</code>行锁</p>
-<p><code>Gap Lock</code>间隙锁</p>
+<h2 id="InnoDB的锁"><a href="#InnoDB的锁" class="headerlink" title="InnoDB的锁"></a>InnoDB的锁</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/rjzheng/p/9950951.html">https://www.cnblogs.com/rjzheng/p/9950951.html</a></p>
+<blockquote>
+<p><code>lock in share mode</code>、<code>for update</code></p>
+</blockquote>
+<p><code>Record Lock</code>行锁</p>
+<p><code>Gap Lock</code>间隙锁（只在可重复读和序列化执行的事务隔离级别下才有）</p>
 <p><code>Next-Key Lock</code>       InnoDB对于行的查询都是采用这个锁定算法</p>
 <blockquote>
 <p>如果筛选条件为<code>where id = 10</code>，id是主键，则不会加间隙锁，Next-Key Lock会降级为Record Lock，只锁定id=10，此时insert id = 9 是不会阻塞的</p>
 </blockquote>
+<p><code>Repeatable</code>隔离级别下，如果where条件是没有索引的列，会在每行加锁、每个间隙加间隙锁，所以像是锁表。</p>
+<p><code>RU</code>和<code>RC</code>级别下，如果where条件是没有索引的列，也只会加行锁</p>
 <h3 id="InnoDB解决幻读："><a href="#InnoDB解决幻读：" class="headerlink" title="InnoDB解决幻读："></a>InnoDB解决幻读：</h3><p>使用 <code>Next-key Lock</code> (<code>Record Lock</code>+<code>Gap Lock</code>)机制</p>
 <blockquote>
 <p>锁定一个范围和该记录本身</p>
@@ -483,7 +489,7 @@ group by Request_at</code></pre>
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/blog/2021/04/06/0_todo_Java_JUC/">
+                      <a href="/blog/2021/04/12/0_todo_Java_JUC/">
                         <i class="iconfont icon-arrowleft"></i>
                         <span class="hidden-mobile"></span>
                         <span class="visible-mobile">上一篇</span>

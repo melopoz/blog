@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      10.3k 字
+      10.4k 字
     </span>
   
 
@@ -559,7 +559,7 @@ zunionstore rank:last_week 7 rank:20150323 rank:20150324 rank:20150325  weights 
 <span class="hljs-comment">#只有当auto-aof-rewrite-min-size和auto-aof-rewrite-percentage两个参数同时满足时，才会自动触发AOF重写，即bgrewriteaof操作。</span></code></pre>
 
 <hr>
-<h3 id="缓存穿透"><a href="#缓存穿透" class="headerlink" title="缓存穿透"></a>缓存穿透</h3><p>穿透  <code>同时大量请求一个不存在的key</code></p>
+<h3 id="缓存穿透（绕过）"><a href="#缓存穿透（绕过）" class="headerlink" title="缓存穿透（绕过）"></a>缓存穿透（绕过）</h3><p>穿透  <code>同时大量请求一个不存在的key</code></p>
 <blockquote>
 <p>一个<strong>不存在</strong>的key，缓存不会起作用，请求直接打到DB，如果流量大，DB危险</p>
 </blockquote>

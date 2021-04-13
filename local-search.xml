@@ -5,8 +5,8 @@
   
   <entry>
     <title></title>
-    <link href="/blog/2021/04/12/0_todo_Java_JUC/"/>
-    <url>/blog/2021/04/12/0_todo_Java_JUC/</url>
+    <link href="/blog/2021/04/13/0_todo_Java_JUC/"/>
+    <url>/blog/2021/04/13/0_todo_Java_JUC/</url>
     
     <content type="html"><![CDATA[<p>Java线程池</p><p>java.util.concurrent包下</p><p>Executor</p><p>ExecutorService</p><p>AbstractExecutorService</p><p>ThreadPoolExecutor</p><p>静态工具类Executors</p><p>拒绝策略</p><blockquote><p>Abolicy</p></blockquote><p>执行原理 直接看代码</p><p>使用线程池的例子</p><p>netty的EventLoop、EventLoopGroup</p><p>阻塞队列</p><p>java.util.concurrent</p><p><img src="https://i.loli.net/2021/04/02/1sVvczI6hmJY3oN.png"></p>]]></content>
     
@@ -18,8 +18,8 @@
   
   <entry>
     <title>缓存的数据一致性</title>
-    <link href="/blog/2021/04/12/%E6%9E%B6%E6%9E%84_%E7%BC%93%E5%AD%98%E7%9A%84%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/"/>
-    <url>/blog/2021/04/12/%E6%9E%B6%E6%9E%84_%E7%BC%93%E5%AD%98%E7%9A%84%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/</url>
+    <link href="/blog/2021/04/13/%E6%9E%B6%E6%9E%84_%E7%BC%93%E5%AD%98%E7%9A%84%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/"/>
+    <url>/blog/2021/04/13/%E6%9E%B6%E6%9E%84_%E7%BC%93%E5%AD%98%E7%9A%84%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/</url>
     
     <content type="html"><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>现在很多项目都引入缓存以提高性能、降低数据库压力。举个例子（简单点说）就是 <code>mysql</code> + <code>redis</code>。</p><p>实现的时候无非就是把数据库和缓存中的数据都更新。如果这是一个原子性操作，啥事没有…</p><p>既然是两个操作，执行总会有先后（两个操作之间可能发生一些事情导致结果并不是你想看到的…没想到这些就是”有bug”，想到了就是”实现不了”）。</p><p>也就是有如下几种<strong>更新策略</strong>：（无数据库锁、单机数据库）</p><h2 id="缓存的更新策略"><a href="#缓存的更新策略" class="headerlink" title="缓存的更新策略"></a>缓存的更新策略</h2><ul><li>先更新cache，再更新db：肯定不行，别想了，<code>更新cache</code>成功，<code>更新db</code>失败，还是脏数据。</li><li>先更新db，再更新cache：如果这两个操作之间有另一个事务T2完成了（执行完<code>更新db</code>+<code>更新cache</code>），当前事务的<code>更新cache</code>就是把脏数据放到了数据库。</li></ul><p>如果<code>cache未命中，从db读取</code>，肯定会填充cache，所以直接把cache删掉，下次从db读取的时候再填充cache就能解决上述问题。</p><p>所以有 <code>更新db</code> + <code>删除cache</code> 的组合：</p><ul><li>先删除cache，再更新db：如果两个操作之间有读请求因为没有命中cache而把db的旧数据填充到了cache，相当于cache中还是脏数据。</li><li><strong>先更新db，再删除cache（常用）</strong>：起码能保证当前事务自身不会把脏数据、旧数据放到cache。</li></ul><p>但是也会有问题：</p><ol><li><p>缓存已失效的情况下，查询和更新同时进行。（一般读多写少，这种情况概率极低）</p><blockquote><blockquote><p>缓存已过期</p></blockquote><p>T1 请求查询，缓存未命中，查询db；</p><p>T2 请求 更新数据库，并删除cache（本来cache也是空的）；</p><p>T1 将查询到的（旧）数据填充到cache。<strong>导致数据不一致</strong></p></blockquote></li><li><p>读写分离的数据库架构</p><blockquote><p>T1 更新db（更新到master，还未同步到slave），删除cache；</p><p>T2 请求查询，从slave读取到旧数据并填充缓存。<strong>导致数据不一致</strong></p></blockquote><p>如果不要求强一致性，就是<strong>用缓存的过期时间来兜底</strong>。</p></li><li><p>如果<strong>删除cache失败</strong>（可能网络故障等等原因。如果因此就回滚db事务或者重试删除，性能下降会很严重。）</p><ul><li>回滚事务：性能下降严重</li><li>重试删除cache：性能下降严重</li><li>删除失败再 <strong>异步 删除cache</strong>：<strong>折中</strong>，保证性能的同时，争取提高数据的一致性。但是因为要引入消息队列，<strong>增加了复杂度</strong>。</li></ul><p>如果是主从架构读写分离的数据库：</p><ul><li>因为主从同步是通过binlog实现，所以可以<strong>监听binlog</strong>，binlog更新就更新缓存。</li></ul></li><li><p>删除key可能主动造成<strong>缓存击穿</strong>（大量请求正在访问这个key，突然一个更新的事务把这个key删掉了）</p><p>那就要走缓存击穿的解决方案了：<strong>加锁</strong>。会影响性能，所以视具体情况折中处理。</p></li></ol><h3 id="延迟删除"><a href="#延迟删除" class="headerlink" title="延迟删除"></a>延迟删除</h3><p>如果写请求不是很密集的话，也可以<strong>延迟删除</strong>。就是在更新db之后，提交一个异步任务（到线程池、MQ），一秒之后将这个key删除。</p><p>这样可以解决 问题1 和 问题2。 </p><blockquote><p>如果写密集的话倒有可能提高问题1、2的概率，而且真正要考虑的是 写多还缓存。。？</p></blockquote><h2 id="过期时间"><a href="#过期时间" class="headerlink" title="过期时间"></a>过期时间</h2><p>为保证最基本的<strong>最终一致性</strong>，就是设置过期时间。这样就算有脏数据，也会有个期限，在缓存过期之后就会从db拿最新数据。</p><blockquote><p>这也是为什么缓存数据要设置过期时间的原因之一了。（还因为没用了会占用内存、而且不然不知道啥时候该删除那个缓存）</p><p>如果每次访问cache更新缓存的过期时间，那就没有了最终一致性的保证。就必须在更新数据的时候保证将db中的最新数据更新到cache。</p></blockquote><p>具体可以参考其他的缓存的思路，比如操作系统的缓存，cpu的缓存行，java的缓存和volitale。总会是性能和一致性的权衡。</p><h2 id="如果非要保证强一致性"><a href="#如果非要保证强一致性" class="headerlink" title="如果非要保证强一致性"></a>如果非要保证强一致性</h2><p>那就是db一旦修改，缓存中的就数据必须失效。所有读请求在<code>写事务完成之前</code>必须都是阻塞的，以读取到最新数据。</p><p>单机数据库可以 先删除缓存，并在数据库的对应的数据行加锁，要小心gapLock的特殊情况导致”锁表”。</p><p>数据库读写分离，就需要使用分布式锁了。性能下降肯定会严重。</p><p>如果使用读写锁，就可能导致写锁饥饿，解决方案就是公平锁，公平锁又会导致性能有下降。比如Java的ReentrantLock的 ReadWriteLock 的写锁饥饿和优化方案：StampLock（使用CLH锁和MCS锁）。</p><p><strong>分布式读写锁</strong>实现比较复杂。可以使用中间件：Curator的 <a href="https://curator.apache.org/apidocs/org/apache/curator/framework/recipes/locks/InterProcessReadWriteLock.html">InterProcessReadWriteLock</a>，Redisson的 <a href="https://static.javadoc.io/org.redisson/redisson/3.3.2/org/redisson/api/RReadWriteLock.html">RReadWriteLock</a>。</p>]]></content>
     
@@ -391,7 +391,7 @@
   
   
   <entry>
-    <title></title>
+    <title>Java中的位运算</title>
     <link href="/blog/2021/01/01/Basics_%E4%BD%8D%E8%BF%90%E7%AE%97&amp;%E8%A1%A5%E7%A0%81/"/>
     <url>/blog/2021/01/01/Basics_%E4%BD%8D%E8%BF%90%E7%AE%97&amp;%E8%A1%A5%E7%A0%81/</url>
     

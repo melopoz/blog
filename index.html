@@ -181,31 +181,26 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/04/13/0_todo_Java_JUC/"></a>
+        <a href="/blog/2021/04/15/0_todo_Java_JUC/">java.util.concurrent</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/04/13/0_todo_Java_JUC/">
+        <a href="/blog/2021/04/15/0_todo_Java_JUC/">
           
           
             
           
-          Java线程池
-java.util.concurrent包下
-Executor
-ExecutorService
-AbstractExecutorService
-ThreadPoolExecutor
-静态工具类Executors
-拒绝策略
+          这是JUC包的总体结构：
 
-Abolicy
 
-执行原理 直接看代码
-使用线程池的例子
-netty的EventLoop、EventLoopGroup
-阻塞队列
-java.util.concu
+
+阻塞队列（线程池、锁要用阻塞队列来实现）
+[线程池 ThreadPoolExecutor](#线程池 ThreadPoolExecutor)
+锁
+并发集合
+
+线程池 ThreadPoolExecutor用一个原子数字  ctl 表示 线程池的状态 state 和 工作线程数workerCount wc。
+private final AtomicInteger ctl
         </a>
       </p>
 
@@ -213,12 +208,32 @@ java.util.concu
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-04-13 23:18" pubdate>
-              2021-04-13
+            <time datetime="2021-04-16 01:19" pubdate>
+              2021-04-16
             </time>
           </div>
         
         
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/Java/">Java</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E9%94%81/">锁</a>
+            
+              <a href="/blog/tags/JUC/">JUC</a>
+            
+              <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">并发</a>
+            
+              <a href="/blog/tags/%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97/">阻塞队列</a>
+            
+          </div>
         
       </div>
     </article>
@@ -230,11 +245,11 @@ java.util.concu
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/04/13/%E6%9E%B6%E6%9E%84_%E7%BC%93%E5%AD%98%E7%9A%84%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/">缓存的数据一致性</a>
+        <a href="/blog/2021/04/15/%E6%9E%B6%E6%9E%84_%E7%BC%93%E5%AD%98%E7%9A%84%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/">缓存的数据一致性</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/04/13/%E6%9E%B6%E6%9E%84_%E7%BC%93%E5%AD%98%E7%9A%84%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/">
+        <a href="/blog/2021/04/15/%E6%9E%B6%E6%9E%84_%E7%BC%93%E5%AD%98%E7%9A%84%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/">
           
           
             
@@ -251,8 +266,8 @@ java.util.concu
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-04-13 23:18" pubdate>
-              2021-04-13
+            <time datetime="2021-04-16 01:19" pubdate>
+              2021-04-16
             </time>
           </div>
         
@@ -354,13 +369,13 @@ InnoDB自适应哈希索引（Adaptive Hash Index，AHI）一条查询语句如�
           
             
           
-          todo 
-https://www.cnblogs.com/waterystone/p/4920797.html
-AQS源码分析维护一个 volatile int 变量 state 代表加锁状态
-维护一个 队列代表请求锁资源的线程，head持有锁，后边的节点（线程）等待锁（CLH锁）
-提供一套模板，实现类必须实现以下方法来实现自己加锁解锁的逻辑：
+          
+todo https://www.cnblogs.com/waterystone/p/4920797.html
 
-boolean tryAcquire(int)：
+AQS 原理&amp;源码变量 volatile int state：代表加锁状态
+
+当state&gt;0时表示已经获取了锁，当state = 0时表示释放了锁。
+提供三个方法：getState()、setState(int newState)、boolean compareAnd
         </a>
       </p>
 
@@ -385,7 +400,9 @@ boolean tryAcquire(int)：
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/blog/tags/todo/">todo</a>
+              <a href="/blog/tags/%E5%90%8C%E6%AD%A5/">同步</a>
+            
+              <a href="/blog/tags/%E9%94%81/">锁</a>
             
               <a href="/blog/tags/JUC/">JUC</a>
             

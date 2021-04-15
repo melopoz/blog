@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      2.1k 字
+      2.3k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      28
+      31
        分钟
     </span>
   
@@ -227,11 +227,21 @@
             <h1 style="display: none">AQS</h1>
             
             <div class="markdown-body">
-              <p>todo </p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/waterystone/p/4920797.html">https://www.cnblogs.com/waterystone/p/4920797.html</a></p>
-<h1 id="AQS源码分析"><a href="#AQS源码分析" class="headerlink" title="AQS源码分析"></a>AQS源码分析</h1><p>维护一个 <code>volatile int</code> 变量 <code>state</code> 代表加锁状态</p>
-<p>维护一个 队列代表请求锁资源的线程，head持有锁，后边的节点（线程）等待锁（CLH锁）</p>
-<p>提供一套模板，实现类必须实现以下方法来实现自己加锁解锁的逻辑：</p>
+              <blockquote>
+<p>todo <a target="_blank" rel="noopener" href="https://www.cnblogs.com/waterystone/p/4920797.html">https://www.cnblogs.com/waterystone/p/4920797.html</a></p>
+</blockquote>
+<h1 id="AQS-原理-amp-源码"><a href="#AQS-原理-amp-源码" class="headerlink" title="AQS 原理&amp;源码"></a>AQS 原理&amp;源码</h1><p>变量 <strong>volatile</strong> int <strong>state</strong>：代表加锁状态</p>
+<blockquote>
+<p>当<strong>state&gt;0</strong>时表示已经获取了锁，当<strong>state = 0</strong>时表示<strong>释放了锁</strong>。</p>
+<p>提供三个方法：<code>getState()</code>、<code>setState(int newState)</code>、<code>boolean compareAndSetState(int expect, int update) &#123;unsafe.CAS(..)&#125;</code></p>
+</blockquote>
+<p><strong>同步队列(CLH锁)**：维护一个</strong>同步队列<strong>存放请求锁的线程，</strong>head是持有锁的线程<strong>，后边的节点（线程）等待锁（</strong>CLH锁<strong>），</strong>释放锁时唤醒next**</p>
+<blockquote>
+<p><strong>CLH锁</strong>就是每个节点在this.prev上自旋嘛。</p>
+<p>AQS的这个CLH自旋操作在 <code>acquireQueued</code> 方法中可以看到。<code>if(prev==head &amp;&amp; tryAcquire == true)</code>才会return。</p>
+</blockquote>
+<p>提供一套<strong>模板方法</strong>，实现类必须实现以下方法来实现自己加锁解锁的逻辑：</p>
+<blockquote>
 <ul>
 <li>boolean tryAcquire(int)：独占式 尝试获取资源，成功则返回true，失败则返回false。</li>
 <li>boolean tryRelease(int)：独占式 尝试释放资源，返回值同上。</li>
@@ -239,20 +249,134 @@
 <li>int tryReleaseShared(int)：共享方式。尝试释放资源，如果释放后允许唤醒后续等待结点返回true，否则返回false。</li>
 <li>isHeldExclusively()：该线程是否正在独占资源。只有用到condition才需要去实现它。</li>
 </ul>
-<p>java同步机制的底层支持(1.6及以上)：LockSupport</p>
-<h1 id="LockSupport"><a href="#LockSupport" class="headerlink" title="LockSupport"></a>LockSupport</h1><p>帮助AQS挂起/恢复当前线程</p>
+</blockquote>
+<p>内部类<strong>Node</strong></p>
 <blockquote>
+<p>Condition也是用的这个Node来实现的<strong>等待队列</strong>。</p>
+<p>Condition的原理就是：把Condition的等待队列中抢到资源的线程，通过<code>enq()</code>插到AQS的同步队列尾部。</p>
+<blockquote>
+<p>可以看看《Java并发编程的艺术》章节5.6  P147。Condition接口</p>
+</blockquote>
+</blockquote>
+<p>AQS声明的方法很像Object的 wait() 和 notify()，底层由LockSupport支持。</p>
+<blockquote>
+<ul>
+<li>void await()  </li>
+<li>void awaitUniterruptibl()</li>
+<li>boolean await(long, TimeUnit)</li>
+<li>long awaitNanos(long)</li>
+<li>boolean awaitUntil(Date)</li>
+<li>void signal()</li>
+<li>void signalAll()</li>
+</ul>
+<p>这些方法在java层面只是对<code>Unsafe#park()</code>、<code>Unsafe#unpark()</code>的封装</p>
+<p>java同步机制的底层支持(1.6及以上)：<a href="#LockSupport">LockSupport</a></p>
+</blockquote>
+<h1 id="Exclusive独占模式"><a href="#Exclusive独占模式" class="headerlink" title="Exclusive独占模式"></a>Exclusive独占模式</h1><h2 id="加锁"><a href="#加锁" class="headerlink" title="加锁"></a>加锁</h2><h3 id="acquire-int-arg"><a href="#acquire-int-arg" class="headerlink" title="acquire(int arg)"></a>acquire(int arg)</h3><p>独占式获取锁</p>
+<pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">void</span> <span class="hljs-title">acquire</span><span class="hljs-params">(<span class="hljs-keyword">int</span> arg)</span> </span>&#123;
+    <span class="hljs-keyword">if</span> (!tryAcquire(arg) &amp;&amp; 				<span class="hljs-comment">// 如果尝试拿锁成功 直接return  没拿到就入队然后阻塞直到获取到锁</span>
+        acquireQueued(addWaiter(Node.EXCLUSIVE), arg))<span class="hljs-comment">// 如果尝试拿锁失败，就以独占模式入队</span>
+        selfInterrupt();<span class="hljs-comment">// currentThread.interrupt(); </span>
+    <span class="hljs-comment">// 调用interrupt()是因为acquireQueued(...)方法可能判断过线程是否被中断，用的是isInterrupted()方法，会清除中断标识，acquireQueued(...)的返回值就代表了线程是否被中断过，所以这里根据这个返回值决定是否需要补充currentThread的中断标识</span>
+&#125;</code></pre>
+
+<h4 id="acquireQueued-…-独占模式入队并阻塞获取锁"><a href="#acquireQueued-…-独占模式入队并阻塞获取锁" class="headerlink" title="acquireQueued(…) 独占模式入队并阻塞获取锁"></a>acquireQueued(…) 独占模式入队并阻塞获取锁</h4><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">final</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">acquireQueued</span><span class="hljs-params">(<span class="hljs-keyword">final</span> Node node, <span class="hljs-keyword">int</span> arg)</span> </span>&#123;
+    <span class="hljs-comment">//标记是否成功拿到资源，默认false</span>
+    <span class="hljs-keyword">boolean</span> failed = <span class="hljs-keyword">true</span>;
+    <span class="hljs-keyword">try</span> &#123;
+        <span class="hljs-keyword">boolean</span> interrupted = <span class="hljs-keyword">false</span>;<span class="hljs-comment">//标记等待过程中是否被中断过</span>
+        <span class="hljs-keyword">for</span> (;;) &#123;
+            <span class="hljs-keyword">final</span> Node p = node.predecessor();<span class="hljs-comment">// 相当于 p = node.prev  判断了prev是不是null</span>
+            <span class="hljs-comment">// 如果当前节点是头节点 且 尝试获取锁成功 就return</span>
+            <span class="hljs-keyword">if</span> (p == head &amp;&amp; tryAcquire(arg)) &#123;<span class="hljs-comment">// node.prev == head 并且 try=true</span>
+                setHead(node);<span class="hljs-comment">// 清理引用： head = node; node.thread = null; node.prev = null;</span>
+                p.next = <span class="hljs-keyword">null</span>; <span class="hljs-comment">// help GC</span>
+                failed = <span class="hljs-keyword">false</span>;
+                <span class="hljs-keyword">return</span> interrupted;<span class="hljs-comment">// return false 表示没有中断, acquire()会直接return</span>
+            &#125;
+            <span class="hljs-comment">// 如果上边try失败了就检查当前线程是否应该park(),如果需要 就检查当前线程是否被中断了（会清空中断标识，然后继续自旋，所以说是不可被中断的，说的就是acquireQueued(...)这个方法！ 只能是最后将原本的中断标识返回出去，由acquire()方法在设置上当前线程的中断标识）</span>
+            <span class="hljs-keyword">if</span> (shouldParkAfterFailedAcquire(p, node) &amp;&amp; <span class="hljs-comment">// 检查当前线程是否需要park()</span>
+                parkAndCheckInterrupt())
+                interrupted = <span class="hljs-keyword">true</span>;
+        &#125;
+    &#125; <span class="hljs-keyword">finally</span> &#123;
+        <span class="hljs-keyword">if</span> (failed)
+            cancelAcquire(node);
+    &#125;
+&#125;</code></pre>
+
+<p>值得一提的是：<code>Condition#await()</code>的调用链中的一环——<code>doAcquireSharedInterruptibly()</code>的大致逻辑也是这样！</p>
+<h5 id="addWaiter-node-将当前线程包装成node入队-将curNode通过自旋置为tail"><a href="#addWaiter-node-将当前线程包装成node入队-将curNode通过自旋置为tail" class="headerlink" title="addWaiter(node)将当前线程包装成node入队  将curNode通过自旋置为tail"></a>addWaiter(node)将当前线程包装成node入队  将curNode通过自旋置为tail</h5><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">private</span> Node <span class="hljs-title">addWaiter</span><span class="hljs-params">(Node mode)</span> </span>&#123;
+    Node node = <span class="hljs-keyword">new</span> Node(Thread.currentThread(), mode);
+    <span class="hljs-comment">// Try the fast path of enq; backup to full enq on failure</span>
+    Node pred = tail;
+    <span class="hljs-keyword">if</span> (pred != <span class="hljs-keyword">null</span>) &#123;
+        node.prev = pred;
+        <span class="hljs-keyword">if</span> (compareAndSetTail(pred, node)) &#123;
+            pred.next = node;
+            <span class="hljs-keyword">return</span> node;
+        &#125;
+    &#125;
+    <span class="hljs-comment">// 如果pred==null说明队列需要初始化</span>
+    enq(node);<span class="hljs-comment">// 在这里自旋，CAS设置tail为自己</span>
+    <span class="hljs-keyword">return</span> node;
+&#125;
+
+<span class="hljs-comment">// enq(node) 将node置为tail</span>
+<span class="hljs-function"><span class="hljs-keyword">private</span> Node <span class="hljs-title">enq</span><span class="hljs-params">(<span class="hljs-keyword">final</span> Node node)</span> </span>&#123;
+    <span class="hljs-keyword">for</span> (;;) &#123;			<span class="hljs-comment">// 自旋                1</span>
+        Node t = tail;
+        <span class="hljs-keyword">if</span> (t == <span class="hljs-keyword">null</span>) &#123; <span class="hljs-comment">// Must initialize  必须初始化，因为发现队列没有初始化才调用的enq()，这里再验证一下</span>
+            <span class="hljs-keyword">if</span> (compareAndSetHead(<span class="hljs-keyword">new</span> Node()))
+                tail = head;
+        &#125; <span class="hljs-keyword">else</span> &#123;
+            node.prev = t;                       <span class="hljs-comment">// 2</span>
+            <span class="hljs-keyword">if</span> (compareAndSetTail(t, node)) &#123;    <span class="hljs-comment">// 3  其实就是自选执行这三步 所以就算多个线程在同时跑这三行代码 总会排着队入队的</span>
+                t.next = node;<span class="hljs-comment">// 必须把自己设置为tail才行</span>
+                <span class="hljs-keyword">return</span> t; <span class="hljs-comment">// 唯一出口</span>
+            &#125;
+        &#125;
+    &#125;
+&#125;</code></pre>
+
+<h5 id="shouldParkAfterFailedAcquire-prev-curNode-检查当前线程是否应该park"><a href="#shouldParkAfterFailedAcquire-prev-curNode-检查当前线程是否应该park" class="headerlink" title="shouldParkAfterFailedAcquire(prev, curNode) 检查当前线程是否应该park()"></a>shouldParkAfterFailedAcquire(prev, curNode) 检查当前线程是否应该park()</h5><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">shouldParkAfterFailedAcquire</span><span class="hljs-params">(Node pred, Node node)</span> </span>&#123;
+    <span class="hljs-keyword">int</span> ws = pred.waitStatus;
+    <span class="hljs-keyword">if</span> (ws == Node.SIGNAL)<span class="hljs-comment">//Signal： -1，指示后续线程需要unpark()</span>
+        <span class="hljs-comment">//prev的状态是signal，要求释放以发出信号，所以可以安全地park()</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+    <span class="hljs-keyword">if</span> (ws &gt; <span class="hljs-number">0</span>) &#123;
+        <span class="hljs-comment">// prev对应的线程被cancelled(取消)</span>
+        <span class="hljs-keyword">do</span> &#123;
+            <span class="hljs-comment">// 跳过prev并重试 直到找到waitStatus&lt;=0的node</span>
+            node.prev = pred = pred.prev;
+        &#125; <span class="hljs-keyword">while</span> (pred.waitStatus &gt; <span class="hljs-number">0</span>);
+        <span class="hljs-comment">// 让(最靠后的、waitStatus&lt;=0的)node作为当前节点的prev</span>
+        pred.next = node;
+    &#125; <span class="hljs-keyword">else</span> &#123;
+        <span class="hljs-comment">/*</span>
+<span class="hljs-comment">         * waitStatus must be 0 or PROPAGATE.  Indicate that we</span>
+<span class="hljs-comment">         * need a signal, but don&#x27;t park yet.  Caller will need to</span>
+<span class="hljs-comment">         * retry to make sure it cannot acquire before parking.</span>
+<span class="hljs-comment">         */</span>
+        compareAndSetWaitStatus(pred, ws, Node.SIGNAL);
+    &#125;
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+&#125;</code></pre>
+
+<h5 id="parkAndCheckInterrupt-park当前线程并中断"><a href="#parkAndCheckInterrupt-park当前线程并中断" class="headerlink" title="parkAndCheckInterrupt() park当前线程并中断"></a>parkAndCheckInterrupt() park当前线程并中断</h5><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">parkAndCheckInterrupt</span><span class="hljs-params">()</span> </span>&#123;
+    LockSupport.park(<span class="hljs-keyword">this</span>);<span class="hljs-comment">// 挂起当前线程</span>
+    <span class="hljs-keyword">return</span> Thread.interrupted();<span class="hljs-comment">//最后在查询线程是否被中断，并返回该中断标识（清除掉了，不处理，return出去交给调用方处理）</span>
+&#125;</code></pre>
+
+
+
+<h2 id="解锁"><a href="#解锁" class="headerlink" title="解锁"></a>解锁</h2><h1 id="Shared共享模式"><a href="#Shared共享模式" class="headerlink" title="Shared共享模式"></a>Shared共享模式</h1><h2 id="加锁-1"><a href="#加锁-1" class="headerlink" title="加锁"></a>加锁</h2><h2 id="解锁-1"><a href="#解锁-1" class="headerlink" title="解锁"></a>解锁</h2><h1 id="ReentrantReadWriteLock"><a href="#ReentrantReadWriteLock" class="headerlink" title="ReentrantReadWriteLock"></a>ReentrantReadWriteLock</h1><blockquote>
+<p>todo 《Java并发编程的艺术》 5.4.2 读写锁的实现分析</p>
+</blockquote>
+<h1 id="LockSupport"><a href="#LockSupport" class="headerlink" title="LockSupport"></a>LockSupport</h1><blockquote>
 <p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/yonghengzh/p/14280670.html">https://www.cnblogs.com/yonghengzh/p/14280670.html</a></p>
 </blockquote>
-<p>这个接口声明的方法很像Object的 wait() 和 notify()</p>
-<p>void await()  </p>
-<p>void awaitUniterruptibl()</p>
-<p>boolean await(long, TimeUnit)</p>
-<p>long awaitNanos(long)</p>
-<p>boolean awaitUntil(Date)</p>
-<p>void signal()</p>
-<p>void signalAll()</p>
-<p>在java层面只是对<code>Unsafe#park()</code>、<code>Unsafe#unpark()</code>的简单封装，在JVM的C语言实现中，每个线程持有一个Parker对象，该Parker对象有三个变量： <code>_counter</code>、``_cond<code>、</code>_mutex<code>，</code>_counter<code>初始值为</code>0`</p>
+<p>在JVM的C语言实现中，每个线程持有一个<code>Parker</code>对象，该<code>Parker</code>对象有三个变量： <code>_counter</code>(始值为0)、<code>_cond</code>、<code>_mutex</code></p>
 <h2 id="park"><a href="#park" class="headerlink" title="park()"></a>park()</h2><p>HotSpot源码（部分）：</p>
 <pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">Parker::park</span><span class="hljs-params">(<span class="hljs-keyword">bool</span> isAbsolute, jlong time)</span> </span>&#123;
 	<span class="hljs-keyword">if</span> (Atomic::xchg(<span class="hljs-number">0</span>, &amp;_counter) &gt; <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span>;<span class="hljs-comment">// 获取_counter的值并将其置为0，如果原值为1，则什么也不做</span>
@@ -358,105 +482,7 @@
 <p>相比Object的<code>wait()-notify()/notifyAll()</code>来说更准确，可以控制到指定的线程（只要持有该线程Thread的引用）</p>
 </blockquote>
 </blockquote>
-<h1 id="Exclusive独占模式"><a href="#Exclusive独占模式" class="headerlink" title="Exclusive独占模式"></a>Exclusive独占模式</h1><h2 id="加锁"><a href="#加锁" class="headerlink" title="加锁"></a>加锁</h2><h3 id="acquire-int-arg"><a href="#acquire-int-arg" class="headerlink" title="acquire(int arg)"></a>acquire(int arg)</h3><p>独占式获取锁</p>
-<pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">void</span> <span class="hljs-title">acquire</span><span class="hljs-params">(<span class="hljs-keyword">int</span> arg)</span> </span>&#123;
-    <span class="hljs-keyword">if</span> (!tryAcquire(arg) &amp;&amp; 				<span class="hljs-comment">// 如果尝试拿锁成功 直接return  没拿到就入队然后阻塞直到获取到锁</span>
-        acquireQueued(addWaiter(Node.EXCLUSIVE), arg))<span class="hljs-comment">// 如果尝试拿锁失败，就以独占模式入队</span>
-        selfInterrupt();<span class="hljs-comment">// currentThread.interrupt(); </span>
-    <span class="hljs-comment">// 调用interrupt()是因为acquireQueued(...)方法可能判断过线程是否被中断，用的是isInterrupted()方法，会清除中断标识，acquireQueued(...)的返回值就代表了线程是否被中断过，所以这里根据这个返回值决定是否需要补充currentThread的中断标识</span>
-&#125;</code></pre>
 
-<h4 id="acquireQueued-…-独占模式入队并阻塞获取锁"><a href="#acquireQueued-…-独占模式入队并阻塞获取锁" class="headerlink" title="acquireQueued(…) 独占模式入队并阻塞获取锁"></a>acquireQueued(…) 独占模式入队并阻塞获取锁</h4><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">final</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">acquireQueued</span><span class="hljs-params">(<span class="hljs-keyword">final</span> Node node, <span class="hljs-keyword">int</span> arg)</span> </span>&#123;
-    <span class="hljs-comment">//标记是否成功拿到资源，默认false</span>
-    <span class="hljs-keyword">boolean</span> failed = <span class="hljs-keyword">true</span>;
-    <span class="hljs-keyword">try</span> &#123;
-        <span class="hljs-keyword">boolean</span> interrupted = <span class="hljs-keyword">false</span>;<span class="hljs-comment">//标记等待过程中是否被中断过</span>
-        <span class="hljs-keyword">for</span> (;;) &#123;
-            <span class="hljs-keyword">final</span> Node p = node.predecessor();<span class="hljs-comment">// 相当于 p = node.prev  判断了prev是不是null</span>
-            <span class="hljs-comment">// 如果当前节点是头节点 且 尝试获取锁成功 就return</span>
-            <span class="hljs-keyword">if</span> (p == head &amp;&amp; tryAcquire(arg)) &#123;<span class="hljs-comment">// node.prev == head 并且 try=true</span>
-                setHead(node);<span class="hljs-comment">// 清理引用： head = node; node.thread = null; node.prev = null;</span>
-                p.next = <span class="hljs-keyword">null</span>; <span class="hljs-comment">// help GC</span>
-                failed = <span class="hljs-keyword">false</span>;
-                <span class="hljs-keyword">return</span> interrupted;<span class="hljs-comment">// return false 表示没有中断, acquire()会直接return</span>
-            &#125;
-            <span class="hljs-comment">// 如果上边try失败了就检查当前线程是否应该park(),如果需要 就检查当前线程是否被中断了（会清空中断标识，然后继续自旋，所以说是不可被中断的，说的就是acquireQueued(...)这个方法！ 只能是最后将原本的中断标识返回出去，由acquire()方法在设置上当前线程的中断标识）</span>
-            <span class="hljs-keyword">if</span> (shouldParkAfterFailedAcquire(p, node) &amp;&amp; <span class="hljs-comment">// 检查当前线程是否需要park()</span>
-                parkAndCheckInterrupt())
-                interrupted = <span class="hljs-keyword">true</span>;
-        &#125;
-    &#125; <span class="hljs-keyword">finally</span> &#123;
-        <span class="hljs-keyword">if</span> (failed)
-            cancelAcquire(node);
-    &#125;
-&#125;</code></pre>
-
-<p>值得一提的是：<code>Condition#await()</code>的调用链中的一环——<code>doAcquireSharedInterruptibly()</code>的大致逻辑也是这样！</p>
-<h5 id="addWaiter-node-将当前线程包装成node入队-将curNode通过自旋置为tail"><a href="#addWaiter-node-将当前线程包装成node入队-将curNode通过自旋置为tail" class="headerlink" title="addWaiter(node)将当前线程包装成node入队  将curNode通过自旋置为tail"></a>addWaiter(node)将当前线程包装成node入队  将curNode通过自旋置为tail</h5><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">private</span> Node <span class="hljs-title">addWaiter</span><span class="hljs-params">(Node mode)</span> </span>&#123;
-    Node node = <span class="hljs-keyword">new</span> Node(Thread.currentThread(), mode);
-    <span class="hljs-comment">// Try the fast path of enq; backup to full enq on failure</span>
-    Node pred = tail;
-    <span class="hljs-keyword">if</span> (pred != <span class="hljs-keyword">null</span>) &#123;
-        node.prev = pred;
-        <span class="hljs-keyword">if</span> (compareAndSetTail(pred, node)) &#123;
-            pred.next = node;
-            <span class="hljs-keyword">return</span> node;
-        &#125;
-    &#125;
-    <span class="hljs-comment">// 如果pred==null说明队列需要初始化</span>
-    enq(node);<span class="hljs-comment">// 在这里自旋，CAS设置tail为自己</span>
-    <span class="hljs-keyword">return</span> node;
-&#125;
-
-<span class="hljs-comment">// enq(node) 将node置为tail</span>
-<span class="hljs-function"><span class="hljs-keyword">private</span> Node <span class="hljs-title">enq</span><span class="hljs-params">(<span class="hljs-keyword">final</span> Node node)</span> </span>&#123;
-    <span class="hljs-keyword">for</span> (;;) &#123;			<span class="hljs-comment">// 自旋                1</span>
-        Node t = tail;
-        <span class="hljs-keyword">if</span> (t == <span class="hljs-keyword">null</span>) &#123; <span class="hljs-comment">// Must initialize  必须初始化，因为发现队列没有初始化才调用的enq()，这里再验证一下</span>
-            <span class="hljs-keyword">if</span> (compareAndSetHead(<span class="hljs-keyword">new</span> Node()))
-                tail = head;
-        &#125; <span class="hljs-keyword">else</span> &#123;
-            node.prev = t;                       <span class="hljs-comment">// 2</span>
-            <span class="hljs-keyword">if</span> (compareAndSetTail(t, node)) &#123;    <span class="hljs-comment">// 3  其实就是自选执行这三步 所以就算多个线程在同时跑这三行代码 总会排着队入队的</span>
-                t.next = node;<span class="hljs-comment">// 必须把自己设置为tail才行</span>
-                <span class="hljs-keyword">return</span> t; <span class="hljs-comment">// 唯一出口</span>
-            &#125;
-        &#125;
-    &#125;
-&#125;</code></pre>
-
-<h5 id="shouldParkAfterFailedAcquire-prev-curNode-检查当前线程是否应该park"><a href="#shouldParkAfterFailedAcquire-prev-curNode-检查当前线程是否应该park" class="headerlink" title="shouldParkAfterFailedAcquire(prev, curNode) 检查当前线程是否应该park()"></a>shouldParkAfterFailedAcquire(prev, curNode) 检查当前线程是否应该park()</h5><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">shouldParkAfterFailedAcquire</span><span class="hljs-params">(Node pred, Node node)</span> </span>&#123;
-    <span class="hljs-keyword">int</span> ws = pred.waitStatus;
-    <span class="hljs-keyword">if</span> (ws == Node.SIGNAL)<span class="hljs-comment">//Signal： -1，指示后续线程需要unpark()</span>
-        <span class="hljs-comment">//prev的状态是signal，要求释放以发出信号，所以可以安全地park()</span>
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
-    <span class="hljs-keyword">if</span> (ws &gt; <span class="hljs-number">0</span>) &#123;
-        <span class="hljs-comment">// prev对应的线程被cancelled(取消)</span>
-        <span class="hljs-keyword">do</span> &#123;
-            <span class="hljs-comment">// 跳过prev并重试 直到找到waitStatus&lt;=0的node</span>
-            node.prev = pred = pred.prev;
-        &#125; <span class="hljs-keyword">while</span> (pred.waitStatus &gt; <span class="hljs-number">0</span>);
-        <span class="hljs-comment">// 让(最靠后的、waitStatus&lt;=0的)node作为当前节点的prev</span>
-        pred.next = node;
-    &#125; <span class="hljs-keyword">else</span> &#123;
-        <span class="hljs-comment">/*</span>
-<span class="hljs-comment">         * waitStatus must be 0 or PROPAGATE.  Indicate that we</span>
-<span class="hljs-comment">         * need a signal, but don&#x27;t park yet.  Caller will need to</span>
-<span class="hljs-comment">         * retry to make sure it cannot acquire before parking.</span>
-<span class="hljs-comment">         */</span>
-        compareAndSetWaitStatus(pred, ws, Node.SIGNAL);
-    &#125;
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
-&#125;</code></pre>
-
-<h5 id="parkAndCheckInterrupt-park当前线程并中断"><a href="#parkAndCheckInterrupt-park当前线程并中断" class="headerlink" title="parkAndCheckInterrupt() park当前线程并中断"></a>parkAndCheckInterrupt() park当前线程并中断</h5><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">parkAndCheckInterrupt</span><span class="hljs-params">()</span> </span>&#123;
-    LockSupport.park(<span class="hljs-keyword">this</span>);<span class="hljs-comment">// 挂起当前线程</span>
-    <span class="hljs-keyword">return</span> Thread.interrupted();<span class="hljs-comment">//最后在查询线程是否被中断，并返回该中断标识（清除掉了，不处理，return出去交给调用方处理）</span>
-&#125;</code></pre>
-
-
-
-<h2 id="解锁"><a href="#解锁" class="headerlink" title="解锁"></a>解锁</h2><h1 id="Shared共享模式"><a href="#Shared共享模式" class="headerlink" title="Shared共享模式"></a>Shared共享模式</h1><h2 id="加锁-1"><a href="#加锁-1" class="headerlink" title="加锁"></a>加锁</h2><h2 id="解锁-1"><a href="#解锁-1" class="headerlink" title="解锁"></a>解锁</h2>
             </div>
             <hr>
             <div>
@@ -473,7 +499,9 @@
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
-                      <a class="hover-with-bg" href="/blog/tags/todo/">todo</a>
+                      <a class="hover-with-bg" href="/blog/tags/%E5%90%8C%E6%AD%A5/">同步</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/%E9%94%81/">锁</a>
                     
                       <a class="hover-with-bg" href="/blog/tags/JUC/">JUC</a>
                     

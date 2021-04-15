@@ -1,7 +1,8 @@
 ---
 title: AQS
 tags: 
-  - todo
+  - 同步
+  - 锁
   - JUC
 categories: Java
 date: 2021/01/01 20:46:25
@@ -12,166 +13,65 @@ updated: 2021/01/01 20:46:25
 
 
 
-todo 
-
-https://www.cnblogs.com/waterystone/p/4920797.html
+> todo https://www.cnblogs.com/waterystone/p/4920797.html
 
 
 
 
 
-# AQS源码分析
+# AQS 原理&源码
 
-维护一个 `volatile int` 变量 `state` 代表加锁状态
+变量 **volatile** int **state**：代表加锁状态
 
-维护一个 队列代表请求锁资源的线程，head持有锁，后边的节点（线程）等待锁（CLH锁）
-
-提供一套模板，实现类必须实现以下方法来实现自己加锁解锁的逻辑：
-
-- boolean tryAcquire(int)：独占式 尝试获取资源，成功则返回true，失败则返回false。
-- boolean tryRelease(int)：独占式 尝试释放资源，返回值同上。
-- int tryAcquireShared(int)：共享方式。尝试获取资源。负数表示失败；0表示成功，但没有剩余可用资源；正数表示成功，且有剩余资源。
-- int tryReleaseShared(int)：共享方式。尝试释放资源，如果释放后允许唤醒后续等待结点返回true，否则返回false。
-- isHeldExclusively()：该线程是否正在独占资源。只有用到condition才需要去实现它。
-
-
-
-
-
-java同步机制的底层支持(1.6及以上)：LockSupport
-
-# LockSupport
-
-帮助AQS挂起/恢复当前线程
-
-> https://www.cnblogs.com/yonghengzh/p/14280670.html
-
-这个接口声明的方法很像Object的 wait() 和 notify()
-
-void await()  
-
-void awaitUniterruptibl()
-
-boolean await(long, TimeUnit)
-
-long awaitNanos(long)
-
-boolean awaitUntil(Date)
-
-void signal()
-
-void signalAll()
-
-在java层面只是对`Unsafe#park()`、`Unsafe#unpark()`的简单封装，在JVM的C语言实现中，每个线程持有一个Parker对象，该Parker对象有三个变量： `_counter`、``_cond`、`_mutex`，`_counter`初始值为`0`
-
-
-
-## park()
-
-HotSpot源码（部分）：
-
-```c
-void Parker::park(bool isAbsolute, jlong time) {
-	if (Atomic::xchg(0, &_counter) > 0) return;// 获取_counter的值并将其置为0，如果原值为1，则什么也不做
-    Thread* thread = Thread::current();
-    assert(thread->is Java_thread(), "Must be JavaThread");
-    JavaThread *jt = (JavaThread *)thread;
-    
-    assert(_cur_index == -1, "invariant");
-    if (time == 0) {
-        _cur_index = REL_INDEX;
-        
-        // 使当前线程加入操作系统的条件等待队列，同时释放mutex锁，并挂起当前线程（也就是 阻塞在这里！！！！！）
-        statue = pthread_cond_wait (&_cond[_cur_index], _mutex);// pthread_cond_wait 是Linux标准线程库的一个系统调用
-        // Java中的wait()、await()如果是在Linux中调用，也是通过native调用的这个函数
-
-    } else {
-        _cur_index = isAbsolute ? ABS_INDEX : REL_INDEX;
-        status = os::Linux::safe_cond_timedwait (&_cond[_cur_index], _mutex, &absTime);//??????
-        if (status != 0 && WorkAroundNPTLTimedWaitHang) {
-            pthread_cond_destroy (&_cond[_cur_index]);
-            pthread_cond_init    (&_cond[_cur_index], isAbsolute ? NULL : os::Linux::condAttr());
-        }
-    }
-    _cur_index = -1;
-    assert_status(status == 0 || status == EINTR || ...)
-        ...
-
-    _counter = 0; // 计数器再次被置为0
-    status = pthread_mutex_unlock(_mutex);// 线程释放锁   结束一个park()操作
-    
-    assert_status(status == 0, status, "invariant");
-    OrderAccess::fence();
-    if (jt -> handle_special_suspend_equivalent_condition()) {
-        jt->java_suspend_self();
-    }
-}
-```
-
-1. 获取当前线程关联的 Parker 对象。
-2. 将计数器置为 0，同时检查计数器的原值是否为 1，如果是则放弃后续操作。
-3. 在互斥量上加锁。
-4. **在条件变量上阻塞**，同时**释放锁**并等待被其他线程唤醒，当被唤醒后，将重新获取锁。
-5. 当线程恢复至运行状态后，将计数器的值再次置为 0。
-6. 释放锁。`最后都要释放锁`
-
-简单说：
-
-> - 如果`_counter==0`，则线程t暂停（wait）,直到被唤醒（ unpark(t) ）；
-> - 如果`_counter==1`，则将`_counter`置为`0`，线程继续运行；
-
-## unpark(Thread)
-
-HotSpot源码：
-
-```c
-void Parker::unpark() {
-    int s, status ;
-    status = pthread_mutex_lock(_mutex);// 给当前线程加锁           这里加锁了
-    assert (status == 0, "invariant");
-    s = _counter;
-    _counter = 1;// 然后将_counter置为1
-    if (s < 1) {// 然后判断Parker对象关联的线程是否被park(),
-        // thread might be parked 线程可能已经停止了
-        if (_cur_index != 1) {
-            if (WorkAroundNPTLTimedWaitHang) {
-                status = pthread_cond_signal (&_cond[_cur_index]);// 如果被park():通过 pthread_mutex_signal 函数唤醒该线程
-                assert (status == 0, "invariant");
-                status = pthread_mutex_unlock(_mutex);// 最后释放锁
-                assert (status == 0, "invariant");
-            } else {
-                status = pthread_mutex_unlock(_mutext);
-                assert (status == 0, "invariant");
-                status = pthread_cond_signal (&_cond[_cur_index]);
-                assert (status == 0, "invariant");
-            }
-        } else {
-            pthread_mutex_unlock(_mutex);
-            assert (status == 0, "invariant");
-        }
-    } else {
-        pthread_mutex_unlock(_mutex);
-        assert (status == 0, "invariant");
-    }    
-}
-//   --该线程恢复至运行状态(先拿到mutex锁)然后从pthread_cond_wait方法返回--------关联park()源码的pthread_cond_wait函数调用！！！！！
-```
-
-1. 获取目标线程关联的 Parker 对象（注意目标线程不是当前线程，是Java中unpark(jt)的参数对应的线程）。------jt：JavaThread
-2. 在互斥量上加锁。------jt在park()函数中阻塞的时候是释放了锁的
-3. 将计数器置为 1。------jt在park()函数开始时将`_counter`置为了 0，这里置为 1，jt被唤醒之后还会把`_counter`置为 0
-4. 唤醒在条件变量上等待着的线程。------jt调用park()函数并阻塞在了系统函数`pthread_cond_wait`调用的地方
-5. 释放锁。\------jt继续运行需要拿到对象的mutex锁
-
-简单说：
-
-> - 如果线程已暂停，则唤醒它
-> - 如果线程正在运行，`_counter==0`，将`_counter`置为`1`
-> - 如果线程正在运行，`_counter==1`，do nothing
+> 当**state>0**时表示已经获取了锁，当**state = 0**时表示**释放了锁**。
 >
-> > 可以在改线程调用park()之前调用unpark()，效果就是 该线程调用park()的时候不会暂停
+> 提供三个方法：`getState()`、`setState(int newState)`、`boolean compareAndSetState(int expect, int update) {unsafe.CAS(..)}`
+
+**同步队列(CLH锁)**：维护一个**同步队列**存放请求锁的线程，**head是持有锁的线程**，后边的节点（线程）等待锁（**CLH锁**），**释放锁时唤醒next**
+
+> **CLH锁**就是每个节点在this.prev上自旋嘛。
 >
-> > 相比Object的`wait()-notify()/notifyAll()`来说更准确，可以控制到指定的线程（只要持有该线程Thread的引用）
+> AQS的这个CLH自旋操作在 `acquireQueued` 方法中可以看到。`if(prev==head && tryAcquire == true)`才会return。
+
+提供一套**模板方法**，实现类必须实现以下方法来实现自己加锁解锁的逻辑：
+
+> - boolean tryAcquire(int)：独占式 尝试获取资源，成功则返回true，失败则返回false。
+> - boolean tryRelease(int)：独占式 尝试释放资源，返回值同上。
+> - int tryAcquireShared(int)：共享方式。尝试获取资源。负数表示失败；0表示成功，但没有剩余可用资源；正数表示成功，且有剩余资源。
+> - int tryReleaseShared(int)：共享方式。尝试释放资源，如果释放后允许唤醒后续等待结点返回true，否则返回false。
+> - isHeldExclusively()：该线程是否正在独占资源。只有用到condition才需要去实现它。
+
+内部类**Node**
+
+> Condition也是用的这个Node来实现的**等待队列**。
+>
+> Condition的原理就是：把Condition的等待队列中抢到资源的线程，通过`enq()`插到AQS的同步队列尾部。
+>
+> > 可以看看《Java并发编程的艺术》章节5.6  P147。Condition接口
+
+
+
+AQS声明的方法很像Object的 wait() 和 notify()，底层由LockSupport支持。
+
+> - void await()  
+> - void awaitUniterruptibl()
+> - boolean await(long, TimeUnit)
+> - long awaitNanos(long)
+> - boolean awaitUntil(Date)
+> - void signal()
+> - void signalAll()
+>
+> 这些方法在java层面只是对`Unsafe#park()`、`Unsafe#unpark()`的封装
+>
+> java同步机制的底层支持(1.6及以上)：[LockSupport](#LockSupport)
+
+
+
+
+
+
+
+
 
 
 
@@ -310,3 +210,139 @@ private final boolean parkAndCheckInterrupt() {
 ## 加锁
 
 ## 解锁
+
+
+
+
+
+
+
+
+
+# ReentrantReadWriteLock
+
+> todo 《Java并发编程的艺术》 5.4.2 读写锁的实现分析
+
+
+
+
+
+
+
+
+
+# LockSupport
+
+> https://www.cnblogs.com/yonghengzh/p/14280670.html
+
+在JVM的C语言实现中，每个线程持有一个`Parker`对象，该`Parker`对象有三个变量： `_counter`(始值为0)、`_cond`、`_mutex`
+
+
+
+## park()
+
+HotSpot源码（部分）：
+
+```c
+void Parker::park(bool isAbsolute, jlong time) {
+	if (Atomic::xchg(0, &_counter) > 0) return;// 获取_counter的值并将其置为0，如果原值为1，则什么也不做
+    Thread* thread = Thread::current();
+    assert(thread->is Java_thread(), "Must be JavaThread");
+    JavaThread *jt = (JavaThread *)thread;
+    
+    assert(_cur_index == -1, "invariant");
+    if (time == 0) {
+        _cur_index = REL_INDEX;
+        
+        // 使当前线程加入操作系统的条件等待队列，同时释放mutex锁，并挂起当前线程（也就是 阻塞在这里！！！！！）
+        statue = pthread_cond_wait (&_cond[_cur_index], _mutex);// pthread_cond_wait 是Linux标准线程库的一个系统调用
+        // Java中的wait()、await()如果是在Linux中调用，也是通过native调用的这个函数
+
+    } else {
+        _cur_index = isAbsolute ? ABS_INDEX : REL_INDEX;
+        status = os::Linux::safe_cond_timedwait (&_cond[_cur_index], _mutex, &absTime);//??????
+        if (status != 0 && WorkAroundNPTLTimedWaitHang) {
+            pthread_cond_destroy (&_cond[_cur_index]);
+            pthread_cond_init    (&_cond[_cur_index], isAbsolute ? NULL : os::Linux::condAttr());
+        }
+    }
+    _cur_index = -1;
+    assert_status(status == 0 || status == EINTR || ...)
+        ...
+
+    _counter = 0; // 计数器再次被置为0
+    status = pthread_mutex_unlock(_mutex);// 线程释放锁   结束一个park()操作
+    
+    assert_status(status == 0, status, "invariant");
+    OrderAccess::fence();
+    if (jt -> handle_special_suspend_equivalent_condition()) {
+        jt->java_suspend_self();
+    }
+}
+```
+
+1. 获取当前线程关联的 Parker 对象。
+2. 将计数器置为 0，同时检查计数器的原值是否为 1，如果是则放弃后续操作。
+3. 在互斥量上加锁。
+4. **在条件变量上阻塞**，同时**释放锁**并等待被其他线程唤醒，当被唤醒后，将重新获取锁。
+5. 当线程恢复至运行状态后，将计数器的值再次置为 0。
+6. 释放锁。`最后都要释放锁`
+
+简单说：
+
+> - 如果`_counter==0`，则线程t暂停（wait）,直到被唤醒（ unpark(t) ）；
+> - 如果`_counter==1`，则将`_counter`置为`0`，线程继续运行；
+
+## unpark(Thread)
+
+HotSpot源码：
+
+```c
+void Parker::unpark() {
+    int s, status ;
+    status = pthread_mutex_lock(_mutex);// 给当前线程加锁           这里加锁了
+    assert (status == 0, "invariant");
+    s = _counter;
+    _counter = 1;// 然后将_counter置为1
+    if (s < 1) {// 然后判断Parker对象关联的线程是否被park(),
+        // thread might be parked 线程可能已经停止了
+        if (_cur_index != 1) {
+            if (WorkAroundNPTLTimedWaitHang) {
+                status = pthread_cond_signal (&_cond[_cur_index]);// 如果被park():通过 pthread_mutex_signal 函数唤醒该线程
+                assert (status == 0, "invariant");
+                status = pthread_mutex_unlock(_mutex);// 最后释放锁
+                assert (status == 0, "invariant");
+            } else {
+                status = pthread_mutex_unlock(_mutext);
+                assert (status == 0, "invariant");
+                status = pthread_cond_signal (&_cond[_cur_index]);
+                assert (status == 0, "invariant");
+            }
+        } else {
+            pthread_mutex_unlock(_mutex);
+            assert (status == 0, "invariant");
+        }
+    } else {
+        pthread_mutex_unlock(_mutex);
+        assert (status == 0, "invariant");
+    }    
+}
+//   --该线程恢复至运行状态(先拿到mutex锁)然后从pthread_cond_wait方法返回--------关联park()源码的pthread_cond_wait函数调用！！！！！
+```
+
+1. 获取目标线程关联的 Parker 对象（注意目标线程不是当前线程，是Java中unpark(jt)的参数对应的线程）。------jt：JavaThread
+2. 在互斥量上加锁。------jt在park()函数中阻塞的时候是释放了锁的
+3. 将计数器置为 1。------jt在park()函数开始时将`_counter`置为了 0，这里置为 1，jt被唤醒之后还会把`_counter`置为 0
+4. 唤醒在条件变量上等待着的线程。------jt调用park()函数并阻塞在了系统函数`pthread_cond_wait`调用的地方
+5. 释放锁。\------jt继续运行需要拿到对象的mutex锁
+
+简单说：
+
+> - 如果线程已暂停，则唤醒它
+> - 如果线程正在运行，`_counter==0`，将`_counter`置为`1`
+> - 如果线程正在运行，`_counter==1`，do nothing
+>
+> > 可以在改线程调用park()之前调用unpark()，效果就是 该线程调用park()的时候不会暂停
+>
+> > 相比Object的`wait()-notify()/notifyAll()`来说更准确，可以控制到指定的线程（只要持有该线程Thread的引用）
+

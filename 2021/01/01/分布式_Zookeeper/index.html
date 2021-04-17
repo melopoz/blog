@@ -267,8 +267,8 @@
 
 <img src="https://raw.githubusercontent.com/melopoz/pics/master/img/zk-DataTree-DataNode2.png" srcset="/blog/img/loading.gif" style="zoom: 40%;" />
 
-<h3 id="DataTree"><a href="#DataTree" class="headerlink" title="DataTree"></a>DataTree</h3><p>就全部数据了呗。</p>
-<h3 id="DataNode"><a href="#DataNode" class="headerlink" title="DataNode"></a>DataNode</h3><p>java实现嘛 肯定就是map了，再考虑多线程，必是ConcurrentHashMap了。其中<code>nodes</code>的key是节点的唯一标识：<code>path</code>；<code>ephemerals</code>临时节点需要和会话绑定，所以key是<code>sessionId</code>。</p>
+
+
 <h3 id="Packet"><a href="#Packet" class="headerlink" title="Packet"></a>Packet</h3><p>zk的client和server传递信息都会封装成<strong>Packet</strong>进行传递。</p>
 <h2 id="Watch-监听"><a href="#Watch-监听" class="headerlink" title="Watch 监听"></a>Watch 监听</h2><ul>
 <li><p><strong>One-time trigger</strong>：一次性的。</p>

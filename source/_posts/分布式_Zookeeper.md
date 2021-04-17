@@ -1,7 +1,6 @@
 ---
 title: zookeeper
 tags: 
-  - redo
   - 分布式协调服务
 categories: 分布式
 date: 2021/01/01 20:46:25

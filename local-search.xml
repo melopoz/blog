@@ -455,25 +455,6 @@
   
   
   <entry>
-    <title>JVM的一些参数</title>
-    <link href="/blog/2021/01/01/JVM_%E5%8F%82%E6%95%B0/"/>
-    <url>/blog/2021/01/01/JVM_%E5%8F%82%E6%95%B0/</url>
-    
-    <content type="html"><![CDATA[<p>查看jvm参数(参数默认值): <code>java -XX:+PrintFlagsFinal -version</code></p><p>查看java进程的参数的配置: <code>jinfo -flags [pid]</code> `</p><p>查看java进程的指定参数的配置: <code>jinfo -flags [option] [pid]</code></p><blockquote><p>jinfo -flags NewRatio 15222</p></blockquote><h1 id="SoftRefLRUPolicyMSPerMB"><a href="#SoftRefLRUPolicyMSPerMB" class="headerlink" title="SoftRefLRUPolicyMSPerMB"></a>SoftRefLRUPolicyMSPerMB</h1><blockquote><p>关系到 软引用 再GC发生时,是否被GC回收</p><p>-XX:SoftRefLRUPolicyMSPerMB</p></blockquote><blockquote><p>LRU:  Least Recently Used, 最近最少使用.</p></blockquote><p><a href="https://blog.csdn.net/u010833547/article/details/90289325">https://blog.csdn.net/u010833547/article/details/90289325</a></p><p>软引用是在内存空间不足的时候才会被回收, 这只是比较简单的形容. </p><p>首先看一下SoftReference类和描述</p><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SoftReference</span>&lt;<span class="hljs-title">T</span>&gt; <span class="hljs-keyword">extends</span> <span class="hljs-title">Reference</span>&lt;<span class="hljs-title">T</span>&gt; </span>&#123;    <span class="hljs-comment">/**</span><span class="hljs-comment">     * Timestamp clock, updated by the garbage collector</span><span class="hljs-comment">     */</span>    <span class="hljs-keyword">static</span> <span class="hljs-keyword">private</span> <span class="hljs-keyword">long</span> clock;<span class="hljs-comment">// ------------每次GC会更新这个时间戳</span>    <span class="hljs-comment">/**</span><span class="hljs-comment">     * Timestamp updated by each invocation of the get method.  The VM may use</span><span class="hljs-comment">     * this field when selecting soft references to be cleared, but it is not</span><span class="hljs-comment">     * required to do so.</span><span class="hljs-comment">     */</span>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">long</span> timestamp;<span class="hljs-comment">// ------------每次使用(构造、get)会更新这个时间戳</span>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">SoftReference</span><span class="hljs-params">(T referent)</span> </span>&#123;        <span class="hljs-keyword">super</span>(referent);        <span class="hljs-keyword">this</span>.timestamp = clock;    &#125;    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">SoftReference</span><span class="hljs-params">(T referent, ReferenceQueue&lt;? <span class="hljs-keyword">super</span> T&gt; q)</span> </span>&#123;        <span class="hljs-keyword">super</span>(referent, q);        <span class="hljs-keyword">this</span>.timestamp = clock;    &#125;    <span class="hljs-function"><span class="hljs-keyword">public</span> T <span class="hljs-title">get</span><span class="hljs-params">()</span> </span>&#123;        T o = <span class="hljs-keyword">super</span>.get();        <span class="hljs-keyword">if</span> (o != <span class="hljs-keyword">null</span> &amp;&amp; <span class="hljs-keyword">this</span>.timestamp != clock)            <span class="hljs-keyword">this</span>.timestamp = clock;        <span class="hljs-keyword">return</span> o;    &#125;&#125;</code></pre><p>GC时,回收软引用对象要走LRU算法</p><blockquote><p>if (       <code>clock - timestamp &lt;= freespace * SoftRefLRUPolicyMSPerMB</code>       ) {</p><p>​        不回收这个对象</p><p>}</p></blockquote><p>clock 记录的是上一次GC的时间戳, timestamp 记录最近使用这个引用对象的时间, freespace是 剩余可用空间, </p><p><code>clock - timestamp</code> 表示这个引用已经闲置了多久, </p><p><code>freespace * SoftRefLRUPolicyMSPerMB</code> 表示JVM.GC对软引用的忍耐程度. SoftRefLRUPolicyMSPerMB越小, 就会越早回收soft-ref对象. </p><p>如果<code>clock - timestamp</code>为负数, 是 本次GC之前,上次GC之后被使用过, 那么本次GC不回收这个soft-ref. </p><p>所以软引用肯定不会被它所经历的第一次GC(本次GC)回收. </p><blockquote><p>只有发生gc时才会计算这个 <code>clock - timestamp</code> 的啊.. </p><p>个人认为必须要 先确定是否回收这个soft-ref, 如果不必回收这个soft-ref, 再更新clock. </p><p>这样这个clock才能表示 上次GC的时间, 否则这个clock就是当前GC的时间(因为要STW, 所以clock就是当前时间)</p></blockquote><p>SoftRefLRUPolicyMSPerMB的默认值为1000, 也就是1s</p><h3 id="xx-SoftRefLRUPolicyMSPerMB-的坑"><a href="#xx-SoftRefLRUPolicyMSPerMB-的坑" class="headerlink" title="-xx:SoftRefLRUPolicyMSPerMB 的坑"></a>-xx:SoftRefLRUPolicyMSPerMB 的坑</h3><p>这个值越小, jvm对软引用的忍耐程度就越小, 但是不能设置为0</p><h6 id="如果为0"><a href="#如果为0" class="headerlink" title="如果为0:"></a>如果为0:</h6><p>每次GC的时候很多软引用</p><p>参考: <a href="https://blog.csdn.net/qiang_zi_/article/details/100700784">https://blog.csdn.net/qiang_zi_/article/details/100700784</a></p><p>就是jvm利用反射生成的很多软引用对象, 每次GC的时候因为对软引用的忍耐程序为0, 就都给清除了,  清除之后还要用到这些soft-ref, 就又生成, 这样不但没有真正节省出内存空间, 还降低了性能. </p><p>还如上方链接中举例, 可能会造成metaspace不稳定, 导致FULL GC频率飙升</p><p>所以不便在一开始就设置SoftRefLRUPolicyMSPerMB, 可以在后期根据情况进行调整.</p><p>有可能需要调高SOftRefLRUPolicyMSPerMB, 让一些经常用到的soft-ref对象不会总被回收再创建, 使metaspace空间的使用率更平稳一些.</p>]]></content>
-    
-    
-    <categories>
-      
-      <category>JVM</category>
-      
-    </categories>
-    
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>JVM安全退出</title>
     <link href="/blog/2021/01/01/JVM_%E5%AE%89%E5%85%A8%E9%80%80%E5%87%BA/"/>
     <url>/blog/2021/01/01/JVM_%E5%AE%89%E5%85%A8%E9%80%80%E5%87%BA/</url>
@@ -512,6 +493,25 @@
       <tag>redo</tag>
       
     </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>JVM的一些参数</title>
+    <link href="/blog/2021/01/01/JVM_%E5%8F%82%E6%95%B0/"/>
+    <url>/blog/2021/01/01/JVM_%E5%8F%82%E6%95%B0/</url>
+    
+    <content type="html"><![CDATA[<p>查看jvm参数(参数默认值): <code>java -XX:+PrintFlagsFinal -version</code></p><p>查看java进程的参数的配置: <code>jinfo -flags [pid]</code> `</p><p>查看java进程的指定参数的配置: <code>jinfo -flags [option] [pid]</code></p><blockquote><p>jinfo -flags NewRatio 15222</p></blockquote><h1 id="SoftRefLRUPolicyMSPerMB"><a href="#SoftRefLRUPolicyMSPerMB" class="headerlink" title="SoftRefLRUPolicyMSPerMB"></a>SoftRefLRUPolicyMSPerMB</h1><blockquote><p>关系到 软引用 再GC发生时,是否被GC回收</p><p>-XX:SoftRefLRUPolicyMSPerMB</p></blockquote><blockquote><p>LRU:  Least Recently Used, 最近最少使用.</p></blockquote><p><a href="https://blog.csdn.net/u010833547/article/details/90289325">https://blog.csdn.net/u010833547/article/details/90289325</a></p><p>软引用是在内存空间不足的时候才会被回收, 这只是比较简单的形容. </p><p>首先看一下SoftReference类和描述</p><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SoftReference</span>&lt;<span class="hljs-title">T</span>&gt; <span class="hljs-keyword">extends</span> <span class="hljs-title">Reference</span>&lt;<span class="hljs-title">T</span>&gt; </span>&#123;    <span class="hljs-comment">/**</span><span class="hljs-comment">     * Timestamp clock, updated by the garbage collector</span><span class="hljs-comment">     */</span>    <span class="hljs-keyword">static</span> <span class="hljs-keyword">private</span> <span class="hljs-keyword">long</span> clock;<span class="hljs-comment">// ------------每次GC会更新这个时间戳</span>    <span class="hljs-comment">/**</span><span class="hljs-comment">     * Timestamp updated by each invocation of the get method.  The VM may use</span><span class="hljs-comment">     * this field when selecting soft references to be cleared, but it is not</span><span class="hljs-comment">     * required to do so.</span><span class="hljs-comment">     */</span>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">long</span> timestamp;<span class="hljs-comment">// ------------每次使用(构造、get)会更新这个时间戳</span>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">SoftReference</span><span class="hljs-params">(T referent)</span> </span>&#123;        <span class="hljs-keyword">super</span>(referent);        <span class="hljs-keyword">this</span>.timestamp = clock;    &#125;    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">SoftReference</span><span class="hljs-params">(T referent, ReferenceQueue&lt;? <span class="hljs-keyword">super</span> T&gt; q)</span> </span>&#123;        <span class="hljs-keyword">super</span>(referent, q);        <span class="hljs-keyword">this</span>.timestamp = clock;    &#125;    <span class="hljs-function"><span class="hljs-keyword">public</span> T <span class="hljs-title">get</span><span class="hljs-params">()</span> </span>&#123;        T o = <span class="hljs-keyword">super</span>.get();        <span class="hljs-keyword">if</span> (o != <span class="hljs-keyword">null</span> &amp;&amp; <span class="hljs-keyword">this</span>.timestamp != clock)            <span class="hljs-keyword">this</span>.timestamp = clock;        <span class="hljs-keyword">return</span> o;    &#125;&#125;</code></pre><p>GC时,回收软引用对象要走LRU算法</p><blockquote><p>if (       <code>clock - timestamp &lt;= freespace * SoftRefLRUPolicyMSPerMB</code>       ) {</p><p>​        不回收这个对象</p><p>}</p></blockquote><p>clock 记录的是上一次GC的时间戳, timestamp 记录最近使用这个引用对象的时间, freespace是 剩余可用空间, </p><p><code>clock - timestamp</code> 表示这个引用已经闲置了多久, </p><p><code>freespace * SoftRefLRUPolicyMSPerMB</code> 表示JVM.GC对软引用的忍耐程度. SoftRefLRUPolicyMSPerMB越小, 就会越早回收soft-ref对象. </p><p>如果<code>clock - timestamp</code>为负数, 是 本次GC之前,上次GC之后被使用过, 那么本次GC不回收这个soft-ref. </p><p>所以软引用肯定不会被它所经历的第一次GC(本次GC)回收. </p><blockquote><p>只有发生gc时才会计算这个 <code>clock - timestamp</code> 的啊.. </p><p>个人认为必须要 先确定是否回收这个soft-ref, 如果不必回收这个soft-ref, 再更新clock. </p><p>这样这个clock才能表示 上次GC的时间, 否则这个clock就是当前GC的时间(因为要STW, 所以clock就是当前时间)</p></blockquote><p>SoftRefLRUPolicyMSPerMB的默认值为1000, 也就是1s</p><h3 id="xx-SoftRefLRUPolicyMSPerMB-的坑"><a href="#xx-SoftRefLRUPolicyMSPerMB-的坑" class="headerlink" title="-xx:SoftRefLRUPolicyMSPerMB 的坑"></a>-xx:SoftRefLRUPolicyMSPerMB 的坑</h3><p>这个值越小, jvm对软引用的忍耐程度就越小, 但是不能设置为0</p><h6 id="如果为0"><a href="#如果为0" class="headerlink" title="如果为0:"></a>如果为0:</h6><p>每次GC的时候很多软引用</p><p>参考: <a href="https://blog.csdn.net/qiang_zi_/article/details/100700784">https://blog.csdn.net/qiang_zi_/article/details/100700784</a></p><p>就是jvm利用反射生成的很多软引用对象, 每次GC的时候因为对软引用的忍耐程序为0, 就都给清除了,  清除之后还要用到这些soft-ref, 就又生成, 这样不但没有真正节省出内存空间, 还降低了性能. </p><p>还如上方链接中举例, 可能会造成metaspace不稳定, 导致FULL GC频率飙升</p><p>所以不便在一开始就设置SoftRefLRUPolicyMSPerMB, 可以在后期根据情况进行调整.</p><p>有可能需要调高SOftRefLRUPolicyMSPerMB, 让一些经常用到的soft-ref对象不会总被回收再创建, 使metaspace空间的使用率更平稳一些.</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>JVM</category>
+      
+    </categories>
+    
     
   </entry>
   
@@ -783,8 +783,6 @@
     
     
     <tags>
-      
-      <tag>redo</tag>
       
       <tag>分布式协调服务</tag>
       

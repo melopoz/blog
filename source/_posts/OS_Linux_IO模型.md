@@ -520,3 +520,35 @@ int readySet = key.readyOps();// 用位表示fd的就绪状态
 ```
 
 > 如readySet=13（`0000 1101`），从低位到高位：第一、三、四位为 1，那么说明该channel：读就绪、写就绪，连接就绪。
+
+
+
+### Java nio epoll bug
+
+java nio 在 windows 系统没有问题，java的的NIO**在Linux下**使用的是epoll，不过在`Selector.select()/Selector.select(timeout)`轮询事件返回数量为0时，本应阻塞在`select()`，但是NIO会不断wake up出来，导致CPU 100%。
+
+> https://bugs.java.com/bugdatabase/view_bug.do?bug_id=6670302
+
+netty的解决方案：
+
+用计数方式检查是否发生了epoll bug，如果发生了就重建selector并替换原来的selector。
+
+```java
+/**
+ * Replaces the current {@link Selector} of this event loop with newly created {@link Selector}s to work
+ * around the infamous epoll 100% CPU bug.
+ */
+public void rebuildSelector() {
+    if (!inEventLoop()) {
+        execute(new Runnable() {
+            @Override
+            public void run() {
+                rebuildSelector0();
+            }
+        });
+        return;
+    }
+    rebuildSelector0();
+}
+```
+

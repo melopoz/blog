@@ -477,7 +477,7 @@ select/poll/epoll 中均并没发现用mmap的痕迹啊，而且我觉得...本�
 >
 >    举个例子： 惊群现象，投一粒米，所有鸽子都来吃，只有一个吃到，然后所有鸽子都得回去睡觉。
 >
->    这个可读的数据可能就是已经被其他进程/线程读完了。
+>    这个可读的数据可能已经被其他进程/线程读完了。
 >
 >    链接：https://www.zhihu.com/question/37271342/answer/81757593
 
@@ -488,3 +488,35 @@ select/poll/epoll 中均并没发现用mmap的痕迹啊，而且我觉得...本�
 ## Java中的NIO
 
 https://www.jianshu.com/p/874744d19d0d
+
+> 个人理解就是 Channel 逻辑概念，对应物理概念就是内存/磁盘中的文件（Buffer）。数据总要落到物理介质上嘛。
+
+**Channel** 通道 ：必须绑定 Buffer。
+
+**Buffer** 缓冲区 ：有 position、limit 读写指针 和 capacity等核心属性。
+
+**Selector**：
+
+调用select()是阻塞的，select内部调用（注册到Selector的Channel）ready()是非阻塞的。
+
+```java
+SocketChannel channel = SocketChannel.open();
+channel.configureBlocking(false);// 必须 设置channel为非阻塞
+SelectionKey key = channel.register(selector, SelectionKey.OP_READ);//像选择器注册一个通道
+```
+
+使用selector获取IO就绪的channel
+
+```java
+Set<SelectionKey> keys = selector.selectedKeys();
+```
+
+通过key获取通道、选择器、或者通道的IO就绪状态
+
+```java
+Selector selector = key.selector();
+SocketChannel = key.channel();
+int readySet = key.readyOps();// 用位表示fd的就绪状态
+```
+
+> 如readySet=13（`0000 1101`），从低位到高位：第一、三、四位为 1，那么说明该channel：读就绪、写就绪，连接就绪。

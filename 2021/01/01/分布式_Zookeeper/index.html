@@ -1,0 +1,808 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/favicon.png">
+  <link rel="icon" type="image/png" href="/blog/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Although things are always not as you wish, but effort will be lucy!">
+  <meta name="author" content="melopoz">
+  <meta name="keywords" content="">
+  <title>zookeeper - Be your own god.</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/blog/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.1.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"melopoz.github.io","root":"/blog/","version":"1.8.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"copy_btn":true,"image_zoom":{"enable":true},"lazyload":{"enable":true,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/blog/">&nbsp;<strong>Fluid</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/blog/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="zookeeper">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-01-01 20:46" pubdate>
+        2021年1月1日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      4.1k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      49
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">zookeeper</h1>
+            
+            <div class="markdown-body">
+              <p>官方文档：</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://zookeeper.apache.org/doc/r3.5.8/zookeeperProgrammers.html">https://zookeeper.apache.org/doc/r3.5.8/zookeeperProgrammers.html</a></p>
+</blockquote>
+<p>常用命令：</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/feixiang2039/article/details/79810102">https://blog.csdn.net/feixiang2039/article/details/79810102</a></p>
+</blockquote>
+<p><strong>分布式协调服务</strong>，可以用来做</p>
+<ol>
+<li><strong>数据/服务发布/订阅</strong>（by Watch）：做配置中心，修改某节点的数据，client通过zk.watch来更新配置。</li>
+<li><strong>分布式协调/通知</strong>（by Watch）</li>
+<li><strong>负载均衡</strong>：需要client实现负载均衡算法；</li>
+<li><strong>命名服务</strong>：记录服务名称，如kafka；利用顺序节点生成全局唯一的顺序ID（如业务上的项目编号）；</li>
+<li><strong>集群管理</strong>：记录某集群每个节点的信息（状态、地址），如kafka；</li>
+<li><strong>分布式锁</strong>：利用zk的强一致性、临时节点</li>
+<li><strong>Master 选举</strong>：利用zk的强一致性，多个broker去leader位置设置为自己，只有一个broker能成功，其他broker只能get该master的信息并记录下来；</li>
+<li><strong>分布式队列</strong>：by 顺序节点，FIFO；或者每个task完成之后在/job下创建taskN节点，/job下节点数量达到N，说明job完成。</li>
+</ol>
+<h2 id="数据模型"><a href="#数据模型" class="headerlink" title="数据模型"></a>数据模型</h2><p>就像Unix的文件<strong>树</strong>。基本单位是 <strong>ZNode</strong> 。ZNode有四种：</p>
+<ul>
+<li><strong>持久</strong>节点（persistent）：客户端与 Zookeeper 断开会话后，该节点依旧存在，直到执行删除操作才会清除节点</li>
+<li>顺序<strong>顺序</strong>节点（persistent_sequential）：给该节点名称加上一个数字后缀，进行顺序编号</li>
+<li><strong>临时</strong>节点（ephemeral）：和客户端的会话绑定，会话断开后，该节点被自动删除</li>
+<li>临时<strong>顺序</strong>节点（ephemeral_sequential）：加数字后缀，进行顺序编号</li>
+</ul>
+<p>ZNode结构中包含一下数据：</p>
+<ul>
+<li><strong>data</strong> : Znode存储的数据；</li>
+<li><strong>ACL</strong>：记录 Znode 的访问权限，即哪些人或哪些 IP 可以访问本节点；</li>
+<li><strong>stat</strong>：包含Znode的各种源数据，包括<strong>ZXID</strong>、版本号、时间戳、数据长度等；</li>
+<li><strong>child</strong>：子节点引用；</li>
+</ul>
+<hr>
+<p>zk的数据有<strong>内存数据</strong>（树）和<strong>磁盘数据</strong>（快照、事务日志）。zk启动时会把磁盘中的数据加载到内存（持久化）。</p>
+<p>内存数据主要分为DataTree、DataNode。</p>
+<img alt="zk-DataTree-DataNode" src="https://raw.githubusercontent.com/melopoz/pics/master/img/zk-DataTree-DataNode.png" srcset="/blog/img/loading.gif" style="zoom:50%;" />
+
+<img src="https://raw.githubusercontent.com/melopoz/pics/master/img/zk-DataTree-DataNode2.png" srcset="/blog/img/loading.gif" style="zoom: 40%;" />
+
+<h3 id="DataTree"><a href="#DataTree" class="headerlink" title="DataTree"></a>DataTree</h3><p>就全部数据了呗。</p>
+<h3 id="DataNode"><a href="#DataNode" class="headerlink" title="DataNode"></a>DataNode</h3><p>java实现嘛 肯定就是map了，再考虑多线程，必是ConcurrentHashMap了。其中<code>nodes</code>的key是节点的唯一标识：<code>path</code>；<code>ephemerals</code>临时节点需要和会话绑定，所以key是<code>sessionId</code>。</p>
+<h3 id="Packet"><a href="#Packet" class="headerlink" title="Packet"></a>Packet</h3><p>zk的client和server传递信息都会封装成<strong>Packet</strong>进行传递。</p>
+<h2 id="Watch-监听"><a href="#Watch-监听" class="headerlink" title="Watch 监听"></a>Watch 监听</h2><ul>
+<li><p><strong>One-time trigger</strong>：一次性的。</p>
+</li>
+<li><p><strong>Send to the client</strong>：可能在 <code>发送修改请求的client1收到ok</code>之前，<code>watches事件</code>就被发送到了<code>设置watches的client2</code>（client2可能就是client1）。但是每个client收到的所有watches时间顺序都是一样的。</p>
+<blockquote>
+<p>每个client收到的所有监听事件是有序的，且监听事件肯定是在数据操作成功之后产生的。</p>
+</blockquote>
+</li>
+<li><p><strong>The data for which the watch was set</strong>：事件有类型之分。可以理解为两个watches list。<strong>data watches</strong>和<strong>child watches</strong></p>
+<blockquote>
+<p><code>getData()</code> 和 <code>exists()</code> 设置 <strong>data watches</strong>，返回 根据数据类型决定的结果。</p>
+<p><code>getChildren()</code> 设置 <strong>child watches</strong>，返回 子节点列表。</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="设置watch-和-触发watch"><a href="#设置watch-和-触发watch" class="headerlink" title="设置watch 和 触发watch"></a>设置watch 和 触发watch</h3><p>通过三种调用设置watches：<strong>exists</strong>、<strong>getData</strong>、<strong>getChildren</strong>。事务事件都会触发</p>
+<ul>
+<li><strong>Created event:</strong> Enabled with a call to <strong>exists</strong>.        （调用 <code>exists()</code> 来监听 <code>created event</code>）</li>
+<li><strong>Deleted event:</strong> Enabled with a call to <strong>exists</strong>, <strong>getData</strong>, and <strong>getChildren</strong>.</li>
+<li><strong>Changed event:</strong> Enabled with a call to <strong>exists</strong> and <strong>getData</strong>.</li>
+<li><strong>Child event:</strong> Enabled with a call to <strong>getChildren</strong>.</li>
+</ul>
+<img alt="zookeeper-watch" src="https://raw.githubusercontent.com/melopoz/pics/master/img/zookeeper-watch.png" srcset="/blog/img/loading.gif" style="zoom:67%;" />
+
+<p>注意：</p>
+<ul>
+<li><p>getData在ZNode创建时不会触发！因为获取数据必须要节点已经存在。（蓝色 row2 col1）</p>
+</li>
+<li><p><strong>Znode的子节点创建或删除</strong>，或是这个<strong>Znode自身被删除</strong>时，都会触发<strong>getChildren</strong>操作上的watch！</p>
+<blockquote>
+<p>可以通过查看watch事件类型来区分是Znode，还是他的子节点被删除：NodeDelete表示Znode被删除，NodeDeletedChanged表示子节点被删除。</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="watch实现"><a href="#watch实现" class="headerlink" title="watch实现"></a>watch实现</h3><p>watch是由server在本地维护的(<code>map&lt;path, watches&lt;paths&gt;&gt;</code>)。客户端断开再连接之后还可以收到之前注册的事件。</p>
+<p>先看<a href="#%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B">线程模型</a>，再看这一章节。</p>
+<blockquote>
+<p>可以看这篇源码笔记：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/wuzhenzhao/p/9994450.html">https://www.cnblogs.com/wuzhenzhao/p/9994450.html</a></p>
+</blockquote>
+<h4 id="注册watch"><a href="#注册watch" class="headerlink" title="注册watch"></a>注册watch</h4><ol>
+<li><p>client注册watch</p>
+<blockquote>
+<p>将请求包装成Packet（<code>set watch=true</code>）后发送到server</p>
+<p>（这里发送完exists、getData之后会不断的轮询Selector，以获取操作执行结果，接第三步）。</p>
+</blockquote>
+</li>
+<li><p>服务端处理watch</p>
+<blockquote>
+<p>服务器使用责任链模式，根据节点身份调用不同的处理函数。<code>setupRequestProcessors()</code>。</p>
+<ol>
+<li><p><strong>AccpectThread</strong>的<code>processRequest</code>只是将request添加到阻塞队列 <code>submittedRequests</code>。</p>
+</li>
+<li><p><strong>SelectThread</strong>从 <code>submittedRequests</code> 中取出并在责任链中传播，在责任链最后会将watch保存在本地（map）。</p>
+<p><code>FinalRequestProcessor#processRequest(request)</code> 调用 <code>statNode(path, watcher)</code>，statNode 调用 <code>addWatch(path, watcher)</code>。</p>
+<blockquote>
+<pre><code class="hljs java"><span class="hljs-comment">//保存 watch 事件</span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title">addWatch</span><span class="hljs-params">(String path, Watcher watcher)</span> </span>&#123;
+    HashSet&lt;Watcher&gt; list = watchTable.get(path);
+    <span class="hljs-keyword">if</span> (list == <span class="hljs-keyword">null</span>) &#123;
+        list = <span class="hljs-keyword">new</span> HashSet&lt;Watcher&gt;(<span class="hljs-number">4</span>);
+        watchTable.put(path, list);
+    &#125;
+    list.add(watcher);
+
+    HashSet&lt;String&gt; paths = watch2Paths.get(watcher);
+    <span class="hljs-keyword">if</span> (paths == <span class="hljs-keyword">null</span>) &#123;
+        <span class="hljs-comment">// cnxns typically have many watches, so use default cap here</span>
+        paths = <span class="hljs-keyword">new</span> HashSet&lt;String&gt;();
+        watch2Paths.put(watcher, paths);
+    &#125;
+    paths.add(path);
+&#125;</code></pre>
+
+<blockquote>
+<p>观察者模式吧，在map中存储Map(<code>key:path</code>  <code>value:Set&lt;Watch&gt;</code>)来保存watch信息。(每个watch还存储监听的多个path哦)</p>
+<p>对path进行操作之后调用Set中的观察者的方法。</p>
+</blockquote>
+</blockquote>
+</li>
+<li><p>然后等待时间触发，就调用path对应的watch</p>
+<blockquote>
+<p><strong>watch 事件触发</strong>：processRequest会调用<code>getZKDatabase().processTxn(hdr, txn)</code>，其中<code>procesTxn(hdr, txn)</code>会调用<code>dataWatches.triggerWatch(path, EventType.NodeDataChanged);</code>。</p>
+<p><strong>triggerWatch</strong> 方法名就证明他是做什么的。。</p>
+<blockquote>
+<p>triggerWatch会取出所有watch，<strong>从watch.paths移除当前path</strong>，并调用<code>w.process(e);</code></p>
+</blockquote>
+<p><code>process()</code> 方法会调用 <code>ServerCnxn#process()</code> 方法（abstract方法，有两个实现类：NIOServerCnxn、NettyServerCnxn）</p>
+<p>其中<code>NIOServerCnxn#process()</code>是调用了<code>sendResponse(h, e, &quot;notification&quot;);</code>。就是向client发送通知了。</p>
+</blockquote>
+</li>
+</ol>
+</blockquote>
+</li>
+<li><p>client不断轮询Selector，读写就绪都会进入<code>ClientCnxnSocketNIO#doIO</code>，这里看收到server的watch事件通知，所以应该是 处理<code>读就绪</code>：</p>
+<blockquote>
+<p><code>readResponse</code>读取并解析header</p>
+<blockquote>
+<p>xid=<strong>-2</strong>：是ping的response，return</p>
+<p>xid=<strong>-4</strong>：AuthPacket的response，return</p>
+<p>xid=<strong>-1</strong>：是<strong>watch通知</strong><code>notifacation</code>，应该读取并构造成<strong>Event</strong>，然后发送到<code>EventThread.queueEvent</code>。</p>
+<p><strong>else</strong>：从pendingQueue拿出Packet，调用finishPacket注册本地事件（取出watch注册到ZKWatchManager）</p>
+</blockquote>
+</blockquote>
+</li>
+</ol>
+<h4 id="watch触发"><a href="#watch触发" class="headerlink" title="watch触发"></a>watch触发</h4><p>上述步骤的<strong>2.3</strong>之后，client还是会进入 <code>doIO()</code> ，然后 <code>readResponse()</code> 且 <code>xid=-1</code>，解析出Event，调用<code>queueEvent(WatchEvent event)</code></p>
+<blockquote>
+<pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">queueEvent</span><span class="hljs-params">(WatchedEvent event)</span> </span>&#123;
+    <span class="hljs-keyword">if</span> (event.getType() == EventType.None &amp;&amp; sessionState == event.getState()) &#123;
+        <span class="hljs-keyword">return</span>;
+    &#125;
+    sessionState = event.getState();
+    <span class="hljs-comment">// materialize the watchers based on the event</span>
+    <span class="hljs-comment">// 封装 WatcherSetEventPair 对象，添加到 waitngEvents 队列中</span>
+    WatcherSetEventPair pair = <span class="hljs-keyword">new</span> WatcherSetEventPair(
+        watcher.materialize(event.getState(), event.getType(),
+                            event.getPath()), event);
+    waitingEvents.add(pair); <span class="hljs-comment">// 添加到队列 等待事件被处理</span>
+&#125;</code></pre>
+
+<p><code>waitingEvents</code> 就是 <code>EventThread</code> 的阻塞队列， 可以看EventThread的run()方法，循环调用<code>processEvent(event)</code>（<code>watcher.process(pair.event);</code>）。这样就调用到了自定义Watch的回调方法。</p>
+</blockquote>
+<p>总体流程就是：</p>
+<p><strong>SendThread</strong>负责处理连接（发送 和 解析响应）；</p>
+<p><strong>EventThread</strong>负责处理事件队列中的事件，调用watch的回调。主要是这个线程。</p>
+<blockquote>
+<p>事件监听回调，线程池、阻塞队列，还是这一套。就像是线程合作中 await 和 signal 的合作方式，只不过两个线程不是在同一个机器。</p>
+<p>处理链接的也是由线程池来负责解析和处理，多步骤解耦，提高响应速度。</p>
+</blockquote>
+<img alt="zk-EventThread" src="https://raw.githubusercontent.com/melopoz/pics/master/img/zk-EventThread%E5%A4%84%E7%90%86WatchEvent.png" srcset="/blog/img/loading.gif" style="zoom:40%;" />
+
+
+
+<h2 id="线程模型"><a href="#线程模型" class="headerlink" title="线程模型"></a>线程模型</h2><h3 id="Client线程模型"><a href="#Client线程模型" class="headerlink" title="Client线程模型"></a>Client线程模型</h3><h4 id="三个队列"><a href="#三个队列" class="headerlink" title="三个队列"></a>三个队列</h4><ul>
+<li><strong>OutgoingQueue</strong>：存储 <code>待发送</code> 的消息</li>
+<li><strong>PendingQueue</strong>：存储 <code>已发送,等待响应</code> 的消息</li>
+<li><strong>EventQueue</strong>：存储 <code>watch监听到的事件</code></li>
+</ul>
+<h4 id="两个线程"><a href="#两个线程" class="headerlink" title="两个线程"></a>两个线程</h4><ul>
+<li><p><strong>SendThread</strong>：消息发送线程，负责与server进行通信和超时重连。（如果server认定session过期，则这个线程会退出）</p>
+<blockquote>
+<p>将 QutgoingQueue队头 发送，并加入到 PendingQueue队尾。</p>
+<p>同步发送：等待Event处理结束返回结果；</p>
+<p>异步发送：直接返回结果，由处理Watch的线程后台进行回调Watch。</p>
+</blockquote>
+</li>
+<li><p><strong>EventThread</strong>：事件处理线程<code>org.apache.zookeeper.ClientCnxn.EventThread.processEvent(Objectevent)</code></p>
+<blockquote>
+<p>以为Watch是一次性的，如果想要继续注册Watch，就需要在回调函数中再次注册自己。</p>
+</blockquote>
+</li>
+</ul>
+<p>client初始化时（<code>new Zookeeper（args) &#123;new ClientCnxn(args).start();&#125;</code>）就会启动这两个线程：<strong>sendThread</strong> 和 <strong>eventThead</strong>。</p>
+<pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ClientCnxn</span><span class="hljs-params">(String chrootPath, HostProvider hostProvider, <span class="hljs-keyword">int</span> sessionTimeout, ZooKeeper zooKeeper,</span></span>
+<span class="hljs-function"><span class="hljs-params">        ClientWatchManager watcher, ClientCnxnSocket clientCnxnSocket,</span></span>
+<span class="hljs-function"><span class="hljs-params">        <span class="hljs-keyword">long</span> sessionId, <span class="hljs-keyword">byte</span>[] sessionPasswd, <span class="hljs-keyword">boolean</span> canBeReadOnly)</span> </span>&#123;
+    <span class="hljs-keyword">this</span>.zooKeeper = zooKeeper;
+    <span class="hljs-keyword">this</span>.watcher = watcher;
+    <span class="hljs-keyword">this</span>.sessionId = sessionId;
+    <span class="hljs-keyword">this</span>.sessionPasswd = sessionPasswd;
+    <span class="hljs-keyword">this</span>.sessionTimeout = sessionTimeout;<span class="hljs-comment">//会话超时</span>
+    <span class="hljs-keyword">this</span>.hostProvider = hostProvider;
+    <span class="hljs-keyword">this</span>.chrootPath = chrootPath;
+    connectTimeout = sessionTimeout / hostProvider.size();<span class="hljs-comment">// 连接超时</span>
+    readTimeout = sessionTimeout * <span class="hljs-number">2</span> / <span class="hljs-number">3</span>; <span class="hljs-comment">//超时</span>
+    readOnly = canBeReadOnly;
+    sendThread = <span class="hljs-keyword">new</span> SendThread(clientCnxnSocket);<span class="hljs-comment">// 新建了一个发送线程</span>
+    eventThread = <span class="hljs-keyword">new</span> EventThread();<span class="hljs-comment">// 处理watcher回调event的线程</span>
+&#125;
+<span class="hljs-comment">//启动两个线程</span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">start</span><span class="hljs-params">()</span> </span>&#123;
+    sendThread.start();
+    eventThread.start();
+&#125;</code></pre>
+
+
+
+<h3 id="Server-线程模型"><a href="#Server-线程模型" class="headerlink" title="Server 线程模型"></a>Server 线程模型</h3><p>就是个Reactor单线程模型。</p>
+<ol>
+<li>主线程（<strong>AcceptThread</strong>）（通过<code>select()</code>）处理连接请求，将新连接放到 <strong>SelectorThread</strong> 的阻塞队列 <code>acceptedQueue</code>;</li>
+<li><strong>SelectorThread</strong> 线程从<code>acceptedQueue</code>中取出新建立的连接 <strong>Channel</strong> 注册到 <strong>SelectorThread</strong> 的 <strong>Selector</strong> 上，并监听<strong>读</strong>事件；</li>
+<li>当 <strong>Channel</strong> 可读时(说明请求数据已经写入到了buffer)，就会调用 <strong>SelectorThread</strong>.<code>handleIO</code> 方法，在 <code>handleIO</code> 方法中会将该连接派发到工作线程中进行处理(调用workerPool.schedule方法)。</li>
+</ol>
+<p>将请求扔到队列（），负责处理请求的线程（）将队列（）中的请求取出来解析并扔到事件队列，负责处理</p>
+<blockquote>
+<p>源码中用到很多 BlockingQueue、synchronized</p>
+</blockquote>
+<h2 id="Session管理"><a href="#Session管理" class="headerlink" title="Session管理"></a>Session管理</h2><p>zkClient要和一个zkServer不断交互，所以TCP长连接很合适。</p>
+<p>只要在<strong>SessionTimeout</strong>之内zkClient和zkServer能够重新连接，原来session就还有效。</p>
+<ul>
+<li><p><strong>sessionID</strong>：客户端创建会话的时候，zkServer会通过<code>initializeNextSession(long id)</code>生成一个全局唯一的sessionID</p>
+</li>
+<li><p><strong>TimeOut</strong>：会话超时时间，如果客户端与服务器之间因为网络闪断导致断开连接，并在TimeOut时间内未连上其他server，则此次会话失效，此次会话创建的临时节点将被清理</p>
+</li>
+<li><p><strong>ExpirationTime</strong>：下次会话超时时间点。其值接近于 <code>当前时间+TimeOut</code></p>
+<blockquote>
+<p>超时检测采用<strong>分段策略</strong>，提高会话的超时检查与清理效率。</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="会话超时"><a href="#会话超时" class="headerlink" title="会话超时"></a>会话超时</h3><p>Leader 会定期进行会话超时检查，默认时间间隔 <strong>expirationInterval</strong> 为 <code>2000ms</code>。</p>
+<p>对于session的超时处理，采用一个分段策略，具体实现可以看<code>ExpiryQueue</code>：</p>
+<blockquote>
+<img alt="图片来自https://blog.csdn.net/mystory110/article/details/77533376" src="https://raw.githubusercontent.com/melopoz/pics/master/img/zk-ExpiryQueue%E4%BC%9A%E8%AF%9D%E8%B6%85%E6%97%B6%E7%AE%A1%E7%90%86.png" srcset="/blog/img/loading.gif" style="zoom:50%;" />
+
+<p>将 <strong>ExpirationTime</strong> 处于同一区间的 session 放到一个 <code>Set</code>中，每次更新 ExpirationTime 时将该 session 加入到新位置的Set集合。</p>
+<img alt="zk-获取session过期时间" src="https://raw.githubusercontent.com/melopoz/pics/master/img/zk-%E8%8E%B7%E5%8F%96session%E8%BF%87%E6%9C%9F%E6%97%B6%E9%97%B4.png" srcset="/blog/img/loading.gif" style="zoom:50%;" />
+
+<p>每次只检查下次超时时间内的session。提高效率。</p>
+</blockquote>
+<p>如果会话过期，集群中所有节点就会删除该session对应的临时节点。</p>
+<h3 id="会话激活"><a href="#会话激活" class="headerlink" title="会话激活"></a>会话激活</h3><p><strong>SessionTrackerImpl#touchSession</strong></p>
+<ul>
+<li>每次client发送请求都会激活一次session；</li>
+<li>如果client在<code>sessionTimeOut / 3</code>的时间之内没有发送请求，就会主动发起一次PING请求，触发激活。</li>
+</ul>
+<h2 id="CP模型"><a href="#CP模型" class="headerlink" title="CP模型"></a>CP模型</h2><blockquote>
+<p>Zookeeper虽然是CP模型，但也是<strong>最终一致性</strong>，因为读请求打到Observer节点的时候可能数据还没更新过来。</p>
+<p>zookeeper既然不是强一致性的，那我们如何能保证两个客户端读到的数据是一致性的呢，那就是sync方法，zookeeper原生客户端API和Curator客户端都提供了该sync()方法，调用sync()方法之后，zookeeper集群会保证集群所有节点数据都是一致性的，此时客户端再去任意节点读取数据，都能读取最新的数据。</p>
+</blockquote>
+<ul>
+<li><p>用户请求zookeeper有可能得不到响应</p>
+<blockquote>
+<p><strong>任何时刻对ZooKeeper的访问请求能得到一致的数据结果</strong>（C），同时系统对网络分割具备容错性；但是它不能保证每次服务请求的可用性。</p>
+<p>可以通过client调用sync()来让集群数据一致，达到强一致性。</p>
+<p>（注：也就是在极端环境下，ZooKeeper可能会丢弃一些请求，消费者程序需要重新请求才能获得结果）。所以说，ZooKeeper不能保证服务可用性。</p>
+</blockquote>
+</li>
+<li><p>选举leader节点的时候，集群不可用</p>
+<blockquote>
+<p>选举leader的时间太长，30 ~ 120s，<strong>选举期间注册服务瘫痪</strong>，服务只是能够<strong>最终恢复</strong>。</p>
+</blockquote>
+</li>
+</ul>
+<h1 id="集群架构"><a href="#集群架构" class="headerlink" title="集群架构"></a>集群架构</h1><img alt="zookeeper架构图" src="https://raw.githubusercontent.com/melopoz/pics/master/img/zookeeper%E6%9E%B6%E6%9E%84%E5%9B%BE.png" srcset="/blog/img/loading.gif" style="zoom:50%;" />
+
+<p><strong>Leader</strong>：处理客户端<strong>读写</strong>请求；</p>
+<p><strong>Follower</strong>：处理<strong>读</strong>请求，<strong>写请求转发给leader</strong>，参与leader选举；</p>
+<p><strong>Observer</strong>：处理<strong>读</strong>请求，<strong>写请求转发给leader</strong>，<strong>不参与leader选举</strong>。（所以</p>
+<p>节点的四种状态：</p>
+<p><strong>LOOKING</strong>：寻找Leader状态。当服务器处于该状态时，它会认为当前集群中没有Leader，因此需要进入Leader选举状态。</p>
+<p><strong>FOLLOWING</strong>：表明当前服务器角色是Follower。</p>
+<p><strong>LEADING</strong>：表明当前服务器角色是Leader。</p>
+<p><strong>OBSERVING</strong>：表明当前服务器角色是Observer。</p>
+<h2 id="☆-集群下的数据一致性"><a href="#☆-集群下的数据一致性" class="headerlink" title="☆ 集群下的数据一致性"></a>☆ 集群下的数据一致性</h2><p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/324291664/answer/909822937">https://www.zhihu.com/question/324291664/answer/909822937</a>  （就是依靠 <strong>最少半数节点</strong>+<strong>读时检测</strong> 保证的一致性）</p>
+<p><strong>读时检测</strong>：client发送请求时会携带zxid，server如果发现zxid比当前节点的最大的zxid还大，说明server自己的数据并不是最新的，就会拒绝client的请求，client就会请求下一个server节点。</p>
+<h2 id="ZAB：Zookeeper原子广播协议"><a href="#ZAB：Zookeeper原子广播协议" class="headerlink" title="ZAB：Zookeeper原子广播协议"></a>ZAB：Zookeeper原子广播协议</h2><p>写入的时候：过半写入成功，则认为成功。</p>
+<p>选举leader的时候：某节点获得过半的投票，则当选leader。</p>
+<blockquote>
+<p>Paxos的简单实现吧</p>
+</blockquote>
+<h2 id="Leader选举"><a href="#Leader选举" class="headerlink" title="Leader选举"></a>Leader选举</h2><p>选举一个leader，发送提案，多半同意则发送提交，节点的最大<strong>zxid是 集群中最大的</strong>节点才会当选。</p>
+<p>投票通信时的数据结构：</p>
+<blockquote>
+<p><strong>id</strong>：被推举的Leader的SID。</p>
+<p><strong>zxid</strong>：被推举的Leader事务ID。(自己看到的节点中最大的)</p>
+<p><strong>electionEpoch</strong>：逻辑时钟，用来判断多个投票是否在同一轮选举周期中，该值在服务端是一个自增序列，每次进入新一轮的投票 进行加1操作。</p>
+<p><strong>peerEpoch</strong>：被推举的Leader的epoch。</p>
+<p><strong>state</strong>：当前服务器的状态。</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="http://ningg.top/zookeeper-lesson-2-leader-election/">http://ningg.top/zookeeper-lesson-2-leader-election/</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/leesf456/p/6107600.html">https://www.cnblogs.com/leesf456/p/6107600.html</a></p>
+<h2 id="跨机房部署"><a href="#跨机房部署" class="headerlink" title="跨机房部署"></a>跨机房部署</h2><p>因为要保证一致性，所以节点越多性能就越低，一般3、5个节点即可</p>
+<p>Observer就是一个读的横向扩展，可以多一点。</p>
+<p>Leader和Follower应该在相同机房，网络环境比较稳定， 集群内通信效率高。除非担心整个机房一起挂。</p>
+<h1 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h1><ul>
+<li><p>[☆ 集群下的数据一致性](#☆ 集群下的数据一致性)</p>
+</li>
+<li><p>事务是什么时候刷盘的？</p>
+<blockquote>
+<p>事务每次刷盘都是一次IO操作，所以为了减少刷盘的次数，从而提高响应性能，zookeeper会将每次事务的请求写入都是先写到一个缓冲流中。</p>
+<p><strong>requestProcessor线程</strong> 会从 <strong>queuedRequests队列</strong> 取出事务执行，并写入到事务日志文件的缓冲流中，当requestProcessor统计写入缓冲流的<strong>事务超过1000</strong> 或者 <strong>队列已经没有事务</strong>了，就会开始将缓冲流中的数据刷到磁盘块中。</p>
+<p>至于刷盘的方式是可选择的，通过配置控制它是异步还是同步刷到磁盘中。</p>
+</blockquote>
+</li>
+<li><p>如果zookeeper集群全部宕机， 服务还可用吗？</p>
+<blockquote>
+<p>服务是可用，但是注册中心都没了。去哪发现服务获取服务地址呢？</p>
+<p>除非调用服务的通信协议中完全不需要zk，但可能也只是再一小段时间内能调用provider的服务。最终肯定就不可用了。</p>
+</blockquote>
+</li>
+<li><p>怎么防止脑裂？</p>
+<blockquote>
+<p>选举时票数过半</p>
+</blockquote>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000014479433">https://segmentfault.com/a/1190000014479433</a></p>
+</li>
+</ul>
+<h1 id="下载安装"><a href="#下载安装" class="headerlink" title="下载安装"></a>下载安装</h1><p>镜像下载链接：</p>
+<p><a target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.4.14/">https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.4.14/</a></p>
+<p>zookeeper读取/conf/zoo.cfg文件作为配置文件，可复制zoo_simple.cfg在修改</p>
+<pre><code class="hljs sh">bin/zkServer.sh start/restart/stop/status  <span class="hljs-comment"># 启动/重启/停止/查看状态</span>
+bin/zkCli.sh 				<span class="hljs-comment">#连接zk服务  -server host:port</span>
+
+ls / 					<span class="hljs-comment">#查看根目录下的内容</span>
+ls2 / 					<span class="hljs-comment">#查看根目录下的内容和更新次数等具体信息</span>
+create /<span class="hljs-built_in">test</span> <span class="hljs-string">&quot;info1&quot;</span> 	<span class="hljs-comment">#创建一个新的znode节点，和关联的字符串</span>
+get /<span class="hljs-built_in">test</span>
+<span class="hljs-built_in">set</span> /<span class="hljs-built_in">test</span> <span class="hljs-string">&quot;info-update&quot;</span>
+delete /<span class="hljs-built_in">test</span> 			<span class="hljs-comment">#删除节点</span>
+quit 					<span class="hljs-comment">#退出客户端</span>
+
+<span class="hljs-comment">#nc命令用来设置路由器</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-built_in">stat</span> | nc 127.0.0.1 2181 <span class="hljs-comment">#来查看哪个节点被选择作为follower或者leader</span>
+<span class="hljs-built_in">echo</span> ruok | nc 127.0.0.1 2181 <span class="hljs-comment">#测试是否启动了该Server，若回复imok表示已经启动。</span>
+<span class="hljs-built_in">echo</span> dump | nc 127.0.0.1 2181 <span class="hljs-comment">#列出未经处理的会话和临时节点。</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-built_in">kill</span> | nc 127.0.0.1 2181 <span class="hljs-comment">#关掉server</span>
+<span class="hljs-built_in">echo</span> conf | nc 127.0.0.1 2181 <span class="hljs-comment">#输出相关服务配置的详细信息。</span>
+<span class="hljs-built_in">echo</span> cons | nc 127.0.0.1 2181 <span class="hljs-comment">#列出所有连接到服务器的客户端的完全的连接 / 会话的详细信息。</span>
+<span class="hljs-built_in">echo</span> envi | nc 127.0.0.1 2181 <span class="hljs-comment">#输出关于服务环境的详细信息（区别于 conf 命令）。</span>
+<span class="hljs-built_in">echo</span> reqs | nc 127.0.0.1 2181 <span class="hljs-comment">#列出未经处理的请求。</span>
+<span class="hljs-built_in">echo</span> wchs | nc 127.0.0.1 2181 <span class="hljs-comment">#列出服务器 watch 的详细信息。</span>
+<span class="hljs-built_in">echo</span> wchc | nc 127.0.0.1 2181 <span class="hljs-comment">#通过 session 列出服务器 watch 的详细信息，它的输出是一个与 watch 相关的会话的列表。</span>
+<span class="hljs-built_in">echo</span> wchp | nc 127.0.0.1 2181 <span class="hljs-comment">#通过路径列出服务器 watch 的详细信息。它输出一个与 session 相关的路径。</span></code></pre>
+
+
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/redo/">redo</a>
+                    
+                      <a class="hover-with-bg" href="/blog/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E5%8D%8F%E8%B0%83%E6%9C%8D%E5%8A%A1/">分布式协调服务</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2021/01/01/OS/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">OS</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2021/01/01/NOSQL_Redis/">
+                        <span class="hidden-mobile">Redis</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":200})
+    NProgress.start()
+    document.addEventListener('DOMContentLoaded', function() {
+      window.NProgress && window.NProgress.inc();
+    })
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.staticfile.org/jquery/3.5.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/debouncer.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/blog/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.12.0/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/blog/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/blog/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+
+</body>
+</html>

@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      4.6k 字
+      4.9k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      54
+      59
        分钟
     </span>
   
@@ -618,12 +618,57 @@ epoll_ctl(epfd, EPPOLL_CTL_ADD, ...);
 </li>
 <li><p>select()返回可读之后就直接去read()并不一定能读取到数据，select()内部调用fd是否就绪 和 调用read() 是两次系统调用，这之间是可能有其他事件发生的，</p>
 <p>举个例子： 惊群现象，投一粒米，所有鸽子都来吃，只有一个吃到，然后所有鸽子都得回去睡觉。</p>
-<p>这个可读的数据可能就是已经被其他进程/线程读完了。</p>
+<p>这个可读的数据可能已经被其他进程/线程读完了。</p>
 <p>链接：<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/37271342/answer/81757593">https://www.zhihu.com/question/37271342/answer/81757593</a></p>
 </li>
 </ol>
 </blockquote>
 <h2 id="Java中的NIO"><a href="#Java中的NIO" class="headerlink" title="Java中的NIO"></a>Java中的NIO</h2><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/874744d19d0d">https://www.jianshu.com/p/874744d19d0d</a></p>
+<blockquote>
+<p>个人理解就是 Channel 逻辑概念，对应物理概念就是内存/磁盘中的文件（Buffer）。数据总要落到物理介质上嘛。</p>
+</blockquote>
+<p><strong>Channel</strong> 通道 ：必须绑定 Buffer。</p>
+<p><strong>Buffer</strong> 缓冲区 ：有 position、limit 读写指针 和 capacity等核心属性。</p>
+<p><strong>Selector</strong>：</p>
+<p>调用select()是阻塞的，select内部调用（注册到Selector的Channel）ready()是非阻塞的。</p>
+<pre><code class="hljs java">SocketChannel channel = SocketChannel.open();
+channel.configureBlocking(<span class="hljs-keyword">false</span>);<span class="hljs-comment">// 必须 设置channel为非阻塞</span>
+SelectionKey key = channel.register(selector, SelectionKey.OP_READ);<span class="hljs-comment">//像选择器注册一个通道</span></code></pre>
+
+<p>使用selector获取IO就绪的channel</p>
+<pre><code class="hljs java">Set&lt;SelectionKey&gt; keys = selector.selectedKeys();</code></pre>
+
+<p>通过key获取通道、选择器、或者通道的IO就绪状态</p>
+<pre><code class="hljs java">Selector selector = key.selector();
+SocketChannel = key.channel();
+<span class="hljs-keyword">int</span> readySet = key.readyOps();<span class="hljs-comment">// 用位表示fd的就绪状态</span></code></pre>
+
+<blockquote>
+<p>如readySet=13（<code>0000 1101</code>），从低位到高位：第一、三、四位为 1，那么说明该channel：读就绪、写就绪，连接就绪。</p>
+</blockquote>
+<h3 id="Java-nio-epoll-bug"><a href="#Java-nio-epoll-bug" class="headerlink" title="Java nio epoll bug"></a>Java nio epoll bug</h3><p>java nio 在 windows 系统没有问题，java的的NIO<strong>在Linux下</strong>使用的是epoll，不过在<code>Selector.select()/Selector.select(timeout)</code>轮询事件返回数量为0时，本应阻塞在<code>select()</code>，但是NIO会不断wake up出来，导致CPU 100%。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://bugs.java.com/bugdatabase/view_bug.do?bug_id=6670302">https://bugs.java.com/bugdatabase/view_bug.do?bug_id=6670302</a></p>
+</blockquote>
+<p>netty的解决方案：</p>
+<p>用计数方式检查是否发生了epoll bug，如果发生了就重建selector并替换原来的selector。</p>
+<pre><code class="hljs java"><span class="hljs-comment">/**</span>
+<span class="hljs-comment"> * Replaces the current &#123;<span class="hljs-doctag">@link</span> Selector&#125; of this event loop with newly created &#123;<span class="hljs-doctag">@link</span> Selector&#125;s to work</span>
+<span class="hljs-comment"> * around the infamous epoll 100% CPU bug.</span>
+<span class="hljs-comment"> */</span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">rebuildSelector</span><span class="hljs-params">()</span> </span>&#123;
+    <span class="hljs-keyword">if</span> (!inEventLoop()) &#123;
+        execute(<span class="hljs-keyword">new</span> Runnable() &#123;
+            <span class="hljs-meta">@Override</span>
+            <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;
+                rebuildSelector0();
+            &#125;
+        &#125;);
+        <span class="hljs-keyword">return</span>;
+    &#125;
+    rebuildSelector0();
+&#125;</code></pre>
+
 
             </div>
             <hr>

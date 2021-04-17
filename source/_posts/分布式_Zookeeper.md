@@ -56,14 +56,6 @@ zk的数据有**内存数据**（树）和**磁盘数据**（快照、事务日�
 
 <img src="https://raw.githubusercontent.com/melopoz/pics/master/img/zk-DataTree-DataNode2.png" style="zoom: 40%;" />
 
-### DataTree
-
-就全部数据了呗。
-
-### DataNode
-
-java实现嘛 肯定就是map了，再考虑多线程，必是ConcurrentHashMap了。其中`nodes`的key是节点的唯一标识：`path`；`ephemerals`临时节点需要和会话绑定，所以key是`sessionId`。
-
 
 
 ### Packet

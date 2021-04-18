@@ -25,6 +25,10 @@ InnoDB 唯一主键，B+树（只有叶子节点存数据，普通索引的叶�
 
 InnoDB不支持哈希索引，只有一个自适应哈希索引
 
+#### 最左匹配原则
+
+如果建立三个字段的联合索引`index_a_b_c`，查询时`...where c = ".." and b = ".." and a = ".."`也是会生效的，因为mysql的优化器会对where条件的字段进行重排序。
+
 
 
 ### InnoDB自适应哈希索引（Adaptive Hash Index，AHI）

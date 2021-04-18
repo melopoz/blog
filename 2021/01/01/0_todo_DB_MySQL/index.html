@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      34
+      35
        分钟
     </span>
   
@@ -232,6 +232,7 @@
 <p>辅助索引（普通索引）</p>
 <p>联合索引</p>
 <p>InnoDB不支持哈希索引，只有一个自适应哈希索引</p>
+<h4 id="最左匹配原则"><a href="#最左匹配原则" class="headerlink" title="最左匹配原则"></a>最左匹配原则</h4><p>如果建立三个字段的联合索引<code>index_a_b_c</code>，查询时<code>...where c = &quot;..&quot; and b = &quot;..&quot; and a = &quot;..&quot;</code>也是会生效的，因为mysql的优化器会对where条件的字段进行重排序。</p>
 <h3 id="InnoDB自适应哈希索引（Adaptive-Hash-Index，AHI）"><a href="#InnoDB自适应哈希索引（Adaptive-Hash-Index，AHI）" class="headerlink" title="InnoDB自适应哈希索引（Adaptive Hash Index，AHI）"></a>InnoDB自适应哈希索引（Adaptive Hash Index，AHI）</h3><p>一条查询语句如果使用的是普通索引并需要回表，可能会因为无序导致多次随机IO。</p>
 <p>InnoDB监控对表的索引页的查询，如果<strong>满足要求</strong>就会建立哈希索引。</p>
 <p>这个哈希索引是通过缓存中的索引页构建的，而且也是放在buffer poll中，所以速度很快。</p>
@@ -489,7 +490,7 @@ group by Request_at</code></pre>
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/blog/2021/04/17/0_todo_Java_JUC/">
+                      <a href="/blog/2021/04/18/0_todo_Java_JUC/">
                         <i class="iconfont icon-arrowleft"></i>
                         <span class="hidden-mobile">java.util.concurrent</span>
                         <span class="visible-mobile">上一篇</span>

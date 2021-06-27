@@ -860,7 +860,7 @@ newTab[e.hash &amp; (newCap - <span class="hljs-number">1</span>)] = e;</code></
     <span class="hljs-keyword">return</span> (Node&lt;K,V&gt;)U.getObjectVolatile(tab, ((<span class="hljs-keyword">long</span>)i &lt;&lt; ASHIFT) + ABASE);<span class="hljs-comment">// JDK源码中好多都是记录该值相对于当前对象的偏移量</span>
 &#125;
 <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> &lt;K,V&gt; <span class="hljs-function"><span class="hljs-keyword">boolean</span> <span class="hljs-title">casTabAt</span><span class="hljs-params">(Node&lt;K,V&gt;[] tab, <span class="hljs-keyword">int</span> i,</span></span>
-<span class="hljs-function"><span class="hljs-params">                                    Node&lt;K,V&gt; c, Node&lt;K,V&gt; v)</span> </span>&#123;
+<span class="hljs-params"><span class="hljs-function">                                    Node&lt;K,V&gt; c, Node&lt;K,V&gt; v)</span> </span>&#123;
     <span class="hljs-keyword">return</span> U.compareAndSwapObject(tab, ((<span class="hljs-keyword">long</span>)i &lt;&lt; ASHIFT) + ABASE, c, v);
 &#125;
 <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> &lt;K,V&gt; <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">setTabAt</span><span class="hljs-params">(Node&lt;K,V&gt;[] tab, <span class="hljs-keyword">int</span> i, Node&lt;K,V&gt; v)</span> </span>&#123;

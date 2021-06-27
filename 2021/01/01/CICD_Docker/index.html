@@ -419,8 +419,8 @@ docker cp centosID:/容器内文件路径 /目的路径
 <span class="hljs-regexp">//</span> 可以通过【docker inspect 容器id】查看到VolumesRW.containerDir为true</code></pre>
 <pre><code class="hljs awk">docker run -it -v <span class="hljs-regexp">/hostDir:/</span>containerDir:ro 镜像名 <span class="hljs-regexp">//</span> 只有host可执行写操作，容器只能读
 <span class="hljs-regexp">//</span> 可以通过【docker inspect 容器id】查看到VolumesRW.containerDir为false</code></pre>
-<h5 id="2-DockerFile添加"><a href="#2-DockerFile添加" class="headerlink" title="2. DockerFile添加"></a>2. DockerFile添加</h5><pre><code class="hljs plain">docker的dockerfile就像linux的脚本文件。
-dockerfile不能创建host的本地目录来实现数据卷，只能创建一个&#x2F;多个容器内数据卷。</code></pre>
+<h5 id="2-DockerFile添加"><a href="#2-DockerFile添加" class="headerlink" title="2. DockerFile添加"></a>2. DockerFile添加</h5><pre><code class="hljs">docker的dockerfile就像linux的脚本文件。
+dockerfile不能创建host的本地目录来实现数据卷，只能创建一个/多个容器内数据卷。</code></pre>
 <p>创建dockerfile（touch /mydocker/Dockerfile）</p>
 <pre><code class="hljs dockerfile"><span class="hljs-keyword">FROM</span> centos
 <span class="hljs-keyword">VOLUME</span><span class="bash"> [<span class="hljs-string">&quot;/dataVolumeContainer1&quot;</span>,<span class="hljs-string">&quot;/dataVolumeContainer2&quot;</span>]</span>
@@ -524,7 +524,7 @@ docker commit -a melopoz -m <span class="hljs-string">&quot;centos1.3 to 1.4 wit
 <h5 id="推送到云仓库"><a href="#推送到云仓库" class="headerlink" title="推送到云仓库"></a>推送到云仓库</h5><h6 id="阿里云-容器镜像服务"><a href="#阿里云-容器镜像服务" class="headerlink" title="阿里云-容器镜像服务"></a>阿里云-容器镜像服务</h6><ol>
 <li>创建镜像仓库(需要命名空间)</li>
 <li>阿里云给了推送命令 复制即可<pre><code class="hljs stylus"><span class="hljs-comment">//将镜像推送到Registry</span>
-sudo docker login --username=xxx registry<span class="hljs-selector-class">.cn-beijing</span><span class="hljs-selector-class">.aliyuncs</span>.com
+sudo docker login --username=xxx registry<span class="hljs-selector-class">.cn-beijing</span><span class="hljs-selector-class">.aliyuncs</span><span class="hljs-selector-class">.com</span>
 <span class="hljs-comment">// 输入密码</span>
 sudo docker tag <span class="hljs-selector-attr">[ImageId]</span> registry<span class="hljs-selector-class">.cn-beijing</span><span class="hljs-selector-class">.aliyuncs</span>.com/命名空间/仓库名:<span class="hljs-selector-attr">[镜像版本号]</span>
 sudo docker push registry<span class="hljs-selector-class">.cn-beijing</span><span class="hljs-selector-class">.aliyuncs</span>.com/xx/xx:<span class="hljs-selector-attr">[镜像版本号]</span>

@@ -340,12 +340,12 @@
 <pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;winsock.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> __FD_SETSIZE    1024</span>
 <span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">select</span><span class="hljs-params">(</span></span>
-<span class="hljs-function"><span class="hljs-params">    <span class="hljs-keyword">int</span> nfds, <span class="hljs-comment">// 本参数忽略，仅起到兼容作用</span></span></span>
-<span class="hljs-function"><span class="hljs-params">    fd_set* readfds, <span class="hljs-comment">// （可选）指针，指向一组等待可读性检查的套接口fd</span></span></span>
-<span class="hljs-function"><span class="hljs-params">    fd_set* writefds, <span class="hljs-comment">// （可选）指针，指向一组等待可写性检查的套接口fd</span></span></span>
-<span class="hljs-function"><span class="hljs-params">    fd_set* exceptfds, <span class="hljs-comment">// （可选）指针，指向一组等待错误检查的套接口fd</span></span></span>
-<span class="hljs-function"><span class="hljs-params">    <span class="hljs-keyword">const</span> struct timeval* timeout <span class="hljs-comment">// timeout：select()最多等待时间，对阻塞操作则应为NULL。</span></span></span>
-<span class="hljs-function"><span class="hljs-params">)</span></span>;</code></pre>
+<span class="hljs-params"><span class="hljs-function">    <span class="hljs-keyword">int</span> nfds, <span class="hljs-comment">// 本参数忽略，仅起到兼容作用</span></span></span>
+<span class="hljs-params"><span class="hljs-function">    fd_set* readfds, <span class="hljs-comment">// （可选）指针，指向一组等待可读性检查的套接口fd</span></span></span>
+<span class="hljs-params"><span class="hljs-function">    fd_set* writefds, <span class="hljs-comment">// （可选）指针，指向一组等待可写性检查的套接口fd</span></span></span>
+<span class="hljs-params"><span class="hljs-function">    fd_set* exceptfds, <span class="hljs-comment">// （可选）指针，指向一组等待错误检查的套接口fd</span></span></span>
+<span class="hljs-params"><span class="hljs-function">    <span class="hljs-keyword">const</span> struct timeval* timeout <span class="hljs-comment">// timeout：select()最多等待时间，对阻塞操作则应为NULL。</span></span></span>
+<span class="hljs-params"><span class="hljs-function">)</span></span>;</code></pre>
 
 <p>select是通过维护一个用来存放大量fd的数据结构，这样会使得用户空间和内核空间在传递这些fd时复制开销也随着fd的数量线性增大。也因此单个进程所打开的fd是有一定限制的，它由<code>FD_SETSIZE</code>设置，默认值是<code>1024</code>。</p>
 <blockquote>

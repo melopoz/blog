@@ -424,8 +424,8 @@
 </ul>
 <p>client初始化时（<code>new Zookeeper（args) &#123;new ClientCnxn(args).start();&#125;</code>）就会启动这两个线程：<strong>sendThread</strong> 和 <strong>eventThead</strong>。</p>
 <pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ClientCnxn</span><span class="hljs-params">(String chrootPath, HostProvider hostProvider, <span class="hljs-keyword">int</span> sessionTimeout, ZooKeeper zooKeeper,</span></span>
-<span class="hljs-function"><span class="hljs-params">        ClientWatchManager watcher, ClientCnxnSocket clientCnxnSocket,</span></span>
-<span class="hljs-function"><span class="hljs-params">        <span class="hljs-keyword">long</span> sessionId, <span class="hljs-keyword">byte</span>[] sessionPasswd, <span class="hljs-keyword">boolean</span> canBeReadOnly)</span> </span>&#123;
+<span class="hljs-params"><span class="hljs-function">        ClientWatchManager watcher, ClientCnxnSocket clientCnxnSocket,</span></span>
+<span class="hljs-params"><span class="hljs-function">        <span class="hljs-keyword">long</span> sessionId, <span class="hljs-keyword">byte</span>[] sessionPasswd, <span class="hljs-keyword">boolean</span> canBeReadOnly)</span> </span>&#123;
     <span class="hljs-keyword">this</span>.zooKeeper = zooKeeper;
     <span class="hljs-keyword">this</span>.watcher = watcher;
     <span class="hljs-keyword">this</span>.sessionId = sessionId;

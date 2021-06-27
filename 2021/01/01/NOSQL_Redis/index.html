@@ -551,7 +551,7 @@ zunionstore rank:last_week 7 rank:20150323 rank:20150324 rank:20150325  weights 
 <span class="hljs-meta">no-appendfsync-on-rewrite</span> <span class="hljs-string">no</span>
 <span class="hljs-comment">#如果AOF文件结尾损坏，Redis启动时是否仍载入AOF文件</span>
 <span class="hljs-meta">aof-load-truncated</span> <span class="hljs-string">yes</span>
-
+<span class="hljs-comment"></span>
 <span class="hljs-comment">#执行AOF重写时，文件的最小体积，默认值为64MB。文件重写触发条件之一</span>
 <span class="hljs-meta">auto-aof-rewrite-percentage</span> <span class="hljs-string">100</span>
 <span class="hljs-comment">#执行AOF重写时，当前AOF大小(即aof_current_size)和上一次重写时AOF大小(aof_base_size)的比值。文件重写触发条件之一</span>
@@ -629,7 +629,7 @@ zunionstore rank:last_week 7 rank:20150323 rank:20150324 rank:20150325  weights 
 <h3 id="Redis可实现功能"><a href="#Redis可实现功能" class="headerlink" title="Redis可实现功能"></a>Redis可实现功能</h3><h4 id="缓存"><a href="#缓存" class="headerlink" title="缓存"></a>缓存</h4><p>…</p>
 <h4 id="分布式锁"><a href="#分布式锁" class="headerlink" title="分布式锁"></a>分布式锁</h4><p><strong>加锁</strong></p>
 <pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">tryGetDistributedLock</span><span class="hljs-params">(</span></span>
-<span class="hljs-function"><span class="hljs-params">    String lockKey, String requestId, <span class="hljs-keyword">int</span> expireTime)</span> </span>&#123;
+<span class="hljs-params"><span class="hljs-function">    String lockKey, String requestId, <span class="hljs-keyword">int</span> expireTime)</span> </span>&#123;
 	String result = jedis.set(
         <span class="hljs-comment">// key， value为请求id 解锁还需要这个用这个id， setnx 不存在才set， 失效时间</span>
         lockKey, requestId, SET_IF_NOT_EXIST, SET_WITH_EXPIRE_TIME, expireTime);
@@ -1023,7 +1023,7 @@ b8e047aeacb9398c3f58f96d0602efbbea2078e2 192.168.0.107:6383 slave 5cd3ed3a84ead4
 &#125; clusterMsg;</code></pre>
 
 <p>消息体的源码：</p>
-<pre><code class="hljs plain">。。算了哥  下次一定</code></pre>
+<pre><code class="hljs">。。算了哥  下次一定</code></pre>
 
 <pre><code class="hljs c"><span class="hljs-comment">// https://github.com/redis/redis/blob/unstable/src/cluster.h </span>
 <span class="hljs-comment">// 特么太多了</span>

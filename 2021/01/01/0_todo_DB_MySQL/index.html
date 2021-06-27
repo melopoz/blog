@@ -397,10 +397,10 @@
 </blockquote>
 <pre><code class="hljs mysql">select d.Name Department, e.Name Employee, e.Salary Salary
 from Employee e left join Department d
-on e.DepartmentId &#x3D; d.Id
+on e.DepartmentId = d.Id
 where e.id in (
     select e1.Id from Employee e1 left join Employee e2 
-    on e1.DepartmentId &#x3D; e2.DepartmentId and e1.Salary &lt; e2.Salary
+    on e1.DepartmentId = e2.DepartmentId and e1.Salary &lt; e2.Salary
     group by e1.id
     having count(distinct e2.Salary) &lt; 3
 )
@@ -416,11 +416,11 @@ and e.DepartmentId in (select DepartmentId from Department)
 <p>应用：leetcode <a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/trips-and-users/">262. 行程和用</a></p>
 </blockquote>
 <pre><code class="hljs mysql">select Request_at as Day, 
-	round(count(if(Status !&#x3D; &#39;completed&#39;, Status, null)) &#x2F; count(Status) , 2) as &quot;Cancellation Rate&quot;
+	round(count(if(Status != &#x27;completed&#x27;, Status, null)) / count(Status) , 2) as &quot;Cancellation Rate&quot;
 from Trips t
-	inner join Users u on t.Client_id &#x3D; u.Users_id and u.Banned &#x3D; &quot;No&quot;
-	inner join Users u2 on t.Driver_id &#x3D; u2.Users_id and u2.Banned &#x3D; &quot;No&quot;
-and Request_at &lt; &quot;2013-10-04&quot; and Request_at &gt;&#x3D; &quot;2013-10-01&quot;
+	inner join Users u on t.Client_id = u.Users_id and u.Banned = &quot;No&quot;
+	inner join Users u2 on t.Driver_id = u2.Users_id and u2.Banned = &quot;No&quot;
+and Request_at &lt; &quot;2013-10-04&quot; and Request_at &gt;= &quot;2013-10-01&quot;
 group by Request_at</code></pre>
 
 
@@ -490,9 +490,9 @@ group by Request_at</code></pre>
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/blog/2021/04/18/0_todo_Java_JUC/">
+                      <a href="/blog/2021/06/27/%E6%9E%B6%E6%9E%84_%E7%BC%93%E5%AD%98%E7%9A%84%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">java.util.concurrent</span>
+                        <span class="hidden-mobile">缓存的数据一致性</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     

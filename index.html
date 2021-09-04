@@ -181,6 +181,60 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
+        <a href="/blog/2021/09/04/%E6%9E%B6%E6%9E%84_%E7%BC%93%E5%AD%98%E7%9A%84%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/">缓存的数据一致性</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/09/04/%E6%9E%B6%E6%9E%84_%E7%BC%93%E5%AD%98%E7%9A%84%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/">
+          
+          
+            
+          
+          背景现在很多项目都引入缓存以提高性能、降低数据库压力。举个例子（简单点说）就是 mysql + redis。
+实现的时候无非就是把数据库和缓存中的数据都更新。如果这是一个原子性操作，啥事没有…
+既然是两个操作，执行总会有先后（两个操作之间可能发生一些事情导致结果并不是你想看到的…没想到这些就是”有bug”，想到了就是”实现不了”）。
+也就是有如下几种更新策略：（无数据库锁、单机数据库）
+缓存的更新
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-09-04 19:33" pubdate>
+              2021-09-04
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/%E6%9E%B6%E6%9E%84/">架构</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+            
+              <a href="/blog/tags/%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/">数据一致性</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
         <a href="/blog/2021/09/04/0_todo_Java_JUC/">java.util.concurrent</a>
       </h1>
 
@@ -208,7 +262,7 @@ private final AtomicInteger ctl
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-09-04 19:01" pubdate>
+            <time datetime="2021-09-04 19:33" pubdate>
               2021-09-04
             </time>
           </div>
@@ -245,20 +299,20 @@ private final AtomicInteger ctl
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/blog/2021/09/04/%E6%9E%B6%E6%9E%84_%E7%BC%93%E5%AD%98%E7%9A%84%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/">缓存的数据一致性</a>
+        <a href="/blog/2021/09/04/other_Git%E5%8F%8C%E5%AF%86%E9%92%A5/">git双密钥</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/blog/2021/09/04/%E6%9E%B6%E6%9E%84_%E7%BC%93%E5%AD%98%E7%9A%84%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/">
+        <a href="/blog/2021/09/04/other_Git%E5%8F%8C%E5%AF%86%E9%92%A5/">
           
           
             
           
-          背景现在很多项目都引入缓存以提高性能、降低数据库压力。举个例子（简单点说）就是 mysql + redis。
-实现的时候无非就是把数据库和缓存中的数据都更新。如果这是一个原子性操作，啥事没有…
-既然是两个操作，执行总会有先后（两个操作之间可能发生一些事情导致结果并不是你想看到的…没想到这些就是”有bug”，想到了就是”实现不了”）。
-也就是有如下几种更新策略：（无数据库锁、单机数据库）
-缓存的更新
+          个人机器配置双秘钥登录github和企业gitlab
+个人电脑创建秘钥，并将公钥添加到github/gitlab
+
+生成密钥到指定路径：ssh-keygen -t rsa -C 1329340043@qq.com -f ~/.ssh/id_rsa_github
+将公钥添加到github/gitlab：cat ~/.ssh/id_rsa_github.pub，https://github.com/s
         </a>
       </p>
 
@@ -266,7 +320,7 @@ private final AtomicInteger ctl
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2021-09-04 19:01" pubdate>
+            <time datetime="2021-09-04 18:00" pubdate>
               2021-09-04
             </time>
           </div>
@@ -275,7 +329,7 @@ private final AtomicInteger ctl
           <div class="post-meta mr-3">
             <i class="iconfont icon-category"></i>
             
-              <a href="/blog/categories/%E6%9E%B6%E6%9E%84/">架构</a>
+              <a href="/blog/categories/other/">other</a>
             
           </div>
         
@@ -283,9 +337,7 @@ private final AtomicInteger ctl
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/blog/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
-            
-              <a href="/blog/tags/%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/">数据一致性</a>
+              <a href="/blog/tags/git%E5%8F%8C%E5%AF%86%E9%92%A5/">git双密钥</a>
             
           </div>
         
@@ -702,64 +754,6 @@ HTTP是应用层的协议，自己是此案
               <a href="/blog/tags/OSI/">OSI</a>
             
               <a href="/blog/tags/RPC/">RPC</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/01/01/1_redo_Java_%E5%AF%B9%E8%B1%A1%E9%80%83%E9%80%B8EA&%E9%94%81%E4%BC%98%E5%8C%96/">EA-对象逃逸</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/01/01/1_redo_Java_%E5%AF%B9%E8%B1%A1%E9%80%83%E9%80%B8EA&%E9%94%81%E4%BC%98%E5%8C%96/">
-          
-          
-            
-          
-          逃逸分析 Escape Analysis  简称 EAEA允许java编译器在多种情况下优化我们的代码。
-https://blog.csdn.net/wolfcode_cn/article/details/83058235
-对象逃逸 的 三种状态
-全局级别逃逸 全局逃逸状态
-
-一个对象可能从一个方法或当前线程中逃逸。
-
-如果一个对象被作为方法的返回值，
-
-作为类静态字段 static field
-
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-01-01 20:46" pubdate>
-              2021-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/Java/">Java</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/redo/">redo</a>
             
           </div>
         

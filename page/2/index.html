@@ -181,6 +181,62 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
+        <a href="/blog/2021/01/01/1_redo_%E6%9E%B6%E6%9E%84_%E5%B9%82%E7%AD%89%E6%80%A7%E8%AE%BE%E8%AE%A1/">幂等性设计</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/blog/2021/01/01/1_redo_%E6%9E%B6%E6%9E%84_%E5%B9%82%E7%AD%89%E6%80%A7%E8%AE%BE%E8%AE%A1/">
+          
+          
+            
+          
+          如何保证幂等性
+
+在数据库利用唯一索引。
+
+比如生成订单的时候，不能因为网络延迟而创建两次这个订单，所以可以根据这个订单的唯一id。
+第一个 insert 执行之后已经有了这个订单，下次 insert 的时候会报错，可以直接 try-catch 这个异常，在catch中 select by id 查询这个订单，查询到的结果也就是 insert 的期望结果了。
+
+
+不过要利用这个唯一索引的话，订单的
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-01-01 20:46" pubdate>
+              2021-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/blog/categories/%E6%9E%B6%E6%9E%84/">架构</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/redo/">redo</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
         <a href="/blog/2021/01/01/Basics_Git/">Git</a>
       </h1>
 
@@ -641,63 +697,6 @@ public class JVMShutdownHook &#123;
             
           </div>
         
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/blog/2021/01/01/MQ_Kafka/">Kafka</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/blog/2021/01/01/MQ_Kafka/">
-          
-          
-            
-          
-          整体架构
-
-通过 zookeeper 保存元数据，管理集群配置、选举Leader、Consumer Group发生变化时进行rebalance。
-
-
-TopicKafka是发布/订阅模式的消息队列，生产、消费消息，都是面向Topic的。
-
-另一种是点对点消息队列，即一条消息被一个消费者消费一次就没了
-
-Consumer Group一条消息可以发送到不同的Consumer Group，但一个Cons
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-01-01 20:46" pubdate>
-              2021-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/blog/categories/MQ/">MQ</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/redo/">redo</a>
-            
-          </div>
         
       </div>
     </article>

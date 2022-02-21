@@ -59,7 +59,7 @@
   </script>
   <script  src="/blog/js/utils.js" ></script>
   <script  src="/blog/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.1"></head>
 
 
 <body>
@@ -296,7 +296,7 @@ io-threads <span class="hljs-number">4</span> <span class="hljs-comment">#配置
 <p>以前是：</p>
 <pre><code class="hljs c"><span class="hljs-keyword">while</span>(<span class="hljs-literal">true</span>) &#123;
     epoll_wait(..关注的fd.)
-    <span class="hljs-keyword">for</span> (fd <span class="hljs-keyword">int</span> readyfd) &#123;
+    <span class="hljs-keyword">for</span> (fd <span class="hljs-type">int</span> readyfd) &#123;
         read(fd)
     &#125;
     push 到任务队列
@@ -306,7 +306,7 @@ io-threads <span class="hljs-number">4</span> <span class="hljs-comment">#配置
 <p>redis6是</p>
 <pre><code class="hljs c"><span class="hljs-keyword">while</span>(<span class="hljs-literal">true</span>) &#123;
     epoll_wait(..关注的fd.)
-    <span class="hljs-keyword">for</span> (fd <span class="hljs-keyword">int</span> readyfd) &#123;
+    <span class="hljs-keyword">for</span> (fd <span class="hljs-type">int</span> readyfd) &#123;
         把fd分配给等待队列的IO线程
     &#125;
     ...<span class="hljs-comment">// 阻塞 把等待队列中的IO读完的数据 解析并push到任务队列</span>
@@ -386,7 +386,7 @@ localhost:6379&gt; info persistence  #持久化信息
 <h3 id="数据类型-操作"><a href="#数据类型-操作" class="headerlink" title="数据类型-操作"></a>数据类型-操作</h3><h4 id="string"><a href="#string" class="headerlink" title="string"></a>string</h4><p><code>set</code>、<code>mset</code>、<code>get</code>、<code>mget</code>、<code>getset</code>、<code>strlen</code>、<code>incr</code>、<code>incrby</code>、<code>decr</code>、<code>decrby</code>（原子增量）</p>
 <h4 id="list"><a href="#list" class="headerlink" title="list"></a>list</h4><p><code>lpush</code>、<code>rpush</code>、<code>lpop</code>、<code>rpop</code>、<code>llen</code>  查看list中元素的个数</p>
 <blockquote>
-<pre><code class="hljs shell"><span class="hljs-meta">&gt;</span><span class="bash"> rpush mylist 1 2 3 4 5 <span class="hljs-string">&quot;foo bar&quot;</span></span>
+<pre><code class="hljs shell"><span class="hljs-meta">&gt; </span><span class="language-bash">rpush mylist 1 2 3 4 5 <span class="hljs-string">&quot;foo bar&quot;</span></span>
 (integer) 9</code></pre>
 </blockquote>
 <p><code>lrange [key] [indexStart] [indexEnd]</code> 遍历get</p>
@@ -548,14 +548,14 @@ zunionstore rank:last_week 7 rank:20150323 rank:20150324 rank:20150325  weights 
 <span class="hljs-comment">#fsync持久化策略</span>
 <span class="hljs-attr">appendfsync</span> <span class="hljs-string">everysec</span>
 <span class="hljs-comment">#AOF重写期间是否禁止fsync；如果开启该选项，可以减轻文件重写时CPU和硬盘的负载（尤其是硬盘），但是可能会丢失AOF重写期间的数据；需要在负载和安全性之间进行平衡</span>
-<span class="hljs-meta">no-appendfsync-on-rewrite</span> <span class="hljs-string">no</span>
+<span class="hljs-attr">no-appendfsync-on-rewrite</span> <span class="hljs-string">no</span>
 <span class="hljs-comment">#如果AOF文件结尾损坏，Redis启动时是否仍载入AOF文件</span>
-<span class="hljs-meta">aof-load-truncated</span> <span class="hljs-string">yes</span>
+<span class="hljs-attr">aof-load-truncated</span> <span class="hljs-string">yes</span>
 <span class="hljs-comment"></span>
 <span class="hljs-comment">#执行AOF重写时，文件的最小体积，默认值为64MB。文件重写触发条件之一</span>
-<span class="hljs-meta">auto-aof-rewrite-percentage</span> <span class="hljs-string">100</span>
+<span class="hljs-attr">auto-aof-rewrite-percentage</span> <span class="hljs-string">100</span>
 <span class="hljs-comment">#执行AOF重写时，当前AOF大小(即aof_current_size)和上一次重写时AOF大小(aof_base_size)的比值。文件重写触发条件之一</span>
-<span class="hljs-meta">auto-aof-rewrite-min-size</span> <span class="hljs-string">64mb</span>
+<span class="hljs-attr">auto-aof-rewrite-min-size</span> <span class="hljs-string">64mb</span>
 <span class="hljs-comment">#只有当auto-aof-rewrite-min-size和auto-aof-rewrite-percentage两个参数同时满足时，才会自动触发AOF重写，即bgrewriteaof操作。</span></code></pre>
 
 <hr>
@@ -585,13 +585,13 @@ zunionstore rank:last_week 7 rank:20150323 rank:20150324 rank:20150325  weights 
 <li><p>设置热点数据永不过期（因为大量请求说明可能是热点数据，但是要注意这个缓存key的更新策略，可能会影响到数据一致性，见另一篇笔记：<a href="https://melopoz.github.io/blog/2021/04/12/%E6%9E%B6%E6%9E%84_%E7%BC%93%E5%AD%98%E7%9A%84%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/">缓存的数据一致性</a>）。</p>
 </li>
 <li><p><strong>加锁</strong>。这里也就是靠谱一点的解决方案了。但是加锁又会导致性能问题，所以具体情况具体分析吧，折中处理。</p>
-<pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> V <span class="hljs-title">getData</span><span class="hljs-params">(K key)</span> <span class="hljs-keyword">throws</span> InterruptException </span>&#123;
-    V v = getDataFromCache(key);
-    <span class="hljs-keyword">if</span> (v == <span class="hljs-keyword">null</span>)&#123; <span class="hljs-comment">// cache未命中</span>
+<pre><code class="hljs java"><span class="hljs-keyword">public</span> V <span class="hljs-title function_">getData</span><span class="hljs-params">(K key)</span> <span class="hljs-keyword">throws</span> InterruptException &#123;
+    <span class="hljs-type">V</span> <span class="hljs-variable">v</span> <span class="hljs-operator">=</span> getDataFromCache(key);
+    <span class="hljs-keyword">if</span> (v == <span class="hljs-literal">null</span>)&#123; <span class="hljs-comment">// cache未命中</span>
         <span class="hljs-keyword">if</span> (reentrantLock.tryLock())&#123; <span class="hljs-comment">// 获取DB锁，如果能细化到key更好</span>
             <span class="hljs-keyword">try</span> &#123;
                 v = getDataFromDB(key);
-                <span class="hljs-keyword">if</span> (v != <span class="hljs-keyword">null</span>) &#123; <span class="hljs-comment">// DB中有数据</span>
+                <span class="hljs-keyword">if</span> (v != <span class="hljs-literal">null</span>) &#123; <span class="hljs-comment">// DB中有数据</span>
                     setDataToCache(key, v); <span class="hljs-comment">// 同步到cache </span>
                 &#125; <span class="hljs-keyword">else</span> &#123;
                     <span class="hljs-comment">//如果key不存在,并且请求也很多,都走这个同步可能服务超时,不同步可能会缓存穿透,可以在cache设置key=null,expires=30s.</span>
@@ -628,15 +628,15 @@ zunionstore rank:last_week 7 rank:20150323 rank:20150324 rank:20150325  weights 
 <hr>
 <h3 id="Redis可实现功能"><a href="#Redis可实现功能" class="headerlink" title="Redis可实现功能"></a>Redis可实现功能</h3><h4 id="缓存"><a href="#缓存" class="headerlink" title="缓存"></a>缓存</h4><p>…</p>
 <h4 id="分布式锁"><a href="#分布式锁" class="headerlink" title="分布式锁"></a>分布式锁</h4><p><strong>加锁</strong></p>
-<pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">tryGetDistributedLock</span><span class="hljs-params">(</span></span>
-<span class="hljs-params"><span class="hljs-function">    String lockKey, String requestId, <span class="hljs-keyword">int</span> expireTime)</span> </span>&#123;
-	String result = jedis.set(
+<pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">tryGetDistributedLock</span><span class="hljs-params">(</span>
+<span class="hljs-params">    String lockKey, String requestId, <span class="hljs-type">int</span> expireTime)</span> &#123;
+	<span class="hljs-type">String</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> jedis.set(
         <span class="hljs-comment">// key， value为请求id 解锁还需要这个用这个id， setnx 不存在才set， 失效时间</span>
         lockKey, requestId, SET_IF_NOT_EXIST, SET_WITH_EXPIRE_TIME, expireTime);
     <span class="hljs-keyword">if</span> (LOCK_SUCCESS.equals(result)) &#123;
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
     &#125;
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
 &#125;</code></pre>
 
 <p><strong>解锁</strong>：要注意不能释放别人的锁，所以需要CAS操作，这个操作需要利用lua脚本</p>
@@ -803,11 +803,11 @@ bin/redis-cli -h 192.168.0.110 -p 26379 info Sentinel</code></pre>
 </blockquote>
 <p>配置 redis.conf</p>
 <pre><code class="hljs properties"><span class="hljs-comment">#开启cluster模式</span>
-<span class="hljs-meta">cluster-enable</span> <span class="hljs-string">yes</span>
+<span class="hljs-attr">cluster-enable</span> <span class="hljs-string">yes</span>
 <span class="hljs-comment">#集群模式下的集群配置文件</span>
-<span class="hljs-meta">cluster-config-file</span> <span class="hljs-string">nodes-6379.conf</span>
+<span class="hljs-attr">cluster-config-file</span> <span class="hljs-string">nodes-6379.conf</span>
 <span class="hljs-comment">#集群内节点之间最长响应时间  默认15s 关系到集群节点通信占用的带宽</span>
-<span class="hljs-meta">cluster-node-timeout</span> <span class="hljs-string">15000</span>
+<span class="hljs-attr">cluster-node-timeout</span> <span class="hljs-string">15000</span>
 <span class="hljs-comment"># 还会在加一个端口号用来集群之间节点的通讯  6379+10000  16379</span></code></pre>
 
 <p>启动集群 (需要Ruby版本 &gt; 2.2)</p>
@@ -948,8 +948,8 @@ b8e047aeacb9398c3f58f96d0602efbbea2078e2 192.168.0.107:6383 slave 5cd3ed3a84ead4
 </ul>
 <blockquote>
 <p>redis计算槽的时候如果key的内容有<code>&#123;...&#125;</code>，会使用<code>&#123;&#125;</code>里边的内容，这里<code>...</code>称为<code>hash_tag</code>，可以让不同的key映射到相同的slot。</p>
-<pre><code class="hljs c"><span class="hljs-function">def <span class="hljs-title">key_hash_slot</span><span class="hljs-params">(key)</span>:</span>
-<span class="hljs-function">    <span class="hljs-keyword">int</span> keylen </span>= key.length();
+<pre><code class="hljs c">def <span class="hljs-title function_">key_hash_slot</span><span class="hljs-params">(key)</span>:
+    <span class="hljs-type">int</span> keylen = key.length();
     <span class="hljs-keyword">for</span> (s = <span class="hljs-number">0</span>; s &lt; keylen; s++):
         <span class="hljs-keyword">if</span> (key[s] == <span class="hljs-string">&#x27;&#123;&#x27;</span>):
             <span class="hljs-keyword">break</span>;
@@ -995,30 +995,30 @@ b8e047aeacb9398c3f58f96d0602efbbea2078e2 192.168.0.107:6383 slave 5cd3ed3a84ead4
 <p>再<code>考虑到负载均衡和扩展，槽位也不能太少</code>，折中考虑，作者决定取16384个槽</p>
 <p>消息头的源码：</p>
 <pre><code class="hljs c"><span class="hljs-comment">// https://github.com/redis/redis/blob/unstable/src/cluster.h</span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> CLUSTER_SLOTS 16384  <span class="hljs-comment">// 这里声明常量</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> CLUSTER_SLOTS 16384  <span class="hljs-comment">// 这里声明常量</span></span>
 <span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span>
-    <span class="hljs-keyword">char</span> sig[<span class="hljs-number">4</span>];        <span class="hljs-comment">/* Signature &quot;RCmb&quot; (Redis Cluster message bus). 消息总线*/</span>
-    <span class="hljs-keyword">uint32_t</span> totlen;    <span class="hljs-comment">/* Total length of this message 消息总长度*/</span>
-    <span class="hljs-keyword">uint16_t</span> ver;       <span class="hljs-comment">/* Protocol version, currently set to 1. 协议版本号*/</span>
-    <span class="hljs-keyword">uint16_t</span> port;      <span class="hljs-comment">/* TCP base port number. */</span>
-    <span class="hljs-keyword">uint16_t</span> type;      <span class="hljs-comment">/* Message type 消息类型：meet、ping、pong*/</span>
-    <span class="hljs-keyword">uint16_t</span> count;     <span class="hljs-comment">/* Only used for some kind of messages. 某些信息会用...*/</span>
-    <span class="hljs-keyword">uint64_t</span> currentEpoch;  <span class="hljs-comment">/* The epoch accordingly to the sending node. */</span>
-    <span class="hljs-keyword">uint64_t</span> configEpoch;   <span class="hljs-comment">/* The config epoch if it&#x27;s a master, or the last</span>
+    <span class="hljs-type">char</span> sig[<span class="hljs-number">4</span>];        <span class="hljs-comment">/* Signature &quot;RCmb&quot; (Redis Cluster message bus). 消息总线*/</span>
+    <span class="hljs-type">uint32_t</span> totlen;    <span class="hljs-comment">/* Total length of this message 消息总长度*/</span>
+    <span class="hljs-type">uint16_t</span> ver;       <span class="hljs-comment">/* Protocol version, currently set to 1. 协议版本号*/</span>
+    <span class="hljs-type">uint16_t</span> port;      <span class="hljs-comment">/* TCP base port number. */</span>
+    <span class="hljs-type">uint16_t</span> type;      <span class="hljs-comment">/* Message type 消息类型：meet、ping、pong*/</span>
+    <span class="hljs-type">uint16_t</span> count;     <span class="hljs-comment">/* Only used for some kind of messages. 某些信息会用...*/</span>
+    <span class="hljs-type">uint64_t</span> currentEpoch;  <span class="hljs-comment">/* The epoch accordingly to the sending node. */</span>
+    <span class="hljs-type">uint64_t</span> configEpoch;   <span class="hljs-comment">/* The config epoch if it&#x27;s a master, or the last</span>
 <span class="hljs-comment">                               epoch advertised by its master if it is a</span>
 <span class="hljs-comment">                               slave. */</span>
-    <span class="hljs-keyword">uint64_t</span> offset;    <span class="hljs-comment">/* Master replication offset if node is a master or 主节点的已复制偏移量 或</span>
+    <span class="hljs-type">uint64_t</span> offset;    <span class="hljs-comment">/* Master replication offset if node is a master or 主节点的已复制偏移量 或</span>
 <span class="hljs-comment">                           processed replication offset if node is a slave. 从节点已处理的复制偏移量 */</span>
-    <span class="hljs-keyword">char</span> sender[CLUSTER_NAMELEN]; <span class="hljs-comment">/* Name of the sender node 发送者name*/</span>
+    <span class="hljs-type">char</span> sender[CLUSTER_NAMELEN]; <span class="hljs-comment">/* Name of the sender node 发送者name*/</span>
     <span class="hljs-comment">// 这里这里这里！！！</span>
-    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">char</span> myslots[CLUSTER_SLOTS/<span class="hljs-number">8</span>]; <span class="hljs-comment">// 发送节点负责的slot，这个数组大小是16384/8=2048 byte，2kb</span>
-    <span class="hljs-keyword">char</span> slaveof[CLUSTER_NAMELEN];
-    <span class="hljs-keyword">char</span> myip[NET_IP_STR_LEN];    <span class="hljs-comment">/* Sender IP, if not all zeroed. 不全为0就是发送方的ip*/</span>
-    <span class="hljs-keyword">char</span> notused1[<span class="hljs-number">34</span>];  <span class="hljs-comment">/* 34 bytes reserved for future usage. 保留字节*/</span>
-    <span class="hljs-keyword">uint16_t</span> cport;      <span class="hljs-comment">/* Sender TCP cluster bus port 发送方tcp总线端口*/</span>
-    <span class="hljs-keyword">uint16_t</span> flags;      <span class="hljs-comment">/* Sender node flags 发送方的flags 这里这里这里！！！*/</span>
-    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">char</span> state; <span class="hljs-comment">/* Cluster state from the POV of the sender */</span>
-    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">char</span> mflags[<span class="hljs-number">3</span>]; <span class="hljs-comment">/* Message flags: CLUSTERMSG_FLAG[012]_... */</span>
+    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> myslots[CLUSTER_SLOTS/<span class="hljs-number">8</span>]; <span class="hljs-comment">// 发送节点负责的slot，这个数组大小是16384/8=2048 byte，2kb</span>
+    <span class="hljs-type">char</span> slaveof[CLUSTER_NAMELEN];
+    <span class="hljs-type">char</span> myip[NET_IP_STR_LEN];    <span class="hljs-comment">/* Sender IP, if not all zeroed. 不全为0就是发送方的ip*/</span>
+    <span class="hljs-type">char</span> notused1[<span class="hljs-number">34</span>];  <span class="hljs-comment">/* 34 bytes reserved for future usage. 保留字节*/</span>
+    <span class="hljs-type">uint16_t</span> cport;      <span class="hljs-comment">/* Sender TCP cluster bus port 发送方tcp总线端口*/</span>
+    <span class="hljs-type">uint16_t</span> flags;      <span class="hljs-comment">/* Sender node flags 发送方的flags 这里这里这里！！！*/</span>
+    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> state; <span class="hljs-comment">/* Cluster state from the POV of the sender */</span>
+    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> mflags[<span class="hljs-number">3</span>]; <span class="hljs-comment">/* Message flags: CLUSTERMSG_FLAG[012]_... */</span>
     <span class="hljs-class"><span class="hljs-keyword">union</span> <span class="hljs-title">clusterMsgData</span> <span class="hljs-title">data</span>;</span>
 &#125; clusterMsg;</code></pre>
 
@@ -1118,21 +1118,21 @@ clusterMsgData 消息体
 	    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span> 
 <span class="hljs-keyword">end</span></code></pre>
 
-<h5 id="java实现"><a href="#java实现" class="headerlink" title="java实现"></a>java实现</h5><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> Long lockReleaseOK = <span class="hljs-number">1L</span>;
+<h5 id="java实现"><a href="#java实现" class="headerlink" title="java实现"></a>java实现</h5><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Long</span> <span class="hljs-variable">lockReleaseOK</span> <span class="hljs-operator">=</span> <span class="hljs-number">1L</span>;
 <span class="hljs-comment">// lua脚本，用来释放分布式锁</span>
-<span class="hljs-keyword">static</span> String luaScript = <span class="hljs-string">&quot;if redis.call(&#x27;get&#x27;, KEYS[1]) == ARGV[1] then return redis.call(&#x27;del&#x27;,KEYS[1]) else return 0 end&quot;</span>;
+<span class="hljs-keyword">static</span> <span class="hljs-type">String</span> <span class="hljs-variable">luaScript</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;if redis.call(&#x27;get&#x27;, KEYS[1]) == ARGV[1] then return redis.call(&#x27;del&#x27;,KEYS[1]) else return 0 end&quot;</span>;
  
-<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">releaseLock</span><span class="hljs-params">(String key ,String lockValue)</span></span>&#123;
-	<span class="hljs-keyword">if</span>(key == <span class="hljs-keyword">null</span> || lockValue == <span class="hljs-keyword">null</span>) &#123;
-		<span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">releaseLock</span><span class="hljs-params">(String key ,String lockValue)</span>&#123;
+	<span class="hljs-keyword">if</span>(key == <span class="hljs-literal">null</span> || lockValue == <span class="hljs-literal">null</span>) &#123;
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
 	&#125;
 	<span class="hljs-keyword">try</span> &#123;
-		Jedis jedis = getJedisPool().getResource();
-		Object res =jedis.eval(luaScript,Collections.singletonList(key),Collections.singletonList(lockValue));
+		<span class="hljs-type">Jedis</span> <span class="hljs-variable">jedis</span> <span class="hljs-operator">=</span> getJedisPool().getResource();
+		<span class="hljs-type">Object</span> <span class="hljs-variable">res</span> <span class="hljs-operator">=</span>jedis.eval(luaScript,Collections.singletonList(key),Collections.singletonList(lockValue));
 		jedis.close();
-		<span class="hljs-keyword">return</span> res!=<span class="hljs-keyword">null</span> &amp;&amp; res.equals(lockReleaseOK);
+		<span class="hljs-keyword">return</span> res!=<span class="hljs-literal">null</span> &amp;&amp; res.equals(lockReleaseOK);
 	&#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;
-		<span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
 	&#125;
 &#125;</code></pre>
 
@@ -1143,13 +1143,13 @@ stringRedisTemplate.opsForValue().set(<span class="hljs-string">&quot;hashkey:ke
 
 <span class="hljs-comment">// api源码</span>
 <span class="hljs-meta">@Override</span>
-<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">set</span><span class="hljs-params">(K key, V value, <span class="hljs-keyword">long</span> offset)</span> </span>&#123;
-    <span class="hljs-keyword">byte</span>[] rawKey = rawKey(key);
-    <span class="hljs-keyword">byte</span>[] rawValue = rawValue(value);
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">set</span><span class="hljs-params">(K key, V value, <span class="hljs-type">long</span> offset)</span> &#123;
+    <span class="hljs-type">byte</span>[] rawKey = rawKey(key);
+    <span class="hljs-type">byte</span>[] rawValue = rawValue(value);
     execute(connection -&gt; &#123;
         connection.setRange(rawKey, rawValue, offset);<span class="hljs-comment">// 用指定的字符串覆盖给定key所储存的字符串值，覆盖的位置从偏移量offset开始</span>
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;
-    &#125;, <span class="hljs-keyword">true</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+    &#125;, <span class="hljs-literal">true</span>);
 &#125;
 
 <span class="hljs-comment">// 正确用法：（key, value, offset, timeout）</span>

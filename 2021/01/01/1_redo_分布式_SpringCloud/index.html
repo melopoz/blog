@@ -59,7 +59,7 @@
   </script>
   <script  src="/blog/js/utils.js" ></script>
   <script  src="/blog/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.1"></head>
 
 
 <body>
@@ -296,8 +296,8 @@
 <p>启动类</p>
 <pre><code class="hljs java"><span class="hljs-meta">@SpringBootApplication</span>
 <span class="hljs-meta">@EnableEurekaServer</span>
-<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EurekaServer</span> </span>&#123;
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">EurekaServer</span> &#123;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;
         SpringApplication.run(EurekaServer.class, args);
     &#125;
 &#125;
@@ -350,8 +350,8 @@
 <span class="hljs-comment">//...其他注解</span>
 <span class="hljs-meta">@EnableEurekaClient</span> <span class="hljs-comment">//eureka client</span>
 <span class="hljs-meta">@EnableDiscoveryClient</span> <span class="hljs-comment">//完善注册中心的信息</span>
-<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ApiApplication</span> </span>&#123;
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ApiApplication</span> &#123;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;
         SpringApplication.run(ApiApplication.class, args);
     &#125;
 &#125;</code></pre>
@@ -408,8 +408,8 @@
 <p>启动类</p>
 <pre><code class="hljs java"><span class="hljs-meta">@SpringBootApplication</span>
 <span class="hljs-meta">@EnableEurekaClient</span>
-<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FrontApplication1</span> </span>&#123;
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">FrontApplication1</span> &#123;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;
         SpringApplication.run(FrontApplication1.class, args);
     &#125;
 &#125;
@@ -417,23 +417,23 @@
 
 <p>config</p>
 <pre><code class="hljs java"><span class="hljs-meta">@Configuration</span>
-<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Beans</span> </span>&#123;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Beans</span> &#123;
     <span class="hljs-meta">@Bean</span>
     <span class="hljs-meta">@LoadBalanced</span><span class="hljs-comment">//负载均衡的restTemplate</span>
-    <span class="hljs-function">RestTemplate <span class="hljs-title">restTemplate</span><span class="hljs-params">()</span> </span>&#123;
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> RestTemplate();
+    RestTemplate <span class="hljs-title function_">restTemplate</span><span class="hljs-params">()</span> &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RestTemplate</span>();
     &#125;
 &#125;</code></pre>
 
 <p>controller</p>
 <pre><code class="hljs java"><span class="hljs-comment">// PLAYERAPI 是Eureka中的服务的Application的名称  </span>
-<span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String baseUrl = <span class="hljs-string">&quot;http://PLAYERAPI/player&quot;</span>;
+<span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">baseUrl</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;http://PLAYERAPI/player&quot;</span>;
 
    <span class="hljs-meta">@Autowired</span>
    <span class="hljs-keyword">private</span> RestTemplate restTemplate;
 
    <span class="hljs-meta">@GetMapping(&quot;/list&quot;)</span>
-   <span class="hljs-function"><span class="hljs-keyword">public</span> List <span class="hljs-title">list</span><span class="hljs-params">()</span> </span>&#123;
+   <span class="hljs-keyword">public</span> List <span class="hljs-title function_">list</span><span class="hljs-params">()</span> &#123;
        <span class="hljs-keyword">return</span> restTemplate.getForObject(baseUrl + <span class="hljs-string">&quot;/list&quot;</span>, List.class);
    &#125;</code></pre>
 
@@ -462,13 +462,13 @@
 <p>commons项目 service包</p>
 <pre><code class="hljs java"><span class="hljs-meta">@Component</span>
 <span class="hljs-meta">@FeignClient(value = &quot;PLAYERAPI&quot;, fallbackFactory = FrontPlayerServiceFallbackFactory.class)</span>
-<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">FrontPlayerService</span> </span>&#123;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">FrontPlayerService</span> &#123;
     <span class="hljs-meta">@GetMapping(&quot;/player/list&quot;)</span>
-    <span class="hljs-function">List&lt;Player&gt; <span class="hljs-title">list</span><span class="hljs-params">()</span></span>;
+    List&lt;Player&gt; <span class="hljs-title function_">list</span><span class="hljs-params">()</span>;
     <span class="hljs-meta">@GetMapping(&quot;/player/&#123;id&#125;&quot;)</span><span class="hljs-comment">//在Service中必须有value=，不然报错</span>
-    <span class="hljs-function">Player <span class="hljs-title">getById</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable(value = &quot;id&quot;)</span> Long id)</span></span>;
+    Player <span class="hljs-title function_">getById</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable(value = &quot;id&quot;)</span> Long id)</span>;
     <span class="hljs-meta">@GetMapping(&quot;/player/test&quot;)</span>
-    <span class="hljs-function">Player <span class="hljs-title">test</span><span class="hljs-params">()</span></span>;
+    Player <span class="hljs-title function_">test</span><span class="hljs-params">()</span>;
 &#125;</code></pre>
 
 <p>feignFront项目 依赖</p>
@@ -499,19 +499,19 @@
 <p>controller</p>
 <pre><code class="hljs java"><span class="hljs-meta">@RestController</span>
 <span class="hljs-meta">@RequestMapping(&quot;/player&quot;)</span>
-<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PlayerController</span> </span>&#123;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">PlayerController</span> &#123;
     <span class="hljs-meta">@Autowired</span>
     <span class="hljs-keyword">private</span> FrontPlayerService frontPlayerService; <span class="hljs-comment">//直接注入commons项目中的service</span>
     <span class="hljs-meta">@GetMapping(&quot;/list&quot;)</span>
-    <span class="hljs-function"><span class="hljs-keyword">public</span> List <span class="hljs-title">list</span><span class="hljs-params">()</span> </span>&#123;
+    <span class="hljs-keyword">public</span> List <span class="hljs-title function_">list</span><span class="hljs-params">()</span> &#123;
         <span class="hljs-keyword">return</span> frontPlayerService.list();
     &#125;
     <span class="hljs-meta">@GetMapping(&quot;/&#123;id&#125;&quot;)</span><span class="hljs-comment">//@PathVariable在Service接口中必须有value=</span>
-    <span class="hljs-function"><span class="hljs-keyword">public</span> Player <span class="hljs-title">getById</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> Long id)</span> </span>&#123;
+    <span class="hljs-keyword">public</span> Player <span class="hljs-title function_">getById</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> Long id)</span> &#123;
         <span class="hljs-keyword">return</span> frontPlayerService.getById(id);
     &#125;
     <span class="hljs-meta">@GetMapping(&quot;/test&quot;)</span>
-    <span class="hljs-function"><span class="hljs-keyword">public</span> Player <span class="hljs-title">test</span><span class="hljs-params">()</span> </span>&#123;
+    <span class="hljs-keyword">public</span> Player <span class="hljs-title function_">test</span><span class="hljs-params">()</span> &#123;
         <span class="hljs-keyword">return</span> frontPlayerService.test();
     &#125;
 &#125;</code></pre>
@@ -522,11 +522,11 @@
 <p>在前端项目(consumer)实现负载均衡</p>
 </blockquote>
 <pre><code class="hljs java"><span class="hljs-meta">@Configuration</span>
-<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Beans</span> </span>&#123;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Beans</span> &#123;
     <span class="hljs-meta">@Bean</span>
     <span class="hljs-meta">@LoadBalanced</span><span class="hljs-comment">//负载均衡的restTemplate</span>
-    <span class="hljs-function">RestTemplate <span class="hljs-title">restTemplate</span><span class="hljs-params">()</span> </span>&#123;
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> RestTemplate();
+    RestTemplate <span class="hljs-title function_">restTemplate</span><span class="hljs-params">()</span> &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RestTemplate</span>();
     &#125;
 &#125;</code></pre>
 
@@ -556,17 +556,17 @@
    	<span class="hljs-comment">// 模拟服务调用异常，熔断</span>
     <span class="hljs-meta">@HystrixCommand(fallbackMethod = &quot;hystrixGetById&quot;)</span> <span class="hljs-comment">// 熔断后调用的方法</span>
     <span class="hljs-meta">@GetMapping(&quot;/&#123;id&#125;&quot;)</span>
-    <span class="hljs-function"><span class="hljs-keyword">public</span> Player <span class="hljs-title">getById</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> Long id)</span> </span>&#123;
-        Player player = playerService.getById(id);
-        <span class="hljs-keyword">if</span> (player == <span class="hljs-keyword">null</span>) &#123;
+    <span class="hljs-keyword">public</span> Player <span class="hljs-title function_">getById</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> Long id)</span> &#123;
+        <span class="hljs-type">Player</span> <span class="hljs-variable">player</span> <span class="hljs-operator">=</span> playerService.getById(id);
+        <span class="hljs-keyword">if</span> (player == <span class="hljs-literal">null</span>) &#123;
             System.out.println(<span class="hljs-string">&quot;throw exception...&quot;</span>);
-            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;不存在id为&quot;</span> + id + <span class="hljs-string">&quot;的Player数据&quot;</span>);
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(<span class="hljs-string">&quot;不存在id为&quot;</span> + id + <span class="hljs-string">&quot;的Player数据&quot;</span>);
         &#125;
         <span class="hljs-keyword">return</span> player;
     &#125;
-    <span class="hljs-function"><span class="hljs-keyword">public</span> Player <span class="hljs-title">hystrixGetById</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> Long id)</span> </span>&#123;
+    <span class="hljs-keyword">public</span> Player <span class="hljs-title function_">hystrixGetById</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> Long id)</span> &#123;
         System.out.println(<span class="hljs-string">&quot;hystrixGetById()...&quot;</span>);
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Player().setId(id);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Player</span>().setId(id);
     &#125;
     <span class="hljs-comment">// ...</span>
     <span class="hljs-comment">//模拟服务调用超时，降级</span>
@@ -581,9 +581,9 @@
 <span class="hljs-meta">      fallbackMethod = &quot;listFallbackMethod4Timeout&quot;</span>
 <span class="hljs-meta">    )</span>
     <span class="hljs-meta">@GetMapping(&quot;/list&quot;)</span>
-    <span class="hljs-function"><span class="hljs-keyword">public</span> List&lt;Player&gt; <span class="hljs-title">list</span><span class="hljs-params">()</span> </span>&#123;
+    <span class="hljs-keyword">public</span> List&lt;Player&gt; <span class="hljs-title function_">list</span><span class="hljs-params">()</span> &#123;
         <span class="hljs-keyword">try</span> &#123;
-            <span class="hljs-keyword">int</span> ms = <span class="hljs-keyword">new</span> Random().nextInt(<span class="hljs-number">5</span>);
+            <span class="hljs-type">int</span> <span class="hljs-variable">ms</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Random</span>().nextInt(<span class="hljs-number">5</span>);
             System.out.println(<span class="hljs-string">&quot;休眠&quot;</span> + ms + <span class="hljs-string">&quot;s&quot;</span>);
             Thread.sleep(ms * <span class="hljs-number">1000</span>);
         &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;
@@ -591,9 +591,9 @@
         &#125;
         <span class="hljs-keyword">return</span> playerService.list();
     &#125;
-    <span class="hljs-function"><span class="hljs-keyword">public</span> List&lt;Player&gt; <span class="hljs-title">listFallbackMethod4Timeout</span><span class="hljs-params">()</span> </span>&#123;
+    <span class="hljs-keyword">public</span> List&lt;Player&gt; <span class="hljs-title function_">listFallbackMethod4Timeout</span><span class="hljs-params">()</span> &#123;
         System.out.println(<span class="hljs-string">&quot;listFallbackMethod4Timeout()...list调用超时了&quot;</span>);
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> ArrayList&lt;Player&gt;();
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;Player&gt;();
     &#125;
 &#125;</code></pre>
 </blockquote>
@@ -607,36 +607,36 @@
 <span class="hljs-meta">@FeignClient(value = &quot;PLAYERAPI&quot;, </span>
 <span class="hljs-meta">             // 加入fallback处理</span>
 <span class="hljs-meta">             fallbackFactory = FrontPlayerServiceFallbackFactory.class)</span>
-<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">FrontPlayerService</span> </span>&#123;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">FrontPlayerService</span> &#123;
 
     <span class="hljs-meta">@GetMapping(&quot;/player/list&quot;)</span>
-    <span class="hljs-function">List&lt;Player&gt; <span class="hljs-title">list</span><span class="hljs-params">()</span></span>;
+    List&lt;Player&gt; <span class="hljs-title function_">list</span><span class="hljs-params">()</span>;
 
     <span class="hljs-meta">@GetMapping(&quot;/player/&#123;id&#125;&quot;)</span><span class="hljs-comment">//在Service中必须有value=，不然报错</span>
-    <span class="hljs-function">Player <span class="hljs-title">getById</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable(value = &quot;id&quot;)</span> Long id)</span></span>;
+    Player <span class="hljs-title function_">getById</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable(value = &quot;id&quot;)</span> Long id)</span>;
 
     <span class="hljs-meta">@GetMapping(&quot;/player/test&quot;)</span>
-    <span class="hljs-function">Player <span class="hljs-title">test</span><span class="hljs-params">()</span></span>;
+    Player <span class="hljs-title function_">test</span><span class="hljs-params">()</span>;
 &#125;</code></pre>
 
 <p>config.fallbackFactory</p>
 <pre><code class="hljs java"><span class="hljs-meta">@Component</span>
-<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FrontPlayerServiceFallbackFactory</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">FallbackFactory</span> </span>&#123;
-    <span class="hljs-function"><span class="hljs-keyword">public</span> FrontPlayerService <span class="hljs-title">create</span><span class="hljs-params">(Throwable throwable)</span> </span>&#123;
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> FrontPlayerService() &#123;
-            <span class="hljs-function"><span class="hljs-keyword">public</span> List&lt;Player&gt; <span class="hljs-title">list</span><span class="hljs-params">()</span> </span>&#123;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">FrontPlayerServiceFallbackFactory</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">FallbackFactory</span> &#123;
+    <span class="hljs-keyword">public</span> FrontPlayerService <span class="hljs-title function_">create</span><span class="hljs-params">(Throwable throwable)</span> &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">FrontPlayerService</span>() &#123;
+            <span class="hljs-keyword">public</span> List&lt;Player&gt; <span class="hljs-title function_">list</span><span class="hljs-params">()</span> &#123;
                 System.out.println(<span class="hljs-string">&quot;服务降级...list()...&quot;</span>);
-                <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> ArrayList&lt;Player&gt;();
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;Player&gt;();
             &#125;
 
-            <span class="hljs-function"><span class="hljs-keyword">public</span> Player <span class="hljs-title">getById</span><span class="hljs-params">(Long id)</span> </span>&#123;
+            <span class="hljs-keyword">public</span> Player <span class="hljs-title function_">getById</span><span class="hljs-params">(Long id)</span> &#123;
                 System.out.println(<span class="hljs-string">&quot;服务降级...getById()...&quot;</span>);
-                <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Player().setId(id);
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Player</span>().setId(id);
             &#125;
 
-            <span class="hljs-function"><span class="hljs-keyword">public</span> Player <span class="hljs-title">test</span><span class="hljs-params">()</span> </span>&#123;
+            <span class="hljs-keyword">public</span> Player <span class="hljs-title function_">test</span><span class="hljs-params">()</span> &#123;
                 System.out.println(<span class="hljs-string">&quot;服务降级...test()...&quot;</span>);
-                <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Player();
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Player</span>();
             &#125;
         &#125;;
     &#125;
@@ -675,14 +675,14 @@
 <span class="hljs-meta">@EnableEurekaClient</span>
 <span class="hljs-meta">@EnableDiscoveryClient</span>
 <span class="hljs-meta">@EnableCircuitBreaker</span><span class="hljs-comment">//hystix  开启熔断机制</span>
-<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HystrixApiApplication</span> </span>&#123;
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">HystrixApiApplication</span> &#123;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;
         SpringApplication.run(HystrixApiApplication.class, args);
     &#125;
 
     <span class="hljs-meta">@Bean</span>
-    <span class="hljs-function"><span class="hljs-keyword">public</span> ServletRegistrationBean <span class="hljs-title">hystrixMetricsStreamServlet</span><span class="hljs-params">()</span> </span>&#123;
-        ServletRegistrationBean registrationBean = <span class="hljs-keyword">new</span> ServletRegistrationBean(<span class="hljs-keyword">new</span> HystrixMetricsStreamServlet());
+    <span class="hljs-keyword">public</span> ServletRegistrationBean <span class="hljs-title function_">hystrixMetricsStreamServlet</span><span class="hljs-params">()</span> &#123;
+        <span class="hljs-type">ServletRegistrationBean</span> <span class="hljs-variable">registrationBean</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ServletRegistrationBean</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">HystrixMetricsStreamServlet</span>());
         registrationBean.addUrlMappings(<span class="hljs-string">&quot;/hystrix.stream&quot;</span>);
         <span class="hljs-keyword">return</span> registrationBean;
     &#125;
@@ -694,8 +694,8 @@
 <li><p>创建启动类</p>
 <pre><code class="hljs java"><span class="hljs-meta">@SpringBootApplication</span>
 <span class="hljs-meta">@EnableHystrixDashboard</span>
-<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DashBordApplication</span> </span>&#123;
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">DashBordApplication</span> &#123;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;
         SpringApplication.run(DashBordApplication.class, args);
     &#125;
 &#125;</code></pre>
@@ -721,8 +721,8 @@
 <li><p>启动类</p>
 <pre><code class="hljs java"><span class="hljs-meta">@SpringBootApplication</span>
 <span class="hljs-meta">@EnableZuulProxy</span> <span class="hljs-comment">//使用zuul网关</span>
-<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ZuulGatewayApplication</span> </span>&#123;
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ZuulGatewayApplication</span> &#123;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;
         SpringApplication.run(ZuulGatewayApplication.class, args);
     &#125;
 &#125;

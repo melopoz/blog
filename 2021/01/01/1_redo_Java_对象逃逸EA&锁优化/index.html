@@ -59,7 +59,7 @@
   </script>
   <script  src="/blog/js/utils.js" ></script>
   <script  src="/blog/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.1"></head>
 
 
 <body>
@@ -285,14 +285,14 @@
 <p>如果在方法的参数中就传入承载计算结果的容器，在把这个方法计算的结果存入该参数，不用设置该大对象为返回值。</p>
 <blockquote>
 <p>例如</p>
-<pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">private</span> Object <span class="hljs-title">doSomething</span><span class="hljs-params">(Object arg1, Object arg2)</span></span>&#123;
+<pre><code class="hljs java"><span class="hljs-keyword">private</span> Object <span class="hljs-title function_">doSomething</span><span class="hljs-params">(Object arg1, Object arg2)</span>&#123;
 	<span class="hljs-comment">//do something...</span>
-	Object result = <span class="hljs-keyword">new</span> Object();
+	<span class="hljs-type">Object</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>();
 	<span class="hljs-keyword">return</span> result;
 &#125;;</code></pre>
 
 <p>改为</p>
-<pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">doSomething</span><span class="hljs-params">(Object arg1, Object arg2, Object result)</span></span>&#123;&#125;;</code></pre>
+<pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">doSomething</span><span class="hljs-params">(Object arg1, Object arg2, Object result)</span>&#123;&#125;;</code></pre>
 </blockquote>
 <p>就不会有全局对象逃逸，参数级别逃逸就可能去掉同步锁，可以提高并发性能。</p>
 <p>在一个线程中的一串任务中如果都使用这种方式，就可能节省堆空间，降低gc的压力。提高程序的性能。</p>

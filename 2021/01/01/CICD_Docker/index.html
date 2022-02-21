@@ -59,7 +59,7 @@
   </script>
   <script  src="/blog/js/utils.js" ></script>
   <script  src="/blog/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.1"></head>
 
 
 <body>
@@ -271,25 +271,25 @@
 <pre><code class="hljs dockerfile"><span class="hljs-comment"># MAINTAINER：维护员，一般写个人id或组织id</span>
 <span class="hljs-comment"># LABEL 就是注释，纯注释。方便阅读的，纯注释说明。不会对Dockerfile造成任何影响</span>
 <span class="hljs-keyword">MAINTAINER</span> melopoz.com
-<span class="hljs-keyword">LABEL</span><span class="bash"> version = <span class="hljs-string">&quot;1.0.0&quot;</span></span>
-<span class="hljs-keyword">LABEL</span><span class="bash"> description = <span class="hljs-string">&quot;my project&quot;</span></span></code></pre>
+<span class="hljs-keyword">LABEL</span><span class="language-bash"> version = <span class="hljs-string">&quot;1.0.0&quot;</span></span>
+<span class="hljs-keyword">LABEL</span><span class="language-bash"> description = <span class="hljs-string">&quot;my project&quot;</span></span></code></pre>
 </li>
 <li><p>WORKDIR</p>
 <pre><code class="hljs dockerfile"><span class="hljs-comment"># 类似Linux的cd。不同点是如果没有这个目录，WORKDIR就创建</span>
-<span class="hljs-keyword">WORKDIR</span><span class="bash"> /usr/<span class="hljs-built_in">local</span>/mpdir</span></code></pre>
+<span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /usr/local/mpdir</span></code></pre>
 </li>
 <li><p>ADD &amp; COPY</p>
 <pre><code class="hljs dockerfile"><span class="hljs-comment"># COPY 拷贝文件到镜像的某个路径下</span>
-<span class="hljs-keyword">COPY</span><span class="bash"> test1.txt /usr/<span class="hljs-built_in">local</span>/mpdir/<span class="hljs-built_in">test</span></span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> test1.txt /usr/local/mpdir/test</span>
 <span class="hljs-comment"># 拷贝所有 abc 开头的文件到testdir目录下</span>
-<span class="hljs-keyword">COPY</span><span class="bash"> abc* /testdir/</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> abc* /testdir/</span>
 <span class="hljs-comment"># ? 是单个字符的占位符，比如匹配文件 abc1.log</span>
-<span class="hljs-keyword">COPY</span><span class="bash"> abc?.<span class="hljs-built_in">log</span> /testdir/</span></code></pre>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> abc?.<span class="hljs-built_in">log</span> /testdir/</span></code></pre>
 
 <pre><code class="hljs dockerfile"><span class="hljs-comment"># 拷贝文件到镜像的某个路径下，如果路径不存在则创建</span>
-<span class="hljs-keyword">ADD</span><span class="bash"> test1.txt /usr/<span class="hljs-built_in">local</span>/mpdir/test1</span>
+<span class="hljs-keyword">ADD</span><span class="language-bash"> test1.txt /usr/local/mpdir/test1</span>
 <span class="hljs-comment"># 如果ADD的是tar.gz则将解压缩的内容拷贝到镜像的某个路径下</span>
-<span class="hljs-keyword">ADD</span><span class="bash"> test1.tar.gz /usr/<span class="hljs-built_in">local</span>/mpdir/test1</span></code></pre>
+<span class="hljs-keyword">ADD</span><span class="language-bash"> test1.tar.gz /usr/local/mpdir/test1</span></code></pre>
 
 <p>如果是从远程复制文件，尽量使用curl、wget代替ADD。因为ADD会创建更多镜像层。</p>
 </li>
@@ -299,26 +299,26 @@
 </li>
 <li><p>RUN &amp; CMD &amp; ENTRYPOINT</p>
 <pre><code class="hljs dockerfile"><span class="hljs-comment"># RUN 在构建镜像时运行，可以修改镜像内部的文件, 有两种命令格式</span>
-<span class="hljs-keyword">RUN</span><span class="bash"> [<span class="hljs-string">&quot;echo&quot;</span>, <span class="hljs-string">&quot;image is building...&quot;</span>]</span></code></pre>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> [<span class="hljs-string">&quot;echo&quot;</span>, <span class="hljs-string">&quot;image is building...&quot;</span>]</span></code></pre>
 
 <blockquote>
 <ul>
 <li>SHELL 命令格式 生成一个子shell进程去执行脚本，执行完退出子进程，回到父进程</li>
 </ul>
-<pre><code class="hljs dockerfile"><span class="hljs-keyword">RUN</span><span class="bash"> yum -y install vim</span></code></pre>
+<pre><code class="hljs dockerfile"><span class="hljs-keyword">RUN</span><span class="language-bash"> yum -y install vim</span></code></pre>
 
 <ul>
 <li>EXEC 命令格式 用exec进程替换当前进程，保持PID不变，执行完退出，且不会退回原来的进程</li>
 </ul>
-<pre><code class="hljs dockerfile"><span class="hljs-keyword">RUN</span><span class="bash"> [<span class="hljs-string">&quot;yum&quot;</span>, <span class="hljs-string">&quot;-y&quot;</span>, <span class="hljs-string">&quot;install&quot;</span>, <span class="hljs-string">&quot;vim&quot;</span>]</span></code></pre>
+<pre><code class="hljs dockerfile"><span class="hljs-keyword">RUN</span><span class="language-bash"> [<span class="hljs-string">&quot;yum&quot;</span>, <span class="hljs-string">&quot;-y&quot;</span>, <span class="hljs-string">&quot;install&quot;</span>, <span class="hljs-string">&quot;vim&quot;</span>]</span></code></pre>
 
 <p>shell会创建子进程执行，EXEC不会创建子进程。<strong>推荐使用EXEC进程</strong>。</p>
 </blockquote>
 <pre><code class="hljs dockerfile"><span class="hljs-comment"># CMD 在容器启动时执行,如果启动时有其他额外命令，则CMD命令不生效。</span>
-<span class="hljs-keyword">CMD</span><span class="bash"> [<span class="hljs-string">&quot;echo&quot;</span>, <span class="hljs-string">&quot;container starting...&quot;</span>]</span></code></pre>
+<span class="hljs-keyword">CMD</span><span class="language-bash"> [<span class="hljs-string">&quot;echo&quot;</span>, <span class="hljs-string">&quot;container starting...&quot;</span>]</span></code></pre>
 
 <pre><code class="hljs dockerfile"><span class="hljs-comment"># ENTRYPOINT 在容器创建时执行，且Dockerfile中只有最后一个ENTRYPOINT会被执行</span>
-<span class="hljs-keyword">ENTRYPOINT</span><span class="bash"> [<span class="hljs-string">&quot;ps&quot;</span>, <span class="hljs-string">&quot;-ef&quot;</span>]</span></code></pre>
+<span class="hljs-keyword">ENTRYPOINT</span><span class="language-bash"> [<span class="hljs-string">&quot;ps&quot;</span>, <span class="hljs-string">&quot;-ef&quot;</span>]</span></code></pre>
 
 
 
@@ -395,16 +395,16 @@ docker commit <span class="hljs-regexp">//</span>提交容器副本使之成为�
     -q <span class="hljs-regexp">//</span>静默模式，只显示容器编号(可用于批量关闭容器)
     --no-trunc <span class="hljs-regexp">//</span> 不截断输出</code></pre>
 <h5 id="停止容器"><a href="#停止容器" class="headerlink" title="停止容器"></a>停止容器</h5><pre><code class="hljs isbl"><span class="hljs-variable">docker</span> <span class="hljs-variable">stop</span> 容器<span class="hljs-function"><span class="hljs-title">id</span>(或容器名)</span></code></pre>
-<h5 id="强制停止容器"><a href="#强制停止容器" class="headerlink" title="强制停止容器"></a>强制停止容器</h5><pre><code class="hljs isbl"><span class="hljs-variable">docker</span> <span class="hljs-variable">kill</span> 容器<span class="hljs-function"><span class="hljs-title">id</span>(或容器名)</span></code></pre>
-<h5 id="删除已停止容器"><a href="#删除已停止容器" class="headerlink" title="删除已停止容器"></a>删除已停止容器</h5><pre><code class="hljs powershell">docker <span class="hljs-built_in">rm</span> <span class="hljs-operator">-f</span> 容器id
-docker <span class="hljs-built_in">rm</span> 容器id(或容器名)
-    <span class="hljs-operator">-f</span> // 关闭并删除</code></pre>
+<h5 id="强制停止容器"><a href="#强制停止容器" class="headerlink" title="强制停止容器"></a>强制停止容器</h5><pre><code class="hljs bash">docker <span class="hljs-built_in">kill</span> 容器<span class="hljs-built_in">id</span>(或容器名)</code></pre>
+<h5 id="删除已停止容器"><a href="#删除已停止容器" class="headerlink" title="删除已停止容器"></a>删除已停止容器</h5><pre><code class="hljs bash">docker <span class="hljs-built_in">rm</span> -f 容器<span class="hljs-built_in">id</span>
+docker <span class="hljs-built_in">rm</span> 容器<span class="hljs-built_in">id</span>(或容器名)
+    -f // 关闭并删除</code></pre>
 <h5 id="删除多个容器"><a href="#删除多个容器" class="headerlink" title="删除多个容器"></a>删除多个容器</h5><pre><code class="hljs powershell">docker <span class="hljs-built_in">rm</span> <span class="hljs-operator">-f</span> <span class="hljs-variable">$</span>(docker <span class="hljs-built_in">ps</span> <span class="hljs-literal">-a</span> <span class="hljs-literal">-q</span>) 或者 docker <span class="hljs-built_in">ps</span> <span class="hljs-literal">-a</span> <span class="hljs-literal">-q</span> | xargs docker <span class="hljs-built_in">rm</span></code></pre>
 <h5 id="退出容器"><a href="#退出容器" class="headerlink" title="退出容器"></a>退出容器</h5><pre><code class="hljs awk"><span class="hljs-keyword">exit</span> <span class="hljs-regexp">//</span> 容器停止退出
 ctrl+P+Q <span class="hljs-regexp">//</span> 不停止容器退出</code></pre>
 <h5 id="重新进入正在运行的容器"><a href="#重新进入正在运行的容器" class="headerlink" title="重新进入正在运行的容器"></a>重新进入正在运行的容器</h5><pre><code class="hljs arduino">docker attach 容器id  <span class="hljs-comment">// 直接进入容器启动命令的终端，不会启动新进程</span></code></pre>
-<h5 id="在容器内执行命令"><a href="#在容器内执行命令" class="headerlink" title="在容器内执行命令"></a>在容器内执行命令</h5><pre><code class="hljs mel">docker <span class="hljs-keyword">exec</span> -t 容器id 命令 <span class="hljs-comment">// 在容器中打开新终端，并且可以启动新进程</span>
-    比如sentos容器：docker <span class="hljs-keyword">exec</span> -t centosiID <span class="hljs-keyword">ls</span> -l /tmp  <span class="hljs-comment">//就会返回该容器的tmp目录</span></code></pre>
+<h5 id="在容器内执行命令"><a href="#在容器内执行命令" class="headerlink" title="在容器内执行命令"></a>在容器内执行命令</h5><pre><code class="hljs bash">docker <span class="hljs-built_in">exec</span> -t 容器<span class="hljs-built_in">id</span> 命令 // 在容器中打开新终端，并且可以启动新进程
+    比如sentos容器：docker <span class="hljs-built_in">exec</span> -t centosiID <span class="hljs-built_in">ls</span> -l /tmp  //就会返回该容器的tmp目录</code></pre>
 <h5 id="查看日志"><a href="#查看日志" class="headerlink" title="查看日志"></a>查看日志</h5><pre><code>docker logs 容器id
     -t // 显示日志打印的时间
     -f // =tail -f 
@@ -423,21 +423,21 @@ docker cp centosID:/容器内文件路径 /目的路径
 dockerfile不能创建host的本地目录来实现数据卷，只能创建一个/多个容器内数据卷。</code></pre>
 <p>创建dockerfile（touch /mydocker/Dockerfile）</p>
 <pre><code class="hljs dockerfile"><span class="hljs-keyword">FROM</span> centos
-<span class="hljs-keyword">VOLUME</span><span class="bash"> [<span class="hljs-string">&quot;/dataVolumeContainer1&quot;</span>,<span class="hljs-string">&quot;/dataVolumeContainer2&quot;</span>]</span>
-<span class="hljs-keyword">CMD</span><span class="bash"> <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;finished,--------success1&quot;</span></span>
-<span class="hljs-keyword">CMD</span><span class="bash"> /bin/bash</span></code></pre>
+<span class="hljs-keyword">VOLUME</span><span class="language-bash"> [<span class="hljs-string">&quot;/dataVolumeContainer1&quot;</span>,<span class="hljs-string">&quot;/dataVolumeContainer2&quot;</span>]</span>
+<span class="hljs-keyword">CMD</span><span class="language-bash"> <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;finished,--------success1&quot;</span></span>
+<span class="hljs-keyword">CMD</span><span class="language-bash"> /bin/bash</span></code></pre>
 <p>创建dockerfile   单独例2</p>
-<pre><code class="hljs jboss-cli">FORM java<span class="hljs-function">:8</span> <span class="hljs-string">//</span>依赖java8
-EXPOSE 8080 <span class="hljs-string">//</span>暴露8080端口
+<pre><code class="hljs dockerfile">FORM java:<span class="hljs-number">8</span> //依赖java8
+<span class="hljs-keyword">EXPOSE</span> <span class="hljs-number">8080</span> //暴露<span class="hljs-number">8080</span>端口
 
-VOLUME <span class="hljs-string">/tmp</span> <span class="hljs-string">//</span>
+<span class="hljs-keyword">VOLUME</span><span class="language-bash"> /tmp //</span>
 
-ENV TZ=Asia/Shanghai
-RUN ln -sf <span class="hljs-string">/usr/share/zoneinfo/</span>&#123;TZ&#125; <span class="hljs-string">/etc/localtime</span> &amp;&amp; <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;&#123;TZ&#125;&quot;</span> &gt; <span class="hljs-string">/etc/timezone</span>
+<span class="hljs-keyword">ENV</span> TZ=Asia/Shanghai
+<span class="hljs-keyword">RUN</span><span class="language-bash"> <span class="hljs-built_in">ln</span> -sf /usr/share/zoneinfo/&#123;TZ&#125; /etc/localtime &amp;&amp; <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;&#123;TZ&#125;&quot;</span> &gt; /etc/timezone</span>
 
-ADD hims-0.0.1-SNAPSHOT.jar <span class="hljs-string">/app.jar</span> <span class="hljs-string">//</span>将项目jar包添加到容器并设置别名为app.jar
-RUN bash -c &#x27;touch <span class="hljs-string">/app.jar</span>&#x27;
-ENTRYPOINT [<span class="hljs-string">&quot;java&quot;</span>,<span class="hljs-string">&quot;-jar&quot;</span>,<span class="hljs-string">&quot;/app.jar&quot;</span>] <span class="hljs-string">//</span> 启动命令为 java -jar app.jar</code></pre>
+<span class="hljs-keyword">ADD</span><span class="language-bash"> hims-0.0.1-SNAPSHOT.jar /app.jar //将项目jar包添加到容器并设置别名为app.jar</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> bash -c <span class="hljs-string">&#x27;touch /app.jar&#x27;</span></span>
+<span class="hljs-keyword">ENTRYPOINT</span><span class="language-bash"> [<span class="hljs-string">&quot;java&quot;</span>,<span class="hljs-string">&quot;-jar&quot;</span>,<span class="hljs-string">&quot;/app.jar&quot;</span>] // 启动命令为 java -jar app.jar</span></code></pre>
 <p>构建镜像</p>
 <pre><code class="hljs awk">docker build -f <span class="hljs-regexp">/mydocker/</span>Dockerfile -t melopoz/centos</code></pre>
 <p>创建容器并运行</p>
@@ -450,8 +450,8 @@ ENTRYPOINT [<span class="hljs-string">&quot;java&quot;</span>,<span class="hljs-
 <h2 id="镜像分层-概念"><a href="#镜像分层-概念" class="headerlink" title="镜像分层 概念"></a>镜像分层 概念</h2><p>以tomcat镜像为例</p>
 <pre><code class="hljs dockerfile"><span class="hljs-keyword">FROM</span> tomcat:latest
 <span class="hljs-keyword">MAINTAINER</span> melopoz.com
-<span class="hljs-keyword">WORKDIR</span><span class="bash"> /usr/<span class="hljs-built_in">local</span>/tomcat/webapps</span>
-<span class="hljs-keyword">ADD</span><span class="bash"> helloworld ./helloworld</span></code></pre>
+<span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /usr/local/tomcat/webapps</span>
+<span class="hljs-keyword">ADD</span><span class="language-bash"> helloworld ./helloworld</span></code></pre>
 
 <p>Dockerfile内容4行，执行过程也是4行：</p>
 <pre><code class="hljs gradle">Sending build context to Docker daemon <span class="hljs-number">3.584</span>kB
@@ -470,9 +470,9 @@ Successfully tagged melopoz.com/test-helloworld:<span class="hljs-number">1.0</s
 <p>将Dockerfile中的内容改为</p>
 <pre><code class="hljs dockerfile"><span class="hljs-keyword">FROM</span> tomcat:latest
 <span class="hljs-keyword">MAINTAINER</span> melopoz.com
-<span class="hljs-keyword">WORKDIR</span><span class="bash"> /usr/<span class="hljs-built_in">local</span>/tomcat/webapps</span>
-<span class="hljs-keyword">ADD</span><span class="bash"> helloworld ./helloworld</span>
-<span class="hljs-keyword">ADD</span><span class="bash"> helloworld ./helloworld2 <span class="hljs-comment">#多部署一份helloworld到容器的helloworld2目录</span></span></code></pre>
+<span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /usr/local/tomcat/webapps</span>
+<span class="hljs-keyword">ADD</span><span class="language-bash"> helloworld ./helloworld</span>
+<span class="hljs-keyword">ADD</span><span class="language-bash"> helloworld ./helloworld2 <span class="hljs-comment">#多部署一份helloworld到容器的helloworld2目录</span></span></code></pre>
 
 <p>再次build之后输出为：</p>
 <pre><code class="hljs ada">Step <span class="hljs-number">1</span>/<span class="hljs-number">4</span> : <span class="hljs-type">FROM</span> tomcat:latest
@@ -500,13 +500,13 @@ Successfully <span class="hljs-keyword">tagged</span> melopoz.com/test-helloworl
 -e MYSQL_ROOT_PASSWORD=<span class="hljs-number">123456</span>
 -d mysql:<span class="hljs-number">5.7</span>
 <span class="hljs-regexp">//</span> 指定配置文件 容器名 后台运行 。。</code></pre>
-<h3 id="进入容器"><a href="#进入容器" class="headerlink" title="进入容器"></a>进入容器</h3><pre><code class="hljs python">docker <span class="hljs-built_in">exec</span> -it 容器<span class="hljs-built_in">id</span> /<span class="hljs-built_in">bin</span>/bash
+<h3 id="进入容器"><a href="#进入容器" class="headerlink" title="进入容器"></a>进入容器</h3><pre><code class="hljs bash">docker <span class="hljs-built_in">exec</span> -it 容器<span class="hljs-built_in">id</span> /bin/bash
 mysql -uroot -p
 输入密码</code></pre>
 <h3 id="数据备份"><a href="#数据备份" class="headerlink" title="数据备份"></a>数据备份</h3><p>在docker宿主机终端</p>
-<pre><code class="hljs haskell"><span class="hljs-title">docker</span> exec mysql容器id sh -<span class="hljs-type">C</span> &#x27;
-<span class="hljs-title">exec</span> mysqldump <span class="hljs-comment">--all-databases -uroot -p&quot;123456&quot;</span>
-&#x27; &gt; /<span class="hljs-class"><span class="hljs-keyword">data</span>/docker_mysql_data/all-databases.sql</span></code></pre>
+<pre><code class="hljs bash">docker <span class="hljs-built_in">exec</span> mysql容器<span class="hljs-built_in">id</span> sh -C <span class="hljs-string">&#x27;</span>
+<span class="hljs-string">exec mysqldump --all-databases -uroot -p&quot;123456&quot;</span>
+<span class="hljs-string">&#x27;</span> &gt; /data/docker_mysql_data/all-databases.sql</code></pre>
 
 
 <h2 id="Docker-redis"><a href="#Docker-redis" class="headerlink" title="Docker   redis"></a>Docker   redis</h2><h3 id="启动-这是是在创建容器的时候就启动了redis-server，也可以之后使用exec启动"><a href="#启动-这是是在创建容器的时候就启动了redis-server，也可以之后使用exec启动" class="headerlink" title="启动 这是是在创建容器的时候就启动了redis-server，也可以之后使用exec启动"></a>启动 这是是在创建容器的时候就启动了redis-server，也可以之后使用exec启动</h3><pre><code class="hljs awk">docker run -p <span class="hljs-number">6379</span>:<span class="hljs-number">6379</span>
@@ -524,7 +524,7 @@ docker commit -a melopoz -m <span class="hljs-string">&quot;centos1.3 to 1.4 wit
 <h5 id="推送到云仓库"><a href="#推送到云仓库" class="headerlink" title="推送到云仓库"></a>推送到云仓库</h5><h6 id="阿里云-容器镜像服务"><a href="#阿里云-容器镜像服务" class="headerlink" title="阿里云-容器镜像服务"></a>阿里云-容器镜像服务</h6><ol>
 <li>创建镜像仓库(需要命名空间)</li>
 <li>阿里云给了推送命令 复制即可<pre><code class="hljs stylus"><span class="hljs-comment">//将镜像推送到Registry</span>
-sudo docker login --username=xxx registry<span class="hljs-selector-class">.cn-beijing</span><span class="hljs-selector-class">.aliyuncs</span><span class="hljs-selector-class">.com</span>
+sudo docker login <span class="hljs-attr">--username</span>=xxx registry<span class="hljs-selector-class">.cn-beijing</span><span class="hljs-selector-class">.aliyuncs</span><span class="hljs-selector-class">.com</span>
 <span class="hljs-comment">// 输入密码</span>
 sudo docker tag <span class="hljs-selector-attr">[ImageId]</span> registry<span class="hljs-selector-class">.cn-beijing</span><span class="hljs-selector-class">.aliyuncs</span>.com/命名空间/仓库名:<span class="hljs-selector-attr">[镜像版本号]</span>
 sudo docker push registry<span class="hljs-selector-class">.cn-beijing</span><span class="hljs-selector-class">.aliyuncs</span>.com/xx/xx:<span class="hljs-selector-attr">[镜像版本号]</span>

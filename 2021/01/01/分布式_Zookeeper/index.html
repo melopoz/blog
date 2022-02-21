@@ -59,7 +59,7 @@
   </script>
   <script  src="/blog/js/utils.js" ></script>
   <script  src="/blog/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.1"></head>
 
 
 <body>
@@ -326,18 +326,18 @@
 <p><code>FinalRequestProcessor#processRequest(request)</code> 调用 <code>statNode(path, watcher)</code>，statNode 调用 <code>addWatch(path, watcher)</code>。</p>
 <blockquote>
 <pre><code class="hljs java"><span class="hljs-comment">//保存 watch 事件</span>
-<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title">addWatch</span><span class="hljs-params">(String path, Watcher watcher)</span> </span>&#123;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">addWatch</span><span class="hljs-params">(String path, Watcher watcher)</span> &#123;
     HashSet&lt;Watcher&gt; list = watchTable.get(path);
-    <span class="hljs-keyword">if</span> (list == <span class="hljs-keyword">null</span>) &#123;
-        list = <span class="hljs-keyword">new</span> HashSet&lt;Watcher&gt;(<span class="hljs-number">4</span>);
+    <span class="hljs-keyword">if</span> (list == <span class="hljs-literal">null</span>) &#123;
+        list = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashSet</span>&lt;Watcher&gt;(<span class="hljs-number">4</span>);
         watchTable.put(path, list);
     &#125;
     list.add(watcher);
 
     HashSet&lt;String&gt; paths = watch2Paths.get(watcher);
-    <span class="hljs-keyword">if</span> (paths == <span class="hljs-keyword">null</span>) &#123;
+    <span class="hljs-keyword">if</span> (paths == <span class="hljs-literal">null</span>) &#123;
         <span class="hljs-comment">// cnxns typically have many watches, so use default cap here</span>
-        paths = <span class="hljs-keyword">new</span> HashSet&lt;String&gt;();
+        paths = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashSet</span>&lt;String&gt;();
         watch2Paths.put(watcher, paths);
     &#125;
     paths.add(path);
@@ -377,14 +377,14 @@
 </ol>
 <h4 id="watch触发"><a href="#watch触发" class="headerlink" title="watch触发"></a>watch触发</h4><p>上述步骤的<strong>2.3</strong>之后，client还是会进入 <code>doIO()</code> ，然后 <code>readResponse()</code> 且 <code>xid=-1</code>，解析出Event，调用<code>queueEvent(WatchEvent event)</code></p>
 <blockquote>
-<pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">queueEvent</span><span class="hljs-params">(WatchedEvent event)</span> </span>&#123;
+<pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">queueEvent</span><span class="hljs-params">(WatchedEvent event)</span> &#123;
     <span class="hljs-keyword">if</span> (event.getType() == EventType.None &amp;&amp; sessionState == event.getState()) &#123;
         <span class="hljs-keyword">return</span>;
     &#125;
     sessionState = event.getState();
     <span class="hljs-comment">// materialize the watchers based on the event</span>
     <span class="hljs-comment">// 封装 WatcherSetEventPair 对象，添加到 waitngEvents 队列中</span>
-    WatcherSetEventPair pair = <span class="hljs-keyword">new</span> WatcherSetEventPair(
+    <span class="hljs-type">WatcherSetEventPair</span> <span class="hljs-variable">pair</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">WatcherSetEventPair</span>(
         watcher.materialize(event.getState(), event.getType(),
                             event.getPath()), event);
     waitingEvents.add(pair); <span class="hljs-comment">// 添加到队列 等待事件被处理</span>
@@ -423,24 +423,24 @@
 </li>
 </ul>
 <p>client初始化时（<code>new Zookeeper（args) &#123;new ClientCnxn(args).start();&#125;</code>）就会启动这两个线程：<strong>sendThread</strong> 和 <strong>eventThead</strong>。</p>
-<pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ClientCnxn</span><span class="hljs-params">(String chrootPath, HostProvider hostProvider, <span class="hljs-keyword">int</span> sessionTimeout, ZooKeeper zooKeeper,</span></span>
-<span class="hljs-params"><span class="hljs-function">        ClientWatchManager watcher, ClientCnxnSocket clientCnxnSocket,</span></span>
-<span class="hljs-params"><span class="hljs-function">        <span class="hljs-keyword">long</span> sessionId, <span class="hljs-keyword">byte</span>[] sessionPasswd, <span class="hljs-keyword">boolean</span> canBeReadOnly)</span> </span>&#123;
-    <span class="hljs-keyword">this</span>.zooKeeper = zooKeeper;
-    <span class="hljs-keyword">this</span>.watcher = watcher;
-    <span class="hljs-keyword">this</span>.sessionId = sessionId;
-    <span class="hljs-keyword">this</span>.sessionPasswd = sessionPasswd;
-    <span class="hljs-keyword">this</span>.sessionTimeout = sessionTimeout;<span class="hljs-comment">//会话超时</span>
-    <span class="hljs-keyword">this</span>.hostProvider = hostProvider;
-    <span class="hljs-keyword">this</span>.chrootPath = chrootPath;
+<pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-title function_">ClientCnxn</span><span class="hljs-params">(String chrootPath, HostProvider hostProvider, <span class="hljs-type">int</span> sessionTimeout, ZooKeeper zooKeeper,</span>
+<span class="hljs-params">        ClientWatchManager watcher, ClientCnxnSocket clientCnxnSocket,</span>
+<span class="hljs-params">        <span class="hljs-type">long</span> sessionId, <span class="hljs-type">byte</span>[] sessionPasswd, <span class="hljs-type">boolean</span> canBeReadOnly)</span> &#123;
+    <span class="hljs-built_in">this</span>.zooKeeper = zooKeeper;
+    <span class="hljs-built_in">this</span>.watcher = watcher;
+    <span class="hljs-built_in">this</span>.sessionId = sessionId;
+    <span class="hljs-built_in">this</span>.sessionPasswd = sessionPasswd;
+    <span class="hljs-built_in">this</span>.sessionTimeout = sessionTimeout;<span class="hljs-comment">//会话超时</span>
+    <span class="hljs-built_in">this</span>.hostProvider = hostProvider;
+    <span class="hljs-built_in">this</span>.chrootPath = chrootPath;
     connectTimeout = sessionTimeout / hostProvider.size();<span class="hljs-comment">// 连接超时</span>
     readTimeout = sessionTimeout * <span class="hljs-number">2</span> / <span class="hljs-number">3</span>; <span class="hljs-comment">//超时</span>
     readOnly = canBeReadOnly;
-    sendThread = <span class="hljs-keyword">new</span> SendThread(clientCnxnSocket);<span class="hljs-comment">// 新建了一个发送线程</span>
-    eventThread = <span class="hljs-keyword">new</span> EventThread();<span class="hljs-comment">// 处理watcher回调event的线程</span>
+    sendThread = <span class="hljs-keyword">new</span> <span class="hljs-title class_">SendThread</span>(clientCnxnSocket);<span class="hljs-comment">// 新建了一个发送线程</span>
+    eventThread = <span class="hljs-keyword">new</span> <span class="hljs-title class_">EventThread</span>();<span class="hljs-comment">// 处理watcher回调event的线程</span>
 &#125;
 <span class="hljs-comment">//启动两个线程</span>
-<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">start</span><span class="hljs-params">()</span> </span>&#123;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">start</span><span class="hljs-params">()</span> &#123;
     sendThread.start();
     eventThread.start();
 &#125;</code></pre>
@@ -565,12 +565,12 @@
 <pre><code class="hljs sh">bin/zkServer.sh start/restart/stop/status  <span class="hljs-comment"># 启动/重启/停止/查看状态</span>
 bin/zkCli.sh 				<span class="hljs-comment">#连接zk服务  -server host:port</span>
 
-ls / 					<span class="hljs-comment">#查看根目录下的内容</span>
+<span class="hljs-built_in">ls</span> / 					<span class="hljs-comment">#查看根目录下的内容</span>
 ls2 / 					<span class="hljs-comment">#查看根目录下的内容和更新次数等具体信息</span>
-create /<span class="hljs-built_in">test</span> <span class="hljs-string">&quot;info1&quot;</span> 	<span class="hljs-comment">#创建一个新的znode节点，和关联的字符串</span>
-get /<span class="hljs-built_in">test</span>
-<span class="hljs-built_in">set</span> /<span class="hljs-built_in">test</span> <span class="hljs-string">&quot;info-update&quot;</span>
-delete /<span class="hljs-built_in">test</span> 			<span class="hljs-comment">#删除节点</span>
+create /test <span class="hljs-string">&quot;info1&quot;</span> 	<span class="hljs-comment">#创建一个新的znode节点，和关联的字符串</span>
+get /test
+<span class="hljs-built_in">set</span> /test <span class="hljs-string">&quot;info-update&quot;</span>
+delete /test 			<span class="hljs-comment">#删除节点</span>
 quit 					<span class="hljs-comment">#退出客户端</span>
 
 <span class="hljs-comment">#nc命令用来设置路由器</span>

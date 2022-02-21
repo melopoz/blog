@@ -59,7 +59,7 @@
   </script>
   <script  src="/blog/js/utils.js" ></script>
   <script  src="/blog/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.1"></head>
 
 
 <body>
@@ -228,10 +228,10 @@
             
             <div class="markdown-body">
               <h2 id="Shutdown-Hook"><a href="#Shutdown-Hook" class="headerlink" title="Shutdown Hook"></a>Shutdown Hook</h2><p>System.getRuntime().addShutdownHook(Thread thread);</p>
-<pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">JVMShutdownHook</span> </span>&#123;
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> InterruptedException </span>&#123;
+<pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">JVMShutdownHook</span> &#123;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> InterruptedException &#123;
         <span class="hljs-comment">//hook</span>
-        Runtime.getRuntime().addShutdownHook(<span class="hljs-keyword">new</span> Thread(()-&gt;&#123;
+        Runtime.getRuntime().addShutdownHook(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(()-&gt;&#123;
             System.out.println(<span class="hljs-string">&quot;jvm要关闭了&quot;</span>);
             <span class="hljs-keyword">try</span> &#123;
                 TimeUnit.SECONDS.sleep(<span class="hljs-number">3</span>);
@@ -241,7 +241,7 @@
             System.out.println(<span class="hljs-string">&quot;拜拜&quot;</span>);
         &#125;));
 
-        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">5</span>; i++) &#123;
+        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">5</span>; i++) &#123;
             System.out.println(i);
             <span class="hljs-keyword">if</span> (i == <span class="hljs-number">3</span>)&#123;
                 System.exit(<span class="hljs-number">0</span>);

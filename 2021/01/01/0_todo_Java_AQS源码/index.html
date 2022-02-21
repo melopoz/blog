@@ -59,7 +59,7 @@
   </script>
   <script  src="/blog/js/utils.js" ></script>
   <script  src="/blog/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.1"></head>
 
 
 <body>
@@ -273,31 +273,31 @@
 <p>java同步机制的底层支持(1.6及以上)：<a href="#LockSupport">LockSupport</a></p>
 </blockquote>
 <h1 id="Exclusive独占模式"><a href="#Exclusive独占模式" class="headerlink" title="Exclusive独占模式"></a>Exclusive独占模式</h1><h2 id="加锁"><a href="#加锁" class="headerlink" title="加锁"></a>加锁</h2><h3 id="acquire-int-arg"><a href="#acquire-int-arg" class="headerlink" title="acquire(int arg)"></a>acquire(int arg)</h3><p>独占式获取锁</p>
-<pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">void</span> <span class="hljs-title">acquire</span><span class="hljs-params">(<span class="hljs-keyword">int</span> arg)</span> </span>&#123;
+<pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">acquire</span><span class="hljs-params">(<span class="hljs-type">int</span> arg)</span> &#123;
     <span class="hljs-keyword">if</span> (!tryAcquire(arg) &amp;&amp; 				<span class="hljs-comment">// 如果尝试拿锁成功 直接return  没拿到就入队然后阻塞直到获取到锁</span>
         acquireQueued(addWaiter(Node.EXCLUSIVE), arg))<span class="hljs-comment">// 如果尝试拿锁失败，就以独占模式入队</span>
         selfInterrupt();<span class="hljs-comment">// currentThread.interrupt(); </span>
     <span class="hljs-comment">// 调用interrupt()是因为acquireQueued(...)方法可能判断过线程是否被中断，用的是isInterrupted()方法，会清除中断标识，acquireQueued(...)的返回值就代表了线程是否被中断过，所以这里根据这个返回值决定是否需要补充currentThread的中断标识</span>
 &#125;</code></pre>
 
-<h4 id="acquireQueued-…-独占模式入队并阻塞获取锁"><a href="#acquireQueued-…-独占模式入队并阻塞获取锁" class="headerlink" title="acquireQueued(…) 独占模式入队并阻塞获取锁"></a>acquireQueued(…) 独占模式入队并阻塞获取锁</h4><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">final</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">acquireQueued</span><span class="hljs-params">(<span class="hljs-keyword">final</span> Node node, <span class="hljs-keyword">int</span> arg)</span> </span>&#123;
+<h4 id="acquireQueued-…-独占模式入队并阻塞获取锁"><a href="#acquireQueued-…-独占模式入队并阻塞获取锁" class="headerlink" title="acquireQueued(…) 独占模式入队并阻塞获取锁"></a>acquireQueued(…) 独占模式入队并阻塞获取锁</h4><pre><code class="hljs java"><span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">acquireQueued</span><span class="hljs-params">(<span class="hljs-keyword">final</span> Node node, <span class="hljs-type">int</span> arg)</span> &#123;
     <span class="hljs-comment">//标记是否成功拿到资源，默认false</span>
-    <span class="hljs-keyword">boolean</span> failed = <span class="hljs-keyword">true</span>;
+    <span class="hljs-type">boolean</span> <span class="hljs-variable">failed</span> <span class="hljs-operator">=</span> <span class="hljs-literal">true</span>;
     <span class="hljs-keyword">try</span> &#123;
-        <span class="hljs-keyword">boolean</span> interrupted = <span class="hljs-keyword">false</span>;<span class="hljs-comment">//标记等待过程中是否被中断过</span>
+        <span class="hljs-type">boolean</span> <span class="hljs-variable">interrupted</span> <span class="hljs-operator">=</span> <span class="hljs-literal">false</span>;<span class="hljs-comment">//标记等待过程中是否被中断过</span>
         <span class="hljs-keyword">for</span> (;;) &#123;
-            <span class="hljs-keyword">final</span> Node p = node.predecessor();<span class="hljs-comment">// 相当于 p = node.prev  判断了prev是不是null</span>
+            <span class="hljs-keyword">final</span> <span class="hljs-type">Node</span> <span class="hljs-variable">p</span> <span class="hljs-operator">=</span> node.predecessor();<span class="hljs-comment">// 相当于 p = node.prev  判断了prev是不是null</span>
             <span class="hljs-comment">// 如果当前节点是头节点 且 尝试获取锁成功 就return</span>
             <span class="hljs-keyword">if</span> (p == head &amp;&amp; tryAcquire(arg)) &#123;<span class="hljs-comment">// node.prev == head 并且 try=true</span>
                 setHead(node);<span class="hljs-comment">// 清理引用： head = node; node.thread = null; node.prev = null;</span>
-                p.next = <span class="hljs-keyword">null</span>; <span class="hljs-comment">// help GC</span>
-                failed = <span class="hljs-keyword">false</span>;
+                p.next = <span class="hljs-literal">null</span>; <span class="hljs-comment">// help GC</span>
+                failed = <span class="hljs-literal">false</span>;
                 <span class="hljs-keyword">return</span> interrupted;<span class="hljs-comment">// return false 表示没有中断, acquire()会直接return</span>
             &#125;
             <span class="hljs-comment">// 如果上边try失败了就检查当前线程是否应该park(),如果需要 就检查当前线程是否被中断了（会清空中断标识，然后继续自旋，所以说是不可被中断的，说的就是acquireQueued(...)这个方法！ 只能是最后将原本的中断标识返回出去，由acquire()方法在设置上当前线程的中断标识）</span>
             <span class="hljs-keyword">if</span> (shouldParkAfterFailedAcquire(p, node) &amp;&amp; <span class="hljs-comment">// 检查当前线程是否需要park()</span>
                 parkAndCheckInterrupt())
-                interrupted = <span class="hljs-keyword">true</span>;
+                interrupted = <span class="hljs-literal">true</span>;
         &#125;
     &#125; <span class="hljs-keyword">finally</span> &#123;
         <span class="hljs-keyword">if</span> (failed)
@@ -306,11 +306,11 @@
 &#125;</code></pre>
 
 <p>值得一提的是：<code>Condition#await()</code>的调用链中的一环——<code>doAcquireSharedInterruptibly()</code>的大致逻辑也是这样！</p>
-<h5 id="addWaiter-node-将当前线程包装成node入队-将curNode通过自旋置为tail"><a href="#addWaiter-node-将当前线程包装成node入队-将curNode通过自旋置为tail" class="headerlink" title="addWaiter(node)将当前线程包装成node入队  将curNode通过自旋置为tail"></a>addWaiter(node)将当前线程包装成node入队  将curNode通过自旋置为tail</h5><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">private</span> Node <span class="hljs-title">addWaiter</span><span class="hljs-params">(Node mode)</span> </span>&#123;
-    Node node = <span class="hljs-keyword">new</span> Node(Thread.currentThread(), mode);
+<h5 id="addWaiter-node-将当前线程包装成node入队-将curNode通过自旋置为tail"><a href="#addWaiter-node-将当前线程包装成node入队-将curNode通过自旋置为tail" class="headerlink" title="addWaiter(node)将当前线程包装成node入队  将curNode通过自旋置为tail"></a>addWaiter(node)将当前线程包装成node入队  将curNode通过自旋置为tail</h5><pre><code class="hljs java"><span class="hljs-keyword">private</span> Node <span class="hljs-title function_">addWaiter</span><span class="hljs-params">(Node mode)</span> &#123;
+    <span class="hljs-type">Node</span> <span class="hljs-variable">node</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Node</span>(Thread.currentThread(), mode);
     <span class="hljs-comment">// Try the fast path of enq; backup to full enq on failure</span>
-    Node pred = tail;
-    <span class="hljs-keyword">if</span> (pred != <span class="hljs-keyword">null</span>) &#123;
+    <span class="hljs-type">Node</span> <span class="hljs-variable">pred</span> <span class="hljs-operator">=</span> tail;
+    <span class="hljs-keyword">if</span> (pred != <span class="hljs-literal">null</span>) &#123;
         node.prev = pred;
         <span class="hljs-keyword">if</span> (compareAndSetTail(pred, node)) &#123;
             pred.next = node;
@@ -323,11 +323,11 @@
 &#125;
 
 <span class="hljs-comment">// enq(node) 将node置为tail</span>
-<span class="hljs-function"><span class="hljs-keyword">private</span> Node <span class="hljs-title">enq</span><span class="hljs-params">(<span class="hljs-keyword">final</span> Node node)</span> </span>&#123;
+<span class="hljs-keyword">private</span> Node <span class="hljs-title function_">enq</span><span class="hljs-params">(<span class="hljs-keyword">final</span> Node node)</span> &#123;
     <span class="hljs-keyword">for</span> (;;) &#123;			<span class="hljs-comment">// 自旋                1</span>
-        Node t = tail;
-        <span class="hljs-keyword">if</span> (t == <span class="hljs-keyword">null</span>) &#123; <span class="hljs-comment">// Must initialize  必须初始化，因为发现队列没有初始化才调用的enq()，这里再验证一下</span>
-            <span class="hljs-keyword">if</span> (compareAndSetHead(<span class="hljs-keyword">new</span> Node()))
+        <span class="hljs-type">Node</span> <span class="hljs-variable">t</span> <span class="hljs-operator">=</span> tail;
+        <span class="hljs-keyword">if</span> (t == <span class="hljs-literal">null</span>) &#123; <span class="hljs-comment">// Must initialize  必须初始化，因为发现队列没有初始化才调用的enq()，这里再验证一下</span>
+            <span class="hljs-keyword">if</span> (compareAndSetHead(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Node</span>()))
                 tail = head;
         &#125; <span class="hljs-keyword">else</span> &#123;
             node.prev = t;                       <span class="hljs-comment">// 2</span>
@@ -339,11 +339,11 @@
     &#125;
 &#125;</code></pre>
 
-<h5 id="shouldParkAfterFailedAcquire-prev-curNode-检查当前线程是否应该park"><a href="#shouldParkAfterFailedAcquire-prev-curNode-检查当前线程是否应该park" class="headerlink" title="shouldParkAfterFailedAcquire(prev, curNode) 检查当前线程是否应该park()"></a>shouldParkAfterFailedAcquire(prev, curNode) 检查当前线程是否应该park()</h5><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">shouldParkAfterFailedAcquire</span><span class="hljs-params">(Node pred, Node node)</span> </span>&#123;
-    <span class="hljs-keyword">int</span> ws = pred.waitStatus;
+<h5 id="shouldParkAfterFailedAcquire-prev-curNode-检查当前线程是否应该park"><a href="#shouldParkAfterFailedAcquire-prev-curNode-检查当前线程是否应该park" class="headerlink" title="shouldParkAfterFailedAcquire(prev, curNode) 检查当前线程是否应该park()"></a>shouldParkAfterFailedAcquire(prev, curNode) 检查当前线程是否应该park()</h5><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">shouldParkAfterFailedAcquire</span><span class="hljs-params">(Node pred, Node node)</span> &#123;
+    <span class="hljs-type">int</span> <span class="hljs-variable">ws</span> <span class="hljs-operator">=</span> pred.waitStatus;
     <span class="hljs-keyword">if</span> (ws == Node.SIGNAL)<span class="hljs-comment">//Signal： -1，指示后续线程需要unpark()</span>
         <span class="hljs-comment">//prev的状态是signal，要求释放以发出信号，所以可以安全地park()</span>
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
     <span class="hljs-keyword">if</span> (ws &gt; <span class="hljs-number">0</span>) &#123;
         <span class="hljs-comment">// prev对应的线程被cancelled(取消)</span>
         <span class="hljs-keyword">do</span> &#123;
@@ -360,11 +360,11 @@
 <span class="hljs-comment">         */</span>
         compareAndSetWaitStatus(pred, ws, Node.SIGNAL);
     &#125;
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
 &#125;</code></pre>
 
-<h5 id="parkAndCheckInterrupt-park当前线程并中断"><a href="#parkAndCheckInterrupt-park当前线程并中断" class="headerlink" title="parkAndCheckInterrupt() park当前线程并中断"></a>parkAndCheckInterrupt() park当前线程并中断</h5><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">parkAndCheckInterrupt</span><span class="hljs-params">()</span> </span>&#123;
-    LockSupport.park(<span class="hljs-keyword">this</span>);<span class="hljs-comment">// 挂起当前线程</span>
+<h5 id="parkAndCheckInterrupt-park当前线程并中断"><a href="#parkAndCheckInterrupt-park当前线程并中断" class="headerlink" title="parkAndCheckInterrupt() park当前线程并中断"></a>parkAndCheckInterrupt() park当前线程并中断</h5><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">parkAndCheckInterrupt</span><span class="hljs-params">()</span> &#123;
+    LockSupport.park(<span class="hljs-built_in">this</span>);<span class="hljs-comment">// 挂起当前线程</span>
     <span class="hljs-keyword">return</span> Thread.interrupted();<span class="hljs-comment">//最后在查询线程是否被中断，并返回该中断标识（清除掉了，不处理，return出去交给调用方处理）</span>
 &#125;</code></pre>
 
@@ -378,7 +378,7 @@
 </blockquote>
 <p>在JVM的C语言实现中，每个线程持有一个<code>Parker</code>对象，该<code>Parker</code>对象有三个变量： <code>_counter</code>(始值为0)、<code>_cond</code>、<code>_mutex</code></p>
 <h2 id="park"><a href="#park" class="headerlink" title="park()"></a>park()</h2><p>HotSpot源码（部分）：</p>
-<pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">Parker::park</span><span class="hljs-params">(<span class="hljs-keyword">bool</span> isAbsolute, jlong time)</span> </span>&#123;
+<pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">Parker::park</span><span class="hljs-params">(<span class="hljs-type">bool</span> isAbsolute, jlong time)</span> &#123;
 	<span class="hljs-keyword">if</span> (Atomic::xchg(<span class="hljs-number">0</span>, &amp;_counter) &gt; <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span>;<span class="hljs-comment">// 获取_counter的值并将其置为0，如果原值为1，则什么也不做</span>
     Thread* thread = Thread::current();
     assert(thread-&gt;is Java_thread(), <span class="hljs-string">&quot;Must be JavaThread&quot;</span>);
@@ -430,8 +430,8 @@
 </ul>
 </blockquote>
 <h2 id="unpark-Thread"><a href="#unpark-Thread" class="headerlink" title="unpark(Thread)"></a>unpark(Thread)</h2><p>HotSpot源码：</p>
-<pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">Parker::unpark</span><span class="hljs-params">()</span> </span>&#123;
-    <span class="hljs-keyword">int</span> s, status ;
+<pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">Parker::unpark</span><span class="hljs-params">()</span> &#123;
+    <span class="hljs-type">int</span> s, status ;
     status = pthread_mutex_lock(_mutex);<span class="hljs-comment">// 给当前线程加锁           这里加锁了</span>
     assert (status == <span class="hljs-number">0</span>, <span class="hljs-string">&quot;invariant&quot;</span>);
     s = _counter;

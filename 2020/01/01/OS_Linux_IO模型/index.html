@@ -59,7 +59,7 @@
   </script>
   <script  src="/blog/js/utils.js" ></script>
   <script  src="/blog/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.1"></head>
 
 
 <body>
@@ -337,15 +337,15 @@
 <hr>
 <h1 id="select-poll-epoll"><a href="#select-poll-epoll" class="headerlink" title="select/poll/epoll"></a>select/poll/epoll</h1><p>Linux中IO多路复用的实现</p>
 <h4 id="select"><a href="#select" class="headerlink" title="select"></a>select</h4><p><code>select</code>是<code>POSIX</code>规定的，一般操作系统都有实现。</p>
-<pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;winsock.h&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> __FD_SETSIZE    1024</span>
-<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">select</span><span class="hljs-params">(</span></span>
-<span class="hljs-params"><span class="hljs-function">    <span class="hljs-keyword">int</span> nfds, <span class="hljs-comment">// 本参数忽略，仅起到兼容作用</span></span></span>
-<span class="hljs-params"><span class="hljs-function">    fd_set* readfds, <span class="hljs-comment">// （可选）指针，指向一组等待可读性检查的套接口fd</span></span></span>
-<span class="hljs-params"><span class="hljs-function">    fd_set* writefds, <span class="hljs-comment">// （可选）指针，指向一组等待可写性检查的套接口fd</span></span></span>
-<span class="hljs-params"><span class="hljs-function">    fd_set* exceptfds, <span class="hljs-comment">// （可选）指针，指向一组等待错误检查的套接口fd</span></span></span>
-<span class="hljs-params"><span class="hljs-function">    <span class="hljs-keyword">const</span> struct timeval* timeout <span class="hljs-comment">// timeout：select()最多等待时间，对阻塞操作则应为NULL。</span></span></span>
-<span class="hljs-params"><span class="hljs-function">)</span></span>;</code></pre>
+<pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;winsock.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> __FD_SETSIZE    1024</span>
+<span class="hljs-type">int</span> <span class="hljs-title function_">select</span><span class="hljs-params">(</span>
+<span class="hljs-params">    <span class="hljs-type">int</span> nfds, <span class="hljs-comment">// 本参数忽略，仅起到兼容作用</span></span>
+<span class="hljs-params">    fd_set* readfds, <span class="hljs-comment">// （可选）指针，指向一组等待可读性检查的套接口fd</span></span>
+<span class="hljs-params">    fd_set* writefds, <span class="hljs-comment">// （可选）指针，指向一组等待可写性检查的套接口fd</span></span>
+<span class="hljs-params">    fd_set* exceptfds, <span class="hljs-comment">// （可选）指针，指向一组等待错误检查的套接口fd</span></span>
+<span class="hljs-params">    <span class="hljs-type">const</span> <span class="hljs-keyword">struct</span> timeval* timeout <span class="hljs-comment">// timeout：select()最多等待时间，对阻塞操作则应为NULL。</span></span>
+<span class="hljs-params">)</span>;</code></pre>
 
 <p>select是通过维护一个用来存放大量fd的数据结构，这样会使得用户空间和内核空间在传递这些fd时复制开销也随着fd的数量线性增大。也因此单个进程所打开的fd是有一定限制的，它由<code>FD_SETSIZE</code>设置，默认值是<code>1024</code>。</p>
 <blockquote>
@@ -383,9 +383,9 @@
 
 <p>参数size在2.6.8之后已经没什么用了，这个fd的size是内核动态调整的。不过参数size必须&gt;0。</p>
 <p><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/epoll_create.2.html">https://man7.org/linux/man-pages/man2/epoll_create.2.html</a></p>
-<pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">epoll_create</span><span class="hljs-params">(<span class="hljs-keyword">int</span> size)</span></span>;
+<pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">epoll_create</span><span class="hljs-params">(<span class="hljs-type">int</span> size)</span>;
 
-SYSCALL_DEFINE1(epoll_create, <span class="hljs-keyword">int</span>, size)
+SYSCALL_DEFINE1(epoll_create, <span class="hljs-type">int</span>, size)
 &#123;
     <span class="hljs-keyword">if</span> (size &lt;= <span class="hljs-number">0</span>)
         <span class="hljs-keyword">return</span> -EINVAL;
@@ -396,9 +396,9 @@ SYSCALL_DEFINE1(epoll_create, <span class="hljs-keyword">int</span>, size)
 <span class="hljs-comment"> * Open an eventpoll file descriptor.</span>
 <span class="hljs-comment"> * 打开一个时间循环文件描述符</span>
 <span class="hljs-comment"> */</span>
-SYSCALL_DEFINE1(epoll_create1, <span class="hljs-keyword">int</span>, flags)
+SYSCALL_DEFINE1(epoll_create1, <span class="hljs-type">int</span>, flags)
 &#123;
-    <span class="hljs-keyword">int</span> error, fd;
+    <span class="hljs-type">int</span> error, fd;
     <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">eventpoll</span> *<span class="hljs-title">ep</span> =</span> <span class="hljs-literal">NULL</span>;
     <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file</span> *<span class="hljs-title">file</span>;</span>
 
@@ -441,7 +441,7 @@ out_free_ep:
 &#125;</code></pre>
 </blockquote>
 <h6 id="epoll-ctl-…"><a href="#epoll-ctl-…" class="headerlink" title="epoll_ctl(…)"></a>epoll_ctl(…)</h6><p>epoll_ctl()用于向epoll注册事件，而且明确监听的事件类型</p>
-<pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">epoll_ctl</span><span class="hljs-params">(<span class="hljs-keyword">int</span> epfd, <span class="hljs-keyword">int</span> op, <span class="hljs-keyword">int</span> fd, struct epoll_event *event)</span></span>;
+<pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">epoll_ctl</span><span class="hljs-params">(<span class="hljs-type">int</span> epfd, <span class="hljs-type">int</span> op, <span class="hljs-type">int</span> fd, <span class="hljs-keyword">struct</span> epoll_event *event)</span>;
 <span class="hljs-comment">// epfd: 返回值（epoll文件描述符）</span>
 <span class="hljs-comment">// op: 动作：有三个宏（类似enum）可选：EPOLL_CTL_ADD,EPOLL_CTL_MOD,EPOLL_CTL_DEL</span>
 <span class="hljs-comment">// fd: 要监听的fd</span>
@@ -449,15 +449,15 @@ out_free_ep:
 
 <p>事件的数据结构</p>
 <pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">union</span> <span class="hljs-title">epoll_data</span> &#123;</span>
-    <span class="hljs-keyword">void</span> *ptr;
-    <span class="hljs-keyword">int</span> fd;<span class="hljs-comment">// 事件对应的文件描述符</span>
-    <span class="hljs-keyword">__uint32_t</span> u32;
-    <span class="hljs-keyword">__uint64_t</span> u64;
-&#125; <span class="hljs-keyword">epoll_data_t</span>;
+    <span class="hljs-type">void</span> *ptr;
+    <span class="hljs-type">int</span> fd;<span class="hljs-comment">// 事件对应的文件描述符</span>
+    <span class="hljs-type">__uint32_t</span> u32;
+    <span class="hljs-type">__uint64_t</span> u64;
+&#125; <span class="hljs-type">epoll_data_t</span>;
 
 <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">epoll_event</span> &#123;</span>
-    <span class="hljs-keyword">__uint32_t</span> events; <span class="hljs-comment">/* Epoll events */</span>
-    <span class="hljs-keyword">epoll_data_t</span> data; <span class="hljs-comment">/* User data variable */</span>
+    <span class="hljs-type">__uint32_t</span> events; <span class="hljs-comment">/* Epoll events */</span>
+    <span class="hljs-type">epoll_data_t</span> data; <span class="hljs-comment">/* User data variable */</span>
 &#125;;</code></pre>
 
 
@@ -506,7 +506,7 @@ out_free_ep:
 </li>
 </ol>
 </blockquote>
-<h6 id="epoll-wait-…timeout…"><a href="#epoll-wait-…timeout…" class="headerlink" title="epoll_wait(…timeout…)"></a>epoll_wait(…timeout…)</h6><pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">epoll_wait</span><span class="hljs-params">(<span class="hljs-keyword">int</span> epfd, struct epoll_event *events, <span class="hljs-keyword">int</span> maxevents, <span class="hljs-keyword">int</span> timeout)</span></span>;
+<h6 id="epoll-wait-…timeout…"><a href="#epoll-wait-…timeout…" class="headerlink" title="epoll_wait(…timeout…)"></a>epoll_wait(…timeout…)</h6><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">epoll_wait</span><span class="hljs-params">(<span class="hljs-type">int</span> epfd, <span class="hljs-keyword">struct</span> epoll_event *events, <span class="hljs-type">int</span> maxevents, <span class="hljs-type">int</span> timeout)</span>;
 <span class="hljs-comment">// epfd： 方法返回值</span>
 <span class="hljs-comment">// *events： 调用者自己开辟一块事件数组，用于存储就绪的事件</span>
 <span class="hljs-comment">// maxevents： *events size的最大值</span>
@@ -523,7 +523,7 @@ out_free_ep:
 <span class="hljs-keyword">while</span> <span class="hljs-literal">true</span> &#123;
     active_fd[] = epoll_wait(epollfd) <span class="hljs-comment">// 阻塞 直到有事件就绪(epoll_wait只返回已经就绪的事件)</span>
     <span class="hljs-keyword">for</span> i in active_fd[] &#123; <span class="hljs-comment">// 遍历所有已就绪的fd</span>
-        read <span class="hljs-keyword">or</span> write till unavailable <span class="hljs-comment">// 处理对应的事件</span>
+        read or write till unavailable <span class="hljs-comment">// 处理对应的事件</span>
     &#125;
 &#125;
 <span class="hljs-comment">// --------------------------- 具体代码：网上找的一个socket使用epoll的例子</span>
@@ -551,9 +551,9 @@ epoll_ctl(epfd, EPPOLL_CTL_ADD, ...);
         &#125;
         <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(events[i].events&amp;EPOLLOUT) <span class="hljs-comment">//有数据待发送，写socket</span>
         &#123;
-            struct myepoll_data* md = (myepoll_data*)events[i].data.ptr;    <span class="hljs-comment">//取数据</span>
+            <span class="hljs-keyword">struct</span> myepoll_data* md = (myepoll_data*)events[i].data.ptr;    <span class="hljs-comment">//取数据</span>
             sockfd = md-&gt;fd;
-            send( sockfd, md-&gt;ptr, <span class="hljs-built_in">strlen</span>((<span class="hljs-keyword">char</span>*)md-&gt;ptr), <span class="hljs-number">0</span> );        <span class="hljs-comment">//发送数据</span>
+            send( sockfd, md-&gt;ptr, <span class="hljs-built_in">strlen</span>((<span class="hljs-type">char</span>*)md-&gt;ptr), <span class="hljs-number">0</span> );        <span class="hljs-comment">//发送数据</span>
             ev.data.fd=sockfd;
             ev.events=EPOLLIN|EPOLLET;
             epoll_ctl(epfd,EPOLL_CTL_MOD,sockfd,&amp;ev); <span class="hljs-comment">//修改标识符，等待下一个循环时接收数据</span>
@@ -631,17 +631,17 @@ epoll_ctl(epfd, EPPOLL_CTL_ADD, ...);
 <p><strong>Buffer</strong> 缓冲区 ：有 position、limit 读写指针 和 capacity等核心属性。</p>
 <p><strong>Selector</strong>：</p>
 <p>调用select()是阻塞的，select内部调用（注册到Selector的Channel）ready()是非阻塞的。</p>
-<pre><code class="hljs java">SocketChannel channel = SocketChannel.open();
-channel.configureBlocking(<span class="hljs-keyword">false</span>);<span class="hljs-comment">// 必须 设置channel为非阻塞</span>
-SelectionKey key = channel.register(selector, SelectionKey.OP_READ);<span class="hljs-comment">//像选择器注册一个通道</span></code></pre>
+<pre><code class="hljs java"><span class="hljs-type">SocketChannel</span> <span class="hljs-variable">channel</span> <span class="hljs-operator">=</span> SocketChannel.open();
+channel.configureBlocking(<span class="hljs-literal">false</span>);<span class="hljs-comment">// 必须 设置channel为非阻塞</span>
+<span class="hljs-type">SelectionKey</span> <span class="hljs-variable">key</span> <span class="hljs-operator">=</span> channel.register(selector, SelectionKey.OP_READ);<span class="hljs-comment">//像选择器注册一个通道</span></code></pre>
 
 <p>使用selector获取IO就绪的channel</p>
 <pre><code class="hljs java">Set&lt;SelectionKey&gt; keys = selector.selectedKeys();</code></pre>
 
 <p>通过key获取通道、选择器、或者通道的IO就绪状态</p>
-<pre><code class="hljs java">Selector selector = key.selector();
+<pre><code class="hljs java"><span class="hljs-type">Selector</span> <span class="hljs-variable">selector</span> <span class="hljs-operator">=</span> key.selector();
 SocketChannel = key.channel();
-<span class="hljs-keyword">int</span> readySet = key.readyOps();<span class="hljs-comment">// 用位表示fd的就绪状态</span></code></pre>
+<span class="hljs-type">int</span> <span class="hljs-variable">readySet</span> <span class="hljs-operator">=</span> key.readyOps();<span class="hljs-comment">// 用位表示fd的就绪状态</span></code></pre>
 
 <blockquote>
 <p>如readySet=13（<code>0000 1101</code>），从低位到高位：第一、三、四位为 1，那么说明该channel：读就绪、写就绪，连接就绪。</p>
@@ -656,11 +656,11 @@ SocketChannel = key.channel();
 <span class="hljs-comment"> * Replaces the current &#123;<span class="hljs-doctag">@link</span> Selector&#125; of this event loop with newly created &#123;<span class="hljs-doctag">@link</span> Selector&#125;s to work</span>
 <span class="hljs-comment"> * around the infamous epoll 100% CPU bug.</span>
 <span class="hljs-comment"> */</span>
-<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">rebuildSelector</span><span class="hljs-params">()</span> </span>&#123;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">rebuildSelector</span><span class="hljs-params">()</span> &#123;
     <span class="hljs-keyword">if</span> (!inEventLoop()) &#123;
-        execute(<span class="hljs-keyword">new</span> Runnable() &#123;
+        execute(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Runnable</span>() &#123;
             <span class="hljs-meta">@Override</span>
-            <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;
+            <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> &#123;
                 rebuildSelector0();
             &#125;
         &#125;);

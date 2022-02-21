@@ -59,7 +59,7 @@
   </script>
   <script  src="/blog/js/utils.js" ></script>
   <script  src="/blog/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.1"></head>
 
 
 <body>
@@ -451,24 +451,24 @@
 <p>自己通过 keytool 生成一个证书，</p>
 <ol>
 <li><p>生成服务端私钥 generate private key（.key)</p>
-<pre><code class="hljs pgsql"># Key considerations <span class="hljs-keyword">for</span> algorithm &quot;RSA&quot; ≥ <span class="hljs-number">2048</span>-<span class="hljs-type">bit</span>
-openssl genrsa -<span class="hljs-keyword">out</span> <span class="hljs-keyword">server</span>.key <span class="hljs-number">2048</span>
+<pre><code class="hljs crystal"><span class="hljs-comment"># Key considerations for algorithm &quot;RSA&quot; ≥ 2048-bit</span>
+openssl genrsa -<span class="hljs-keyword">out</span> server.key <span class="hljs-number">2048</span>
 
-# Key considerations <span class="hljs-keyword">for</span> algorithm &quot;ECDSA&quot; ≥ secp384r1
-# List ECDSA the supported curves (openssl ecparam -list_curves)
-openssl ecparam -genkey -<span class="hljs-type">name</span> secp384r1 -<span class="hljs-keyword">out</span> <span class="hljs-keyword">server</span>.key</code></pre>
+<span class="hljs-comment"># Key considerations for algorithm &quot;ECDSA&quot; ≥ secp384r1</span>
+<span class="hljs-comment"># List ECDSA the supported curves (openssl ecparam -list_curves)</span>
+openssl ecparam -genkey -name secp384r1 -<span class="hljs-keyword">out</span> server.key</code></pre>
 </li>
 <li><p>生成服务端自签名证书</p>
 <p><code>openssl req -new -x509 -sha256 -key server.key -out -server.crt -days 3560</code></p>
 </li>
 <li><p>填写信息：</p>
-<pre><code class="hljs less"><span class="hljs-selector-tag">Country</span> <span class="hljs-selector-tag">Name</span> (<span class="hljs-number">2</span> letter code) <span class="hljs-selector-attr">[AU]</span>:<span class="hljs-selector-tag">CN</span>
-<span class="hljs-selector-tag">State</span> <span class="hljs-selector-tag">or</span> <span class="hljs-selector-tag">Province</span> <span class="hljs-selector-tag">Name</span> (full name) <span class="hljs-selector-attr">[Some-State]</span>:<span class="hljs-selector-tag">Guangdong</span>
-<span class="hljs-selector-tag">Locality</span> <span class="hljs-selector-tag">Name</span> (eg, city) <span class="hljs-selector-attr">[]</span>:<span class="hljs-selector-tag">FoShan</span>
-<span class="hljs-selector-tag">Organization</span> <span class="hljs-selector-tag">Name</span> (eg, company) <span class="hljs-selector-attr">[Internet Widgits Pty Ltd]</span>:<span class="hljs-selector-tag">TestCA</span>
-<span class="hljs-selector-tag">Organizational</span> <span class="hljs-selector-tag">Unit</span> <span class="hljs-selector-tag">Name</span> (eg, section) <span class="hljs-selector-attr">[]</span>:
-<span class="hljs-selector-tag">Common</span> <span class="hljs-selector-tag">Name</span> (e.g. server FQDN or YOUR name) <span class="hljs-selector-attr">[]</span>:<span class="hljs-selector-tag">xxx</span><span class="hljs-selector-class">.com</span> #域名
-<span class="hljs-selector-tag">Email</span> <span class="hljs-selector-tag">Address</span> <span class="hljs-selector-attr">[]</span>:</code></pre>
+<pre><code class="hljs pgsql">Country <span class="hljs-type">Name</span> (<span class="hljs-number">2</span> letter code) [AU]:CN
+State <span class="hljs-keyword">or</span> Province <span class="hljs-type">Name</span> (<span class="hljs-keyword">full</span> <span class="hljs-type">name</span>) [<span class="hljs-keyword">Some</span>-State]:Guangdong
+Locality <span class="hljs-type">Name</span> (eg, city) []:FoShan
+Organization <span class="hljs-type">Name</span> (eg, company) [Internet Widgits Pty Ltd]:TestCA
+Organizational Unit <span class="hljs-type">Name</span> (eg, section) []:
+Common <span class="hljs-type">Name</span> (e.g. <span class="hljs-keyword">server</span> FQDN <span class="hljs-keyword">or</span> YOUR <span class="hljs-type">name</span>) []:xxx.com #域名
+Email Address []:</code></pre>
 
 
 

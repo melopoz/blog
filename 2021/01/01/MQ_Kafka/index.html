@@ -59,7 +59,7 @@
   </script>
   <script  src="/blog/js/utils.js" ></script>
   <script  src="/blog/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.1"></head>
 
 
 <body>
@@ -290,8 +290,8 @@ Leader-epoch-<span class="hljs-keyword">checkpoint</span></code></pre>
 <li><p>Sync Producer：低延迟，低吞吐率，无数据丢失</p>
 </li>
 <li><p>Async Producer：高延迟，高吞吐率，可能会有数据丢失</p>
-<pre><code class="hljs java"><span class="hljs-function">Future&lt;RecordMetadata&gt; <span class="hljs-title">send</span><span class="hljs-params">(ProducerRecord&lt;K, V&gt; record)</span></span>;
-<span class="hljs-function">Future&lt;RecordMetadata&gt; <span class="hljs-title">send</span><span class="hljs-params">(ProducerRecord&lt;K, V&gt; record, Callback callback)</span></span>;</code></pre>
+<pre><code class="hljs java">Future&lt;RecordMetadata&gt; <span class="hljs-title function_">send</span><span class="hljs-params">(ProducerRecord&lt;K, V&gt; record)</span>;
+Future&lt;RecordMetadata&gt; <span class="hljs-title function_">send</span><span class="hljs-params">(ProducerRecord&lt;K, V&gt; record, Callback callback)</span>;</code></pre>
 
 </li>
 </ul>
@@ -470,15 +470,15 @@ group<span class="hljs-selector-class">.max</span><span class="hljs-selector-cla
 <h4 id="如何处理replica的全部宕机"><a href="#如何处理replica的全部宕机" class="headerlink" title="如何处理replica的全部宕机"></a>如何处理replica的全部宕机</h4><p><a href="#%E5%A4%87%E4%BB%BD%E6%81%A2%E5%A4%8D%E6%9C%BA%E5%88%B6">备份恢复机制</a></p>
 <h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p>配置文件<code>config/server.properties</code></p>
 <pre><code class="hljs properties"><span class="hljs-comment">#日志所在目录</span>
-<span class="hljs-meta">log.dirs</span>=<span class="hljs-string">/tmp/Kafka-logs</span>
+<span class="hljs-attr">log.dirs</span>=<span class="hljs-string">/tmp/Kafka-logs</span>
 <span class="hljs-comment">#开启可能会造成数据丢失</span>
-<span class="hljs-meta">unclean.Leader.election.enable</span>=<span class="hljs-string">false</span>
+<span class="hljs-attr">unclean.Leader.election.enable</span>=<span class="hljs-string">false</span>
 <span class="hljs-comment">#如果Leader发现Follower有 多久(10s) 没有发送fetch请求了，那么Leader就把它从ISR移除。</span>
-<span class="hljs-meta">replica.lag.time.max.ms</span>=<span class="hljs-string">10000</span>
+<span class="hljs-attr">replica.lag.time.max.ms</span>=<span class="hljs-string">10000</span>
 <span class="hljs-comment">#至少保证ISR中有几个replica</span>
-<span class="hljs-meta">min.insync.replicas</span>=<span class="hljs-string">1</span>
+<span class="hljs-attr">min.insync.replicas</span>=<span class="hljs-string">1</span>
 <span class="hljs-comment">#发送确认机制：0/1/-1</span>
-<span class="hljs-meta">request.required.asks</span>=<span class="hljs-string">0</span></code></pre>
+<span class="hljs-attr">request.required.asks</span>=<span class="hljs-string">0</span></code></pre>
 
 
 

@@ -59,7 +59,7 @@
   </script>
   <script  src="/blog/js/utils.js" ></script>
   <script  src="/blog/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.1"></head>
 
 
 <body>
@@ -243,33 +243,33 @@
 <p><a target="_blank" rel="noopener" href="https://blog.csdn.net/u010833547/article/details/90289325">https://blog.csdn.net/u010833547/article/details/90289325</a></p>
 <p>软引用是在内存空间不足的时候才会被回收, 这只是比较简单的形容. </p>
 <p>首先看一下SoftReference类和描述</p>
-<pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SoftReference</span>&lt;<span class="hljs-title">T</span>&gt; <span class="hljs-keyword">extends</span> <span class="hljs-title">Reference</span>&lt;<span class="hljs-title">T</span>&gt; </span>&#123;
+<pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SoftReference</span>&lt;T&gt; <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Reference</span>&lt;T&gt; &#123;
     <span class="hljs-comment">/**</span>
 <span class="hljs-comment">     * Timestamp clock, updated by the garbage collector</span>
 <span class="hljs-comment">     */</span>
-    <span class="hljs-keyword">static</span> <span class="hljs-keyword">private</span> <span class="hljs-keyword">long</span> clock;<span class="hljs-comment">// ------------每次GC会更新这个时间戳</span>
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">private</span> <span class="hljs-type">long</span> clock;<span class="hljs-comment">// ------------每次GC会更新这个时间戳</span>
 
     <span class="hljs-comment">/**</span>
 <span class="hljs-comment">     * Timestamp updated by each invocation of the get method.  The VM may use</span>
 <span class="hljs-comment">     * this field when selecting soft references to be cleared, but it is not</span>
 <span class="hljs-comment">     * required to do so.</span>
 <span class="hljs-comment">     */</span>
-    <span class="hljs-keyword">private</span> <span class="hljs-keyword">long</span> timestamp;<span class="hljs-comment">// ------------每次使用(构造、get)会更新这个时间戳</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-type">long</span> timestamp;<span class="hljs-comment">// ------------每次使用(构造、get)会更新这个时间戳</span>
 
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">SoftReference</span><span class="hljs-params">(T referent)</span> </span>&#123;
-        <span class="hljs-keyword">super</span>(referent);
-        <span class="hljs-keyword">this</span>.timestamp = clock;
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">SoftReference</span><span class="hljs-params">(T referent)</span> &#123;
+        <span class="hljs-built_in">super</span>(referent);
+        <span class="hljs-built_in">this</span>.timestamp = clock;
     &#125;
 
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">SoftReference</span><span class="hljs-params">(T referent, ReferenceQueue&lt;? <span class="hljs-keyword">super</span> T&gt; q)</span> </span>&#123;
-        <span class="hljs-keyword">super</span>(referent, q);
-        <span class="hljs-keyword">this</span>.timestamp = clock;
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">SoftReference</span><span class="hljs-params">(T referent, ReferenceQueue&lt;? <span class="hljs-built_in">super</span> T&gt; q)</span> &#123;
+        <span class="hljs-built_in">super</span>(referent, q);
+        <span class="hljs-built_in">this</span>.timestamp = clock;
     &#125;
 
-    <span class="hljs-function"><span class="hljs-keyword">public</span> T <span class="hljs-title">get</span><span class="hljs-params">()</span> </span>&#123;
-        T o = <span class="hljs-keyword">super</span>.get();
-        <span class="hljs-keyword">if</span> (o != <span class="hljs-keyword">null</span> &amp;&amp; <span class="hljs-keyword">this</span>.timestamp != clock)
-            <span class="hljs-keyword">this</span>.timestamp = clock;
+    <span class="hljs-keyword">public</span> T <span class="hljs-title function_">get</span><span class="hljs-params">()</span> &#123;
+        <span class="hljs-type">T</span> <span class="hljs-variable">o</span> <span class="hljs-operator">=</span> <span class="hljs-built_in">super</span>.get();
+        <span class="hljs-keyword">if</span> (o != <span class="hljs-literal">null</span> &amp;&amp; <span class="hljs-built_in">this</span>.timestamp != clock)
+            <span class="hljs-built_in">this</span>.timestamp = clock;
         <span class="hljs-keyword">return</span> o;
     &#125;
 

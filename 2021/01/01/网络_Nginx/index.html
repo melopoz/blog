@@ -59,7 +59,7 @@
   </script>
   <script  src="/blog/js/utils.js" ></script>
   <script  src="/blog/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.1"></head>
 
 
 <body>
@@ -273,8 +273,8 @@
 <h5 id="指定正则表达式捕获片段之后可以当做一个变量来使用："><a href="#指定正则表达式捕获片段之后可以当做一个变量来使用：" class="headerlink" title="指定正则表达式捕获片段之后可以当做一个变量来使用："></a>指定<strong>正则</strong>表达式<strong>捕获片段</strong>之后可以<strong>当做一个变量</strong>来使用：</h5><blockquote>
 <pre><code class="hljs nginx"><span class="hljs-section">server</span> &#123;
     <span class="hljs-attribute">server_name</span>   ~^(www\.)?(?&lt;domain&gt;.+)$;
-    <span class="hljs-attribute">location</span> / &#123;
-        <span class="hljs-attribute">root</span>   /sites/$domain;
+    <span class="hljs-section">location</span> / &#123;
+        <span class="hljs-attribute">root</span>   /sites/<span class="hljs-variable">$domain</span>;
     &#125;
 &#125;</code></pre>
 
@@ -288,7 +288,7 @@
 <p>这种使用方式尽量限制在简单案例中使用，因为数字引用形式很容易被覆盖。</p>
 <pre><code class="hljs nginx"><span class="hljs-section">server</span> &#123;
     <span class="hljs-attribute">server_name</span>   ~^(www\.)?(.+)$;
-    <span class="hljs-attribute">location</span> / &#123;
+    <span class="hljs-section">location</span> / &#123;
         <span class="hljs-attribute">root</span>   /sites/<span class="hljs-variable">$2</span>;
     &#125;
 &#125;</code></pre>
@@ -347,7 +347,7 @@
     <span class="hljs-attribute">listen</span> <span class="hljs-number">80</span>;
     <span class="hljs-attribute">server_name</span> melopoz.top;
     <span class="hljs-comment">#将请求转成https</span>
-    <span class="hljs-attribute">rewrite</span><span class="hljs-regexp"> ^(.*)$</span> https://$host<span class="hljs-variable">$1</span> <span class="hljs-literal">permanent</span>;
+    <span class="hljs-attribute">rewrite</span><span class="hljs-regexp"> ^(.*)$</span> https://<span class="hljs-variable">$host</span><span class="hljs-variable">$1</span> <span class="hljs-literal">permanent</span>;
 &#125;</code></pre>
 
 <p>私钥应该限制访问权限，如果证书和私钥都在一个文件里的话，也只有证书会发送到客户端。</p>
@@ -392,7 +392,7 @@
 <li>IP哈希（基于客户端的IP地址进行hash，一个客户端的请求每次都是被同一个机器处理（机器没有下线））</li>
 </ul>
 <pre><code class="hljs nginx"><span class="hljs-section">http</span> &#123;
-    <span class="hljs-attribute">upstream</span> myapp1 &#123;
+    <span class="hljs-section">upstream</span> myapp1 &#123;
         <span class="hljs-comment"># ---这里配置使用的负载均衡策略</span>
         <span class="hljs-comment"># 默认轮询</span>
         <span class="hljs-comment"># least_conn</span>
@@ -404,7 +404,7 @@
     &#125;
     <span class="hljs-section">server</span> &#123;
         <span class="hljs-attribute">listen</span> <span class="hljs-number">80</span>;
-        <span class="hljs-attribute">location</span> / &#123;
+        <span class="hljs-section">location</span> / &#123;
             <span class="hljs-attribute">proxy_pass</span> http://myapp1;<span class="hljs-comment"># 如果是https 则直接用https即可</span>
         &#125;
     &#125;

@@ -59,7 +59,7 @@
   </script>
   <script  src="/blog/js/utils.js" ></script>
   <script  src="/blog/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.1"></head>
 
 
 <body>
@@ -244,21 +244,21 @@ $ ssh localhost                         <span class="hljs-comment">#登陆SSH，
 $ <span class="hljs-built_in">exit</span>                                  <span class="hljs-comment">#退出登录的ssh localhost</span>
 $ <span class="hljs-built_in">cd</span> ~/.ssh/                            <span class="hljs-comment">#如果没法进入该目录，执行一次ssh localhost</span>
 $ ssh-keygen -t rsa　<span class="hljs-comment">#然后的三次输入都确定即可 直接回车</span>
-$ cat ./id_rsa.pub &gt;&gt; ./authorized_keys <span class="hljs-comment">#加入授权</span>
+$ <span class="hljs-built_in">cat</span> ./id_rsa.pub &gt;&gt; ./authorized_keys <span class="hljs-comment">#加入授权</span>
 $ ssh localhost                         <span class="hljs-comment">#此时已不需密码即可登录localhost，如果失败则可以搜索SSH免密码登录来寻求答案</span></code></pre>
 </li>
 <li><p>下载hadoop-xxx.tar.gz解压到/usr/local/hadoop…</p>
-<pre><code class="hljs sh">   sudo tar -zxvf hadoop-xxx.tar.gz -C /usr/<span class="hljs-built_in">local</span>
-   <span class="hljs-built_in">cd</span> /usr/<span class="hljs-built_in">local</span>
-mv hadoop-xxx/ hadoop/ <span class="hljs-comment">#将/usr/local/hadoop-xxx 改名为 /usr/local/hadoop</span>
-   sudo chown -R hadoop ./hadoop <span class="hljs-comment">#授权  </span>
-sudo chmod 777 /usr/<span class="hljs-built_in">local</span>/hadoop</code></pre>
+<pre><code class="hljs sh">   sudo tar -zxvf hadoop-xxx.tar.gz -C /usr/local
+   <span class="hljs-built_in">cd</span> /usr/local
+<span class="hljs-built_in">mv</span> hadoop-xxx/ hadoop/ <span class="hljs-comment">#将/usr/local/hadoop-xxx 改名为 /usr/local/hadoop</span>
+   sudo <span class="hljs-built_in">chown</span> -R hadoop ./hadoop <span class="hljs-comment">#授权  </span>
+sudo <span class="hljs-built_in">chmod</span> 777 /usr/local/hadoop</code></pre>
 </li>
 <li><p>配置环境变量 (已配置JAVA的环境变量)</p>
 <pre><code class="hljs shell">sudo vim /etc/profile</code></pre>
 
-<pre><code class="hljs sh"><span class="hljs-built_in">export</span> JAVA_HOME=/usr/<span class="hljs-built_in">local</span>/jdk1.8
-<span class="hljs-built_in">export</span> HADOOP_HOME=/usr/<span class="hljs-built_in">local</span>/hadoop
+<pre><code class="hljs sh"><span class="hljs-built_in">export</span> JAVA_HOME=/usr/local/jdk1.8
+<span class="hljs-built_in">export</span> HADOOP_HOME=/usr/local/hadoop
 <span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$HADOOP_HOME</span>/bin:<span class="hljs-variable">$HADOOP_HOME</span>/sbin:<span class="hljs-variable">$JAVA_HOME</span>/bin
 
 <span class="hljs-comment">#export CLASSPATH=$($HADOOP_HOME/bin/hadoop classpath):$CLASSPATH</span>
@@ -333,7 +333,7 @@ sudo chmod 777 /usr/<span class="hljs-built_in">local</span>/hadoop</code></pre>
 </blockquote>
 <ol>
 <li><p>配置hadoop-env.sh,添加环境变量</p>
-<pre><code class="hljs sh"><span class="hljs-built_in">export</span> JAVA_HOME=/usr/<span class="hljs-built_in">local</span>/jdk1.8</code></pre>
+<pre><code class="hljs sh"><span class="hljs-built_in">export</span> JAVA_HOME=/usr/local/jdk1.8</code></pre>
 </li>
 <li><p>修改core-site.xml文件</p>
 <blockquote>
@@ -486,7 +486,7 @@ sbin/mr-jobhistory-daemon.sh stop historyserver</code></pre>
 </blockquote>
 </li>
 <li><p>map reduce</p>
-<pre><code class="hljs sh">hadoop jar /usr/<span class="hljs-built_in">local</span>/hadoop-2.10.0/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.10.0.jar wordcount /input /output</code></pre>
+<pre><code class="hljs sh">hadoop jar /usr/local/hadoop-2.10.0/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.10.0.jar wordcount /input /output</code></pre>
 </li>
 <li><p>查看结果</p>
 <blockquote>

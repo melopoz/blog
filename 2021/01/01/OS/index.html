@@ -59,7 +59,7 @@
   </script>
   <script  src="/blog/js/utils.js" ></script>
   <script  src="/blog/js/color-schema.js" ></script>
-<meta name="generator" content="Hexo 5.4.0"></head>
+<meta name="generator" content="Hexo 5.4.1"></head>
 
 
 <body>
@@ -430,10 +430,10 @@
 <p>java.nio.channels.FileChannel#transferFrom()/transferTo()</p>
 <blockquote>
 <p>使用 sendfile</p>
-<pre><code class="hljs java">File file = <span class="hljs-keyword">new</span> File(<span class="hljs-string">&quot;demo.zip&quot;</span>);
-RandomAccessFile raf = <span class="hljs-keyword">new</span> RandomAccessFile(file, <span class="hljs-string">&quot;rw&quot;</span>);
-FileChannel fileChannel = raf.getChannel();
-SocketChannel socketChannel = SocketChannel.open(<span class="hljs-keyword">new</span> InetSocketAddress(<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-number">1234</span>));
+<pre><code class="hljs java"><span class="hljs-type">File</span> <span class="hljs-variable">file</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">File</span>(<span class="hljs-string">&quot;demo.zip&quot;</span>);
+<span class="hljs-type">RandomAccessFile</span> <span class="hljs-variable">raf</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RandomAccessFile</span>(file, <span class="hljs-string">&quot;rw&quot;</span>);
+<span class="hljs-type">FileChannel</span> <span class="hljs-variable">fileChannel</span> <span class="hljs-operator">=</span> raf.getChannel();
+<span class="hljs-type">SocketChannel</span> <span class="hljs-variable">socketChannel</span> <span class="hljs-operator">=</span> SocketChannel.open(<span class="hljs-keyword">new</span> <span class="hljs-title class_">InetSocketAddress</span>(<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-number">1234</span>));
 <span class="hljs-comment">// 直接使用了transferTo()进行通道间的数据传输</span>
 fileChannel.transferTo(<span class="hljs-number">0</span>, fileChannel.size(), socketChannel);</code></pre>
 
